@@ -1,0 +1,5 @@
+## code to prepare `DATASET` dataset goes here
+
+sample_data=read.csv(file = "D:/paper/longitudanal data/single_networks/project_expo/ddata.csv")[1:100,2:23]
+sample_data=as.matrix(sample_data)
+

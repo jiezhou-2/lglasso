@@ -1,0 +1,62 @@
+[
+    {
+        "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+        "file_last_write": 1639775743.0,
+        "definitions": [
+            {
+                "usr": "c:@F@rcpparma_hello_world#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "rcpparma_hello_world",
+                "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+                "line": 19,
+                "column": 11
+            },
+            {
+                "usr": "c:@F@rcpparma_outerproduct#&1I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "rcpparma_outerproduct(const int &)",
+                "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+                "line": 31,
+                "column": 11
+            },
+            {
+                "usr": "c:@F@rcpparma_innerproduct#&1I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "rcpparma_innerproduct(const int &)",
+                "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+                "line": 39,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@rcpparma_bothproducts#&1I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "rcpparma_bothproducts(const int &)",
+                "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+                "line": 48,
+                "column": 12
+            },
+            {
+                "usr": "c:@F@phifunction#1I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "phifunction(const int, double, double)",
+                "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+                "line": 62,
+                "column": 11
+            },
+            {
+                "usr": "c:@F@iss#I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "iss(int, double, double)",
+                "file": "C:/Users/jie/Desktop/lglasso/src/rcpparma_hello_world.cpp",
+                "line": 87,
+                "column": 11
+            }
+        ]
+    }
+]
