@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/jiezhou-2/lglasso/workflows/R-CMD-check/badge.svg)](https://github.com/jiezhou-2/lglasso/actions)
+
+[![CRAN status](https://www.r-pkg.org/badges/version/lglasso)](https://CRAN.R-project.org/package=lglasso)
 <!-- badges: end -->
 
 The goal of lglasso is to estimate the Gaussian graphical model(network)
