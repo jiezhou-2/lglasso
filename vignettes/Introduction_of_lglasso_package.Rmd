@@ -1,5 +1,5 @@
 ---
-title: "Introduction of lglasso package"
+title: "Introduction_of_lglasso_package"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction_of_lglasso_package}

@@ -1,8 +1,0 @@
-"0","c=lglasso(data = sample_data, rho = 0.7, heter=T, ty=0)"
-"1","[1]"
-"1"," ""Iteration 1: Mean value of tau's=0"""
-"1","
-"
-"2","Error in solve.default(phi) : 
-  Lapack routine dgesv: system is exactly singular: U[2,2] = 0
-"
