@@ -3,3 +3,4 @@
 ^README\.Rmd$
 ^data-raw$
 ^sample_data.rda$
+^scripts

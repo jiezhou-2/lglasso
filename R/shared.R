@@ -120,17 +120,19 @@ mle_net=function(data,priori){
 #' then a list with two components is returned which are respectively the estimate of correlation parameter \code{tau} and precision matrix \code{omega}.
 #' @export
 
-lglasso=function(data, rho,heter=TRUE,type=1, tole=0.01,lower=0.01,upper=10){
+lglasso=function(data,x=NULL, rho,heter=TRUE,type=1, tole=0.01,lower=0.01,upper=10){
   if (heter==TRUE){
+    if (is.null(x)){
     aa=heterlongraph(data=data,rho=rho,type=type,tole=tole,lower=lower,upper=upper)
   }else{
-    if (heter==FALSE){
-      aa=homolongraph(data=data,rho=rho,type=type,tole=tole,lower=lower,upper=upper)
-    }else{
-      stop("Parameter heter only accept TRUE or FALSE!")
-    }
+    aa=covaheterlongraph(data=data,covariates=x,rho=rho,type=type,tole=tole,lower=lower,upper=upper)
   }
+    }else{
+      aa=homolongraph(data=data,rho=rho,type=type,tole=tole,lower=lower,upper=upper)
+  }
+
   return(aa)
+
 }
 
 
@@ -157,11 +159,15 @@ lglasso=function(data, rho,heter=TRUE,type=1, tole=0.01,lower=0.01,upper=10){
 #' the output also include the estimate of alpha where \code{tau~exp(alpha)}
 #' @author Jie Zhou
 #' @export
-mle=function(data,network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=10){
+mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=10){
   mlenetwork=mle_net(data = data[,-c(1,2)],priori = network)
   if (heter==TRUE){
+    if (is.null(x)){
     mle=mle_alpha(data=data,alpha0=1,omega=mlenetwork, type=type, tole=tole, lower=lower,upper=upper)
-  }else{
+    }else{
+    mle=covamle_alpha(data=data,covariates=x,alpha0=1,omega=mlenetwork, type=type, tole=tole, lower=lower,upper=upper)
+    }
+    }else{
     mle=mle_tau(data=data, omega=mlenetwork, type=type,lower=lower,upper=upper)
   }
   if (heter==TRUE){

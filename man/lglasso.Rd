@@ -6,6 +6,7 @@
 \usage{
 lglasso(
   data,
+  x = NULL,
   rho,
   heter = TRUE,
   type = 1,

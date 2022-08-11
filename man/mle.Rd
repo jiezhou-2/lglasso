@@ -6,6 +6,7 @@
 \usage{
 mle(
   data,
+  x = NULL,
   network,
   heter = TRUE,
   type = 1,
