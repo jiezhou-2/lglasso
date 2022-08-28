@@ -23,7 +23,7 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
   tau1=rep(0,m)
   k=1
   while(1){
-    print(paste("Iteration ",k,":", " Mean value of tau's","=", mean(tau1),sep=""))
+    print(paste("Iteration ",k,":", " Mean value of tau",":", mean(tau1),sep=""))
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
       if (nrow(idata)==1){
@@ -108,7 +108,7 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 
 
 
-#' Complete likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model
+#' Negative likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model
 #'
 #' @param idata Data matrix for the subject i in which the first column is id for subject, the second column is
 #' the time points of observation.  Columns 2 to (p+2) is the observations for p variables.
@@ -137,20 +137,5 @@ logdensity=function(idata,omega,tau,alpha,type){
 }
 
 
-#' Likelihood for alpha
-#'
-#' @param a Coefficient vector for covariates
-#' @param covariates Covariates that affect auto correlations
-#' @param tauhat Given vector of auto correlations
-#'
-#' @return Likihood value for a
-#'
-alikehood=function(a,covariates,tauhat){
-  alpha=covariates%*%a
-  a1=sum(alpha)
-  a2=t(exp(alpha))%*%tauhat
-  c=a1-a2
-  return(c)
-}
 
 

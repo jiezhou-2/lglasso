@@ -2,7 +2,7 @@
 % Please edit documentation in R/heter.R
 \name{logdensity}
 \alias{logdensity}
-\title{Complete likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model}
+\title{Negative likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model}
 \usage{
 logdensity(idata, omega, tau, alpha, type)
 }
@@ -22,7 +22,7 @@ the time points of observation.  Columns 2 to (p+2) is the observations for p va
 Value of complete likelihood function at given value of omega, tau and alpha
 }
 \description{
-Complete likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model
+Negative likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model
 }
 \author{
 Jie Zhou

@@ -60,6 +60,7 @@ iss=function(idata,itau,type){
 #' @return The maximum likelihood estimation
 
 mle_net=function(data,priori){
+  data=data[,-c(1,2)]
   priori=priori+t(priori)
   priori=ifelse(priori==0,0,1)
   diag(priori)=0
@@ -160,7 +161,7 @@ lglasso=function(data,x=NULL, rho,heter=TRUE,type=1, tole=0.01,lower=0.01,upper=
 #' @author Jie Zhou
 #' @export
 mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=10){
-  mlenetwork=mle_net(data = data[,-c(1,2)],priori = network)
+  mlenetwork=mle_net(data = data,priori = network)
   if (heter==TRUE){
     if (is.null(x)){
     mle=mle_alpha(data=data,alpha0=1,omega=mlenetwork, type=type, tole=tole, lower=lower,upper=upper)

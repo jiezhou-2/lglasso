@@ -2,9 +2,9 @@
 % Please edit documentation in R/covariate.R
 \name{covalogdensity}
 \alias{covalogdensity}
-\title{Complete likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model}
+\title{Negative likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model}
 \usage{
-covalogdensity(idata, covariates, omega, tau, alpha, type)
+covalogdensity(idata, icovariates, omega, tau, coe, type)
 }
 \arguments{
 \item{idata}{Data matrix for the subject i in which the first column is id for subject, the second column is
@@ -14,17 +14,17 @@ the time points of observation.  Columns 2 to (p+2) is the observations for p va
 
 \item{tau}{Correlation parameter}
 
-\item{alpha}{Parameter in exponential distribution}
-
 \item{type}{Type of correlation function, which can take either  "abs" or "qua".}
 
 \item{x}{Vector standing for the covariates affecting auto correlations}
+
+\item{alpha}{Parameter in exponential distribution}
 }
 \value{
 Value of complete likelihood function at given value of omega, tau and alpha
 }
 \description{
-Complete likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model
+Negative likelihood function used in EM algorithm of heterogeneous marginal graphical lasso model
 }
 \author{
 Jie Zhou
