@@ -12,7 +12,7 @@
 #' @return list with length equal to 5.
 #' @export
 
-power_compare=function(m,n,p,coe,l,rho,prob){
+power_compare=function(m,n,p,coe,l,rho,prob,heter){
 results=vector("list",length = 5) # container for the final FPR and TPR
 age=vector("list",m) #generate the time points container
 for (i in 1:5) {
@@ -36,7 +36,11 @@ for (h in 1:l){
   }
 
   ## generate the network data
+  if (heter==TRUE){
   ss=sim_heter(p = p,prob=prob,alpha = alpha,age = age)
+  }else{
+    ss=sim_homo(p = p,prob=prob,tau = 1/alpha,age = age)
+  }
   simdata=ss$data
   tau=ss$tau
   lower=min(abs(tau))
@@ -46,20 +50,28 @@ for (h in 1:l){
   id=unique(dd[,1])
   covariate=cbind(id,x)
   ##estiamte the network based on lglasso
-  aa=lglasso(data = dd,x=covariate, rho = rho,heter=T, type=1)
+  if (heter==TRUE){
+  if (length(which(coe==0))==1){
+    aa=lglasso(data = dd, rho = rho,heter=T)
+  }else{
+    aa=lglasso(data = dd,x=covariate, rho = rho,heter=T)
+  }
+  }else{
+    aa=lglasso(data = dd, rho = rho)
+  }
   results[[1]][h,]=as.numeric(comparison(graph,aa$omega))
   ##estiamte the network based on glasso
   s=cov(dd[,-c(1,2)])
-  aa1=glasso(s=s,rho=rho)$wi
+  aa1=glasso(s=s,rho=2*rho)$wi
   results[[2]][h,]=as.numeric(comparison(graph,aa1))
   ##estiamte the network based on nh
-  aa2=addition(data=dd,lambda=rho/2)
+  aa2=addition(data=dd,lambda=1.3*rho)
   results[[3]][h,]=as.numeric(comparison(graph,aa2))
   ##estiamte the network based on CO1
-  aa3=selectFast(s,family="C01",K=0.00001)$C01$G
+  aa3=selectFast(s,family="C01",K=0.6)$C01$G
   results[[4]][h,]=as.numeric(comparison(graph,aa3))
   ##estiamte the network based on EW
-  aa4=selectFast(s,family="LA",K=0.00001)$LA$G
+  aa4=selectFast(s,family="LA",K=0.6)$LA$G
   results[[5]][h,]=as.numeric(comparison(graph,aa4))
 }
 bb=matrix(nrow = 5,ncol = 2)
@@ -75,7 +87,7 @@ for (i in 1:5) {
 }
   bb[i,]=apply(ff, 2, mean)
   }
-return(bb)
+return(list(bb,results))
 }
 
 

@@ -78,8 +78,8 @@ comparison=function(real, estimate){
   diag(real)=1
   estimate=estimate+t(estimate)
   diag(estimate)=1
-  N1=ifelse(abs(real)<=10^(-1),0,1)
-  N2=ifelse(abs(estimate)<=10^(-2),0,1)
+  N1=ifelse(abs(real)<=10^(-5),0,1)
+  N2=ifelse(abs(estimate)<=10^(-5),0,1)
   if (any(dim(N1)!=dim(N2)))
     stop("Two matrixes should have the same dimension")
   p=dim(real)[1]
