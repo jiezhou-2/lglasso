@@ -97,3 +97,32 @@ comparison=function(real, estimate){
   return(aa)
 }
 
+
+
+
+#' Using regression to find the network matrix
+#' @param data Matrix representing the n observations for p variable
+#' @param lambda Tuning parameter for lasso
+#'
+#' @return Matrix representing the network
+#' @export
+addition=function(data,lambda){
+  data=data[,-c(1,2)]
+  p=ncol(data)
+  n=nrow(data)
+  arr=matrix(0,nrow=p,ncol=p)
+
+  for (i in 1:p) {
+    x=as.matrix(data[,-i])
+    y=data[,i]
+    result=glmnet::glmnet(x=x,y=y, family="gaussian",lambda = lambda)
+    bb=as.matrix(result$beta)
+    arr[i,-i]=bb
+  }
+  web=arr+t(arr)
+  return(web)
+}
+
+
+
+

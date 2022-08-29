@@ -33,7 +33,7 @@ graph=ss$precision
   ##homogeneous for temglasso+ebic
   sglasso=cov(dd[,-c(1,2)])
     aa=addition(data=dd[,-c(1,2)],lambda=rho)
-    result=rbind(result,as.numeric(comparison(graph,aa))) 
+    result=rbind(result,as.numeric(comparison(graph,aa)))
 }
 a1=summary(result[,1])
 a2=summary(result[,2])

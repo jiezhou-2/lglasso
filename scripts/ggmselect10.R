@@ -2,14 +2,15 @@
 source("joint1.R")
 source("joint2.R")
 library(glasso)
+library(GGMselect)
 source("simulation_bdgraph_2.R")
 ## generate the data
-m=1
-ni=100
+m=20
+ni=10
 p=80
-alpha=10
+alpha=14
 age=vector("list",m)
-l=500
+l=50
 rho=0.08
 pool1=matrix(nrow = l,ncol = 2)
 for (h in 1:l){
@@ -31,10 +32,8 @@ for (i in 1:m) {
   dd=rbind(dd,data[[i]])
 }
 s=cov(dd[,-c(1,2)])
-##homogeneous for temglasso+ebic
-  ##aa1=longraph_homo(data = dd,tau0 = tau,omega0 = pp,rho = rho,tole = 0.001, lower = 5,upper = 5, type = "abs")$omega
-aa1=glasso(s=s,rho=rho)$wi
-  pool1[h,]=as.numeric(comparison(graph,aa1))
+aa1=selectFast(s,family="C01",K=0.3)$C01$G
+  pool1[h,]=as.numeric(comparison(graph,aa1)) 
 }
 a1=summary(pool1[,1])
 a2=summary(pool1[,2])
