@@ -68,10 +68,10 @@ for (h in 1:l){
   aa2=addition(data=dd,lambda=1.3*rho)
   results[[3]][h,]=as.numeric(comparison(graph,aa2))
   ##estiamte the network based on CO1
-  aa3=selectFast(s,family="C01",K=0.6)$C01$G
+  aa3=selectFast(s,family="C01",K=2*rho)$C01$G
   results[[4]][h,]=as.numeric(comparison(graph,aa3))
   ##estiamte the network based on EW
-  aa4=selectFast(s,family="LA",K=0.6)$LA$G
+  aa4=selectFast(s,family="LA",K=2*rho)$LA$G
   results[[5]][h,]=as.numeric(comparison(graph,aa4))
 }
 bb=matrix(nrow = 5,ncol = 2)
