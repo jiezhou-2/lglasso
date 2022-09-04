@@ -14,7 +14,6 @@ l=10
 rho=0.08
 pool1=matrix(nrow = l,ncol = 2)
 for (h in 1:l){
-  print(h)
 for (k in 1:m) {
   a1=rpois(n=ni,lambda = 1)
   age[[k]][1]=max(a1[1],0.5)
@@ -33,11 +32,10 @@ for (i in 1:m) {
 }
 s=cov(dd[,-c(1,2)])
 aa1=selectFast(s,family="EW",K=0.6)$EW$G
-  pool1[h,]=as.numeric(comparison(graph,aa1)) 
+  pool1[h,]=as.numeric(comparison(graph,aa1))
 }
 a1=summary(pool1[,1])
 a2=summary(pool1[,2])
 a=rbind(a1,a2)
-write.csv(a,file="a10_EW.csv")
 
 

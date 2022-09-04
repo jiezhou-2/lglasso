@@ -1,6 +1,19 @@
 
 
 
+#' Title
+#'
+#' @param m number of subjects
+#' @param n number of observations per subjects
+#' @param p the dimension of the data to be generated
+#' @param coe coefficients for covariates
+#' @param l the simulation scale
+#' @param rho tuning parameter for glasso
+#' @param prob the density of the network
+#' @param heter indicator
+#'
+#' @return list
+#' @export
 power_compare2=function(m,n,p,coe,l,rho,prob,heter){
   results=vector("list",length = 2) # container for the final FPR and TPR
   results[[1]]=vector("list",length = length(rho))
@@ -65,7 +78,17 @@ power_compare2=function(m,n,p,coe,l,rho,prob,heter){
   for (i in 1:2) {
     for (j in 1:length(rho)) {
       iimatrix=results[[i]][[j]]
-      bb[[i]][j,]=apply(iimatrix, 2, mean)
+      index1=which( is.na(iimatrix[,1]))
+      index2=which(is.na(iimatrix[,2]))
+      index=union(index1,index2)
+      if (length(index)==l){stop(paste0(" All results are NA for rho= ", rho[j]))}
+      ff=if(length(index)==0){
+        ff=iimatrix
+      }else{
+        ff=iimatrix[-index,]
+      }
+
+      bb[[i]][j,]=apply(ff, 2, mean)
     }
 
   }
@@ -73,27 +96,3 @@ power_compare2=function(m,n,p,coe,l,rho,prob,heter){
 }
 
 
-rho1=seq(0.01,0.1,length=10)
-rho2=seq(0.1,1,length=20)
-rho=c(rho1,rho2)
-results=ggmselect(m=20,n= 20,p=80,coe = c(0.916,0,0),l=10, rho = rho,prob=0.01, heter=T)
-co=results[[1]]
-co=co[order(co[,2]),]
-la=results[[2]]
-la=la[order(la[,2]),]
-plot(co[1:30,2],co[1:30,1],type = "l",ylim = c(0,1))
-lines(la[1:30,2],la[1:30,1])
-
-
-la=data.frame()
-co=data.frame()
-for (i in 1:length(rho1)) {
-  print(i)
-results=ggmselect(m=20,n= 5,p=80,coe = c(2,1.5,1.5),l=10, rho = rho[i],prob=0.01, heter=T)[[1]]
-co=rbind(co,results[1,])
-la=rbind(la,results[2,])
- }
-co1=co[order(co[,2]),]
-la1=la[order(la[,2]),]
-plot(co1[,2],co1[,1],type="l")
-lines(la1[,2],la1[,1])

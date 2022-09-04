@@ -9,9 +9,10 @@
 #' @return A list for the simulated data and its parameters
 #' @export
 sim_heter=function(p,prob,alpha,age){
+  print("heter data are generated")
   m=length(age)
   data=vector("list",m)
-  tau=rexp(m,rate = alpha)
+  tau=rexp(length(alpha),rate = alpha)
   K=BDgraph::bdgraph.sim(p=p,n=1,type="Gaussian",prob=prob)$K
   Sigma=solve(K)
   sqK=chol(Sigma)
@@ -44,6 +45,7 @@ sim_heter=function(p,prob,alpha,age){
 #' @export
 
 sim_homo=function(p,prob,tau,age){
+  print("homo data are generated")
   m=length(age)
   data=vector("list",m)
   K=BDgraph::bdgraph.sim(p=p,n=1,type="Gaussian",prob=prob)$K
@@ -56,7 +58,7 @@ sim_homo=function(p,prob,tau,age){
     error2=t(t(sqK)%*%error1)
     a[1,]=error2[1,]
     for (t in 2:n) {
-      coe=exp(-tau*abs(age[[i]][t]-age[[i]][t-1]))
+      coe=exp(-tau[i]*abs(age[[i]][t]-age[[i]][t-1]))
       a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
     }
     data[[i]]=cbind(i,age[[i]],a)

@@ -29,6 +29,7 @@ lli_homo=function(idata,omega,tau,type){
 }
 
 
+
 #' Value of likelihood function at given parameter
 #'
 #' @param data Data matrix  in which the first column is subject id, the second column is

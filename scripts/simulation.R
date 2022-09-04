@@ -4,8 +4,12 @@ library(glasso)
 library(lglasso)
 library(BDgraph)
 library(GGMselect)
-#set.seed(1)
-results=power_compare(m=20,n=10,p=80,coe = c(1.25,0,0),l=10,rho = 0.1,prob=0.01,heter=T)
+set.seed(1)
+rho1=seq(0.01,0.1,length=4)
+rho2=seq(0.1,1,length=4)
+rho=c(rho1,rho2)
+results=power_compare1(m=20,n=5,p=80,coe = c(0.916,0,0),l=3,rho1 = 0.1,rho2= 0.1,prob=0.01,heter=T)
+
 
 
 load("C:/Users/Jie Zhou/Desktop/lglassoNew/lglasso/scripts/sample10_coe=0.5.Rd")
