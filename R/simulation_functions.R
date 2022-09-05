@@ -28,7 +28,7 @@ sim_heter=function(p,prob,alpha,age){
   }
     data[[i]]=cbind(i,age[[i]],a)
   }
-  result=list(data=data,tau=tau,precision=K)
+  result=list(data=data,tau=tau,alpha=alpha,precision=K)
   return(result)
 }
 
@@ -58,7 +58,7 @@ sim_homo=function(p,prob,tau,age){
     error2=t(t(sqK)%*%error1)
     a[1,]=error2[1,]
     for (t in 2:n) {
-      coe=exp(-tau[i]*abs(age[[i]][t]-age[[i]][t-1]))
+      coe=exp(-tau*abs(age[[i]][t]-age[[i]][t-1]))
       a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
     }
     data[[i]]=cbind(i,age[[i]],a)
@@ -84,14 +84,18 @@ comparison=function(real, estimate){
   N2=ifelse(abs(estimate)<=10^(-5),0,1)
   if (any(dim(N1)!=dim(N2)))
     stop("Two matrixes should have the same dimension")
-  p=dim(real)[1]
+  p=nrow(real)
   real=(sum(N1)-p)/2
   null=p*(p-1)/2-real
   select=(sum(N2)-p)/2
   real_select=(sum(N2[N1==1])-p)/2
   fause_select=sum(N2[N1==0])/2
-  if (real==0){return( list(TPR=1, FPR=0))}
-  if (select==0) {return(list(TPR=0, FPR=1))}
+  if (real==0){
+    stop("Real network has no edge. Please regenerate the real network")
+    }
+  if (select==0) {
+    stop("Estimated network has no edge. Please decrease the tuning parameter.")
+    }
   TPR=real_select/real
   FPR=fause_select/null
   #FPR=fause_select/select

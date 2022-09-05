@@ -12,11 +12,11 @@
 #' @importFrom glasso glasso
 #' @return S list with three components which are the final estimate of alpha, tau and precision matrix omega
 heterlongraph=function(data,rho, type,tole, lower,upper){
-  alpha0=1
   omega0=diag(ncol(data)-2)
   subject=data[,1]
   subjectid=unique(subject)
   m=length(subjectid)
+  alpha0=rep(0.01,m)
   p=ncol(data)-2
   tau_em=matrix(1/alpha0,nrow = 1,ncol = m)
   is=vector("list",m)
@@ -31,8 +31,8 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
         is[[i]]=iss(idata = idata,itau = 1,type = type)
       }else{
         x=seq(lower,upper,length=50)
-        z=sapply(x, logdensity,idata=idata,omega=omega0,alpha=alpha0,type=type)
-        tau1[i]=x[min(which(z==min(z)))]
+        z=sapply(x, logdensity,idata=idata,omega=omega0,alpha=alpha0[i],type=type)
+        tau1[i]=x[min(which(z==max(z)))]
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
     }
@@ -43,7 +43,7 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
     if (max(abs(tau_em[nrow(tau_em),]-tau_em[nrow(tau_em)-1,]),na.rm = T)<tole){
       break
     }else{
-      alpha0=alpha1
+      alpha0=rep(1/mean(tau1,na.rm=T),m)
       tau0=tau1
       omega0=omega1
       k=k+1
@@ -117,25 +117,26 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 #' @param alpha Parameter in exponential distribution
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
+#' @export
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 logdensity=function(idata,omega,tau,alpha,type){
   t=idata[,2]
-  yy=as.matrix(idata[,-c(1,2)])
-  y=c(t(scale(yy, scale = F)))
+  yy=scale(as.matrix(idata[,-c(1,2)]),scale = F)
   p=nrow(omega)
   n=length(t)
-  if (n*p!=length(y)){
-    stop("the dimensions do not match")
+  if (n==1){
+    a=0.5*log(det(omega))-0.5*t(yy)%*%omega%*%yy
+  }else{
+    a=0.5*log(det(omega))-t(yy[1,])%*%omega%*%yy[1,]/2
+    for (i in 2:n) {
+      coe=exp(-tau*(abs(t[i]-t[i-1]))^type)
+      b=0.5*log(det(1/(1-coe)*omega))-t((yy[i,]-coe*yy[i-1,]))%*%(1/(1-coe)*omega)%*%(yy[i,]-coe*yy[i-1,])/2
+      a=a+b
+    }
+    a=a+log(alpha)-alpha*tau
   }
-
-  phi=phifunction(t=t,tau = tau,type = type)
-  a1=(-p/2)*log(det(phi))+(n/2)*log(det(omega))
-  a2=-t(y)%*%kronecker(solve(phi),omega)%*%y/2
-  a3=-alpha*tau
-  a=-(a1+a2+a3)
   return(a)
 }
-
 
 
 

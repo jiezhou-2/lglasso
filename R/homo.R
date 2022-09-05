@@ -8,24 +8,27 @@
 #' @param tau Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
+#' @export
 #' @return Value of likelihood function for subject i at given omega and tau
 
 lli_homo=function(idata,omega,tau,type){
   t=idata[,2]
-  yy=as.matrix(idata[,-c(1,2)])
-  y=c(t(scale(yy, scale = F)))
+  yy=scale(as.matrix(idata[,-c(1,2)]),scale=F)
   p=nrow(omega)
   n=length(t)
-  if (n*p!=length(y)){
-    stop("the dimensions do not match")
-  }
-
-  phi=phifunction(t=t,tau = tau,type = type)
-  a0=(n/2)*log(det(omega))
-  a1=(-p/2)*log(det(phi))
-  a2=-t(y)%*%kronecker(solve(phi),omega)%*%y/2
-  a=a0+a1+a2
-  return(a)
+if (n==1){
+  a1=(1/2)*log(det(omega))
+  a2=-t(yy)%*%omega%*%yy/2
+  a=a1+a2
+}else{
+  a=0.5*log(det(omega))-t(yy[1,])%*%omega%*%yy[1,]/2
+  for (i in 2:n) {
+cc=exp(-tau*(abs(t[i]-t[i-1]))^type)
+b=0.5*log(det(1/(1-cc)*omega))-t((yy[i,]-cc*yy[i-1,]))%*%(1/(1-cc)*omega)%*%(yy[i,]-cc*yy[i-1,])/2
+a=a+b
+}
+}
+return(a)
 }
 
 
@@ -38,12 +41,13 @@ lli_homo=function(idata,omega,tau,type){
 #' @param tau  Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
+#' @export
 #' @return  Value of likelihood function at given omega and tau
 ll_homo=function(data,omega,tau,type){
   id=unique(data[,1])
   a=0
-  for (i in id) {
-    idata=data[which(data[,1]==i),]
+  for (i in 1:length(id)) {
+    idata=data[which(data[,1]==id[i]),]
     ai=lli_homo(idata = idata,omega = omega,tau = tau,type = type)
     a=a+ai
   }

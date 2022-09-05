@@ -31,7 +31,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
   tau1=rep(0,m)
   k=1
   while(1){
-    print(paste("Iteration ",k,":", " Mean value of tau", mean(tau1),sep=" "))
+    print(paste("Iteration ",k))
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
       icovariates=c(1,covariates[which(covariates[,1]==subjectid[i]),-1])
@@ -41,7 +41,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
       }else{
         x=seq(lower,upper,length=50)
         z=sapply(x, covalogdensity,idata=idata,icovariates=icovariates,omega=omega0,coe=coe0,type=type)
-        tau1[i]=x[min(which(z==min(z)))]
+        tau1[i]=x[min(which(z==max(z)))]
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
     }
@@ -157,24 +157,29 @@ covamle_alpha=function(data,covariates,alpha0,omega, type, tole, lower,upper){
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 covalogdensity=function(idata,icovariates,omega,tau,coe,type){
   t=idata[,2]
-  yy=as.matrix(idata[,-c(1,2)])
-  y=c(t(scale(yy, scale = F)))
+  yy=scale(as.matrix(idata[,-c(1,2)]),scale = F)
   p=nrow(omega)
   n=length(t)
-  if (n*p!=length(y)){
-    stop("The dimensions do not match")
-  }
   if (length(icovariates)!= length(coe)){
     stop(("The length of icovariate should be equal to coeffiient coe!"))
   }
-
-  phi=phifunction(t=t,tau = tau,type = type)
-  a1=(-p/2)*log(det(phi))
-  a2=-t(y)%*%kronecker(solve(phi),omega)%*%y/2
-  a3=-(t(coe[-1])%*%icovariates[-1]+coe[1])*tau
-  a=-(a1+a2+a3)
+  if (n==1){
+    a=0.5*log(det(omega))-0.5*t(yy)%*%omega%*%yy
+  }else{
+    a=0.5*log(det(omega))-t(yy[1,])%*%omega%*%yy[1,]/2
+    for (i in 2:n) {
+      cc=exp(-tau*(abs(t[i]-t[i-1]))^type)
+      b=0.5*log(det(1/(1-cc)*omega))-t((yy[i,]-cc*yy[i-1,]))%*%(1/(1-cc)*omega)%*%(yy[i,]-cc*yy[i-1,])/2
+      a=a+b
+    }
+    a3=exp(t(coe[-1])%*%icovariates[-1]+coe[1])
+    a=a+log(a3)-exp(a3)*tau
+  }
   return(a)
 }
+
+
+
 
 
 

@@ -14,14 +14,20 @@
 
 power_compare1=function(m,n,p,coe,l,rho1,rho2,prob,heter){
   results=vector("list",length = 5) # container for the final FPR and TPR
-  results[[1]]=vector("list",length = length(rho))
-  results[[2]]=vector("list",length = length(rho))
-  results[[3]]=vector("list",length = length(rho))
-  results[[4]]=vector("list",length = length(rho))
-  results[[5]]=vector("list",length = length(rho))
+  results[[1]]=vector("list",length = length(rho1))
+  results[[2]]=vector("list",length = length(rho1))
+  results[[3]]=vector("list",length = length(rho1))
+  results[[4]]=vector("list",length = length(rho2))
+  results[[5]]=vector("list",length = length(rho2))
   age=vector("list",m) #generate the time points container
-  for (i in 1:5) {
-    for (j in 1:length(rho)) {
+  for (i in 1:3) {
+    for (j in 1:length(rho1)) {
+      results[[i]][[j]]= matrix(nrow = l,ncol = 2)
+    }
+
+  }
+  for (i in 4:5) {
+    for (j in 1:length(rho2)) {
       results[[i]][[j]]= matrix(nrow = l,ncol = 2)
     }
 
@@ -48,7 +54,7 @@ for (h in 1:l){
   if (heter==TRUE){
   ss=sim_heter(p = p,prob=prob,alpha = alpha,age = age)
   }else{
-    ss=sim_homo(p = p,prob=prob,tau = 1/alpha,age = age)
+    ss=sim_homo(p = p,prob=prob,tau = 1/alpha[1],age = age)
   }
   simdata=ss$data
   tau=ss$tau
@@ -65,12 +71,12 @@ for (h in 1:l){
     ##estiamte the network based on lglasso
     if (heter==TRUE){
       if (length(which(coe==0))==2){
-        aa=lglasso(data = dd, rho = rho1[j],heter=T)
+        aa=lglasso(data = dd, rho = rho1[j])
       }else{
-        aa=lglasso(data = dd,x=covariate, rho = rho1[j],heter=T)
+        aa=lglasso(data = dd,x=covariate, rho = rho1[j])
       }
     }else{
-      aa=lglasso(data = dd, rho = rho1[j])
+      aa=lglasso(data = dd, rho = rho1[j],heter=F)
     }
 
   results[[1]][[j]][h,]=as.numeric(comparison(graph,aa$omega))

@@ -4,6 +4,7 @@
 #' @param tau correlation parameter
 #' @param type The type of correlation function, which typically take either 0,1 or 2.
 #' @author Jie Zhou
+#' @export
 #' @return A square matrix with dimension equal to the length of vector t
 phifunction=function(t,tau,type=1){
   n=length(t)
@@ -29,6 +30,7 @@ phifunction=function(t,tau,type=1){
 #' @param itau Correlation parameter
 #' @param type  Type of correlation function, which typically take either  0, 1 or 2.
 #' @author Jie Zhou
+#' @export
 #' @return Empirical quasi covariance matrix
 iss=function(idata,itau,type){
   t=idata[,2]
