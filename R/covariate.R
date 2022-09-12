@@ -31,6 +31,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
   tau1=rep(0,m)
   k=1
   while(1){
+    ll=0
     print(paste("Iteration ",k))
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
@@ -38,6 +39,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
       if (nrow(idata)==1){
         tau1[i]=NA
         is[[i]]=iss(idata = idata,itau = 1,type = type)
+        z=covalogdensity(idata = idata,icovariates = icovariates,omega = omega0,tau = tau1,coe = coe0,type = type)
       }else{
         x=seq(lower,upper,length=50)
         z=sapply(x, covalogdensity,idata=idata,icovariates=icovariates,omega=omega0,coe=coe0,type=type)
@@ -45,6 +47,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
     }
+    ll=ll+z
     tau_em=rbind(tau_em,tau1)
     s=Reduce("+",is)/nrow(data)
     omega1=glasso::glasso(s=s,rho = rho)$wi
@@ -74,7 +77,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
 
   }
 
-  result=list(coe=coe1,tau=tau1,omega=omega1)
+  result=list(coe=coe1,tau=tau1,omega=omega1,ll=ll)
   return(result)
 }
 

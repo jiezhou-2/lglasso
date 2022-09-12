@@ -2,7 +2,7 @@
 % Please edit documentation in R/power_compare1.R
 \name{power_compare1}
 \alias{power_compare1}
-\title{Main simulation function comparing five methods for network seletion.}
+\title{Main simulation function comparing five methods for network selection.}
 \usage{
 power_compare1(m, n, p, coe, l, rho1, rho2, prob, heter)
 }
@@ -17,13 +17,13 @@ power_compare1(m, n, p, coe, l, rho1, rho2, prob, heter)
 
 \item{l}{the simulation scale}
 
-\item{rho1}{tuning parameter for glasso}
+\item{rho1}{tuning parameter for glasso,nh and lglasso}
 
-\item{rho2}{tuning parameter for glasso}
+\item{rho2}{tuning parameter for}
 }
 \value{
 list with length equal to 3.
 }
 \description{
-Main simulation function comparing five methods for network seletion.
+Main simulation function comparing five methods for network selection.
 }

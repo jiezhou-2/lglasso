@@ -24,17 +24,20 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
   k=1
   while(1){
     print(paste("Iteration ",k,":", " Mean value of tau",":", mean(tau1),sep=""))
+    ll=0
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
       if (nrow(idata)==1){
         tau1[i]=NA
         is[[i]]=iss(idata = idata,itau = 1,type = type)
+        z=0.5*log(det(omega0))-0.5*t(idata)%*%omega0%*%idata
       }else{
         x=seq(lower,upper,length=50)
         z=sapply(x, logdensity,idata=idata,omega=omega0,alpha=alpha0[i],type=type)
         tau1[i]=x[min(which(z==max(z)))]
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
+ll=ll+z
     }
     tau_em=rbind(tau_em,tau1)
     s=Reduce("+",is)/nrow(data)
@@ -51,7 +54,7 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
 
   }
 
-  result=list(alpha=alpha1,tau=tau1,omega=omega1)
+  result=list(alpha=alpha1,tau=tau1,omega=omega1,ll=ll)
   return(result)
 }
 

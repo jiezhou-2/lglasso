@@ -97,7 +97,7 @@ homolongraph=function(data, rho,type, tole,lower,upper){
     }
   }
 
-  result=list(tau=tau1,omega=omega1)
+  result=list(tau=tau1,omega=omega1,ll=z)
   return(result)
 }
 

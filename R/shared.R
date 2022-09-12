@@ -182,3 +182,17 @@ mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=1
   return(result)
 }
 
+#' BIC function for i.i.d normal data
+#'
+#' @param data The data of interest
+#' @param G The estimated network
+#'
+#' @return The value of bic
+bicfunction=function(data,G){
+  n=nrow(data)
+  k=length(which(G!=0))
+  yy=scale(as.matrix(data[,-c(1,2)]))
+  ll=-0.5*sum(apply(yy,1,function(x)  t(x) %*% G %*% x ))+0.5*n*log(det(M))
+  bic=-2*ll+k*log(n)
+  return(bic=bic)
+}

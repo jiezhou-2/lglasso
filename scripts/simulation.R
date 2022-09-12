@@ -5,12 +5,12 @@ library(lglasso)
 library(BDgraph)
 library(GGMselect)
 #set.seed(100)
-rho1=seq(0.01,0.3,length=50)
+rho1=seq(0.01,0.3,length=10)
 rho2=seq(0.1,1,length=5)
-results=power_compare1(m=20,n=20,p=80,coe = c(2,1.5,1.5),l=5,rho1 = rho1,rho2= 0.1,prob=0.01,heter=T)
-plot(results[[1]][,2],results[[1]][,1],ylim = c(0.5,1))
-lines(results[[2]][,2],results[[1]][,1],col=2)
-lines(results[[3]][,2],results[[1]][,1],col=3)
+results=power_compare1(m=20,n=20,p=80,coe = c(0.916,0,0),l=5,rho1 = rho1,rho2= 0.1,prob=0.01,heter=T)
+plot(results[[2]][,2],results[[1]][,1],ylim = c(0.25,1),type="l")
+lines(results[[3]][,2],results[[1]][,1],col=2)
+lines(results[[1]][,2],results[[1]][,1],col=3)
 
 m=20
 n=20

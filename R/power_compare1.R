@@ -1,14 +1,14 @@
 
 
-#' Main simulation function comparing five methods for network seletion.
+#' Main simulation function comparing five methods for network selection.
 #'
 #' @param m number of subjects
 #' @param n  number of observations per subjects
 #' @param p the dimension of the data to be generated
 #' @param coe coefficients for covariates
 #' @param l the simulation scale
-#' @param rho1 tuning parameter for glasso
-#' @param rho2 tuning parameter for glasso
+#' @param rho1 tuning parameter for glasso,nh and lglasso
+#' @param rho2 tuning parameter for
 #' @return list with length equal to 3.
 #' @export
 
