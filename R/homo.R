@@ -88,7 +88,13 @@ homolongraph=function(data, rho,type, tole,lower,upper){
     }
     s=Reduce("+",is)/nrow(data)
     omega1=glasso::glasso(s=s,rho = rho)$wi
+    #G=glasso::glasso(s=s,rho = rho)$wi
+    #omega1=mle_net(data=data,priori=G)
     if (abs(tau0-tau1)<tole & max(abs(omega0-omega1))<tole){
+      break
+    }
+    if (k>=20){
+      warning("the algorithm does not converge")
       break
     }else{
       tau0=tau1
@@ -97,7 +103,7 @@ homolongraph=function(data, rho,type, tole,lower,upper){
     }
   }
 
-  result=list(tau=tau1,omega=omega1,ll=z)
+  result=list(tau=tau1,omega=omega1,ll=max(z))
   return(result)
 }
 

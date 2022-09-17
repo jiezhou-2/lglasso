@@ -60,7 +60,7 @@ iss=function(idata,itau,type){
 #' @param priori Given structure of precision matrix
 #' @author Jie Zhou
 #' @return The maximum likelihood estimation
-
+#' @export
 mle_net=function(data,priori){
   data=data[,-c(1,2)]
   priori=priori+t(priori)
@@ -189,10 +189,11 @@ mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=1
 #'
 #' @return The value of bic
 bicfunction=function(data,G){
+  if (det(G)<0){stop("G is not positive definite matrix!")}
   n=nrow(data)
-  k=length(which(G!=0))
+  k=length(which(G!=0))/2
   yy=scale(as.matrix(data[,-c(1,2)]))
-  ll=-0.5*sum(apply(yy,1,function(x)  t(x) %*% G %*% x ))+0.5*n*log(det(M))
+  ll=-0.5*sum(apply(yy,1,function(x)  t(x) %*% G %*% x ))+0.5*n*log(det(G))
   bic=-2*ll+k*log(n)
   return(bic=bic)
 }

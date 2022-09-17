@@ -21,12 +21,14 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
   tau_em=matrix(1/alpha0,nrow = 1,ncol = m)
   is=vector("list",m)
   tau1=rep(0,m)
+  iidata=vector("list",m)
   k=1
   while(1){
     print(paste("Iteration ",k,":", " Mean value of tau",":", mean(tau1),sep=""))
     ll=0
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
+      iidata[[i]]=idata
       if (nrow(idata)==1){
         tau1[i]=NA
         is[[i]]=iss(idata = idata,itau = 1,type = type)
@@ -35,15 +37,31 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
         x=seq(lower,upper,length=50)
         z=sapply(x, logdensity,idata=idata,omega=omega0,alpha=alpha0[i],type=type)
         tau1[i]=x[min(which(z==max(z)))]
+        if (is.na(tau1[i])){
+          print(z)
+          stop(paste0("tau1[[",i, "]] is missing!"))
+          }
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
-ll=ll+z
+ll=ll+max(z)
+save(iidata,file="iidata.rd")
+save(tau1,file="tau1.rd")
     }
     tau_em=rbind(tau_em,tau1)
     s=Reduce("+",is)/nrow(data)
+
+    #save(is,file="is.rd")
+    #save(s,file="netwrok.rd")
+    #save(rho,file="rho.rd")
     omega1=glasso(s=s,rho = rho)$wi
+    #G=glasso(s=s,rho = rho)$wi
+    #omega1=mle_net(data=data,priori=G)
     alpha1=1/mean(tau1,na.rm=T)
     if (max(abs(tau_em[nrow(tau_em),]-tau_em[nrow(tau_em)-1,]),na.rm = T)<tole){
+      break
+    }
+    if (k>=20){
+      warning("the algorithm does not converge")
       break
     }else{
       alpha0=rep(1/mean(tau1,na.rm=T),m)
@@ -123,6 +141,7 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 #' @export
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 logdensity=function(idata,omega,tau,alpha,type){
+  if (det(omega)<0) {stop("omega is not poitive definite matrix!")}
   t=idata[,2]
   yy=scale(as.matrix(idata[,-c(1,2)]),scale = F)
   p=nrow(omega)
@@ -133,12 +152,12 @@ logdensity=function(idata,omega,tau,alpha,type){
     a=0.5*log(det(omega))-t(yy[1,])%*%omega%*%yy[1,]/2
     for (i in 2:n) {
       coe=exp(-tau*(abs(t[i]-t[i-1]))^type)
-      b=0.5*log(det(1/(1-coe)*omega))-t((yy[i,]-coe*yy[i-1,]))%*%(1/(1-coe)*omega)%*%(yy[i,]-coe*yy[i-1,])/2
+      b=0.5*log(det(1/(1-coe^2)*omega))-t((yy[i,]-coe*yy[i-1,]))%*%(1/(1-coe^2)*omega)%*%(yy[i,]-coe*yy[i-1,])/2
       a=a+b
     }
-    a=a+log(alpha)-alpha*tau
+    ll=a+log(alpha)-alpha*tau
   }
-  return(a)
+  return(ll)
 }
 
 

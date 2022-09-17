@@ -46,12 +46,14 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
         tau1[i]=x[min(which(z==max(z)))]
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
+      ll=ll+max(z)
     }
-    ll=ll+z
+
     tau_em=rbind(tau_em,tau1)
     s=Reduce("+",is)/nrow(data)
     omega1=glasso::glasso(s=s,rho = rho)$wi
-
+    #G=glasso::glasso(s=s,rho = rho)$wi
+    #omega1=mle_net(data=data,priori=G)
     alikehood=function(coe){
       index=which(!is.na(tau1))
       alpha=covariates[,-1]%*%coe[-1]+coe[1]
