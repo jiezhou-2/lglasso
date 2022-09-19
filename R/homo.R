@@ -12,6 +12,9 @@
 #' @return Value of likelihood function for subject i at given omega and tau
 
 lli_homo=function(idata,omega,tau,type){
+  if (det(omega)<=10^(-20)) {
+    stop("In lli_homo, omega is not poitive definite matrix!")
+  }
   t=idata[,2]
   yy=scale(as.matrix(idata[,-c(1,2)]),scale=F)
   p=nrow(omega)
@@ -24,7 +27,7 @@ if (n==1){
   a=0.5*log(det(omega))-t(yy[1,])%*%omega%*%yy[1,]/2
   for (i in 2:n) {
 cc=exp(-tau*(abs(t[i]-t[i-1]))^type)
-b=0.5*log(det(1/(1-cc)*omega))-t((yy[i,]-cc*yy[i-1,]))%*%(1/(1-cc)*omega)%*%(yy[i,]-cc*yy[i-1,])/2
+b=0.5*log(det(1/(1-cc^2)*omega))-t((yy[i,]-cc*yy[i-1,]))%*%(1/(1-cc^2)*omega)%*%(yy[i,]-cc*yy[i-1,])/2
 a=a+b
 }
 }
@@ -81,7 +84,7 @@ homolongraph=function(data, rho,type, tole,lower,upper){
     x=seq(lower,upper,length=50)
     z=sapply(x, ll_homo,data=data,omega=omega0,type=type)
     tau1=x[min(which(z==max(z)))]
-    print(paste("Iteration ",k,":","tau=",tau1))
+    #print(paste("Iteration ",k,":","tau=",tau1))
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
       is[[i]]=iss(idata = idata,itau = tau1,type = type)

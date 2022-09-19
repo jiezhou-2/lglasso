@@ -88,8 +88,15 @@ mle_net=function(data,priori){
       precision[j,index]=-alpha/sigma[1]
       precision[j,j]=1/sigma
     }
+
     precision=(precision+t(precision))/2
   }
+
+  for (j in 1:(p-1)) {
+    for (i in (j+1):p){
+ precision[i,j]=precision[j,i]
+  }
+}
   return(precision)
 }
 
@@ -186,14 +193,26 @@ mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=1
 #'
 #' @param data The data of interest
 #' @param G The estimated network
-#'
+#' @export
 #' @return The value of bic
-bicfunction=function(data,G){
-  if (det(G)<0){stop("G is not positive definite matrix!")}
+bicfunction=function(data,G,nu=1){
+  if (det(G)<=0){
+    warning("G is not positive definite matrix!")
+    return(bic=NA)
+    }else{
   n=nrow(data)
   k=length(which(G!=0))/2
   yy=scale(as.matrix(data[,-c(1,2)]))
   ll=-0.5*sum(apply(yy,1,function(x)  t(x) %*% G %*% x ))+0.5*n*log(det(G))
-  bic=-2*ll+k*log(n)
+  bic=-2*ll+k*log(n)*nu
+    }
   return(bic=bic)
 }
+
+#bbic=0.5*n*log(det(G))
+#for (i in 1:nrow(yy)) {
+# bbic=bbic-0.5* t(yy[i,])%*% G %*%yy[i,]
+#}
+
+
+

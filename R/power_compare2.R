@@ -12,14 +12,15 @@
 #' @return list with length equal to 3.
 #' @export
 
-power_compare2=function(m,n,p,coe,l,rho1,rho2,prob,heter){
+power_compare2=function(m,n,p,coe,l,rho,prob,heter,nu){
   results=vector("list",length = 5) # container for the final FPR and TPR
-  results[[1]]=vector("list",length = length(rho1))
-  results[[2]]=vector("list",length = length(rho1))
-  results[[3]]=vector("list",length = length(rho1))
-  results[[4]]=vector("list",length = length(rho2))
-  results[[5]]=vector("list",length = length(rho2))
+  results[[1]]=vector("list",length = length(rho[[1]]))
+  results[[2]]=vector("list",length = length(rho[[2]]))
+  results[[3]]=vector("list",length = length(rho[[3]]))
+  results[[4]]=vector("list",length = length(rho[[4]]))
+  results[[5]]=vector("list",length = length(rho[[5]]))
   age=vector("list",m) #generate the time points container
+
 
 
   bb=vector("list",length = 5)
@@ -65,59 +66,74 @@ bic2=c()
 bic3=c()
 bic4=c()
 bic5=c()
-    for (j in 1:length(rho1)) {
-print(paste0("rho1's ",j, " componts: ", rho1[j] ))
-      ##estiamte the network based on lglasso
+##estiamte the network based on lglasso
+    for (j in 1:length(rho[[1]])) {
       if (heter==TRUE){
         if (length(which(coe==0))==2){
-          results[[1]][[j]]=lglasso(data = dd, rho = 0.5*rho1[j],heter=T)
+          results[[1]][[j]]=lglasso(data = dd, rho = 0.5*rho[[1]][j],heter=T)
         }else{
-          results[[1]][[j]]=lglasso(data = dd,x=covariates, rho = 0.5*rho1[j],heter=T)
+          results[[1]][[j]]=lglasso(data = dd,x=covariates, rho = 0.5*rho[[1]][j],heter=T)
         }
       }else{
-        results[[1]][[j]]=lglasso(data = dd, rho = 0.5*rho1[j],heter=F)
+        results[[1]][[j]]=lglasso(data = dd, rho = 0.5*rho[[1]][j],heter=F)
       }
-bb1=-2*results[[1]][[j]]$ll+  0.5*length(which(results[[1]][[j]]$omega!=0))*log(nrow(dd))
+bb1=-2*results[[1]][[j]]$ll +  0.5*length(which(results[[1]][[j]]$omega!=0))*log(nrow(dd))*nu*1.2
 bic1=c(bic1,bb1)
-      ##estiamte the network based on glasso
-      s=cov(dd[,-c(1,2)])
-      results[[2]][[j]]=glasso(s=s,rho=rho1[j])$wi
-      #G2=glasso(s=s,rho=rho1[j])$wi
-      #results[[2]][[j]]=mle_net(dd,priori=G2)
-      bb2=bicfunction(data=dd,G=as.matrix(results[[2]][[j]]))
-      bic2=c(bic2,bb2)
-      ##estiamte the network based on nh
-      results[[3]][[j]]=addition(data=dd,lambda=rho1[j])
-     #G3=addition(data=dd,lambda=rho1[j])
-     #results[[3]][[j]]=mle_net(data=dd,priori=G3)
-      bb3=bicfunction(data=dd,G=results[[3]][[j]])
-      bic3=c(bic3,bb3)
     }
 
-    for (j in 1:length(rho2)) {
-      ##estimate the network based on CO1
-      results[[4]][[j]]=selectFast(s,family="C01",K=rho2[j])$C01$G
-      #G4=selectFast(s,family="C01",K=rho2[j])$C01$G
-      #results[[4]][[j]]=mle_net(data=dd,priori=G4)
-      bb4=bicfunction(data=dd,G=results[[4]][[j]])
-      bic4=c(bic4,bb4)
-      ##estiamte the network based on EW
-      results[[5]][[j]]=selectFast(s,family="LA",K=rho2[j])$LA$G
-      #G5=selectFast(s,family="LA",K=rho2[j])$LA$G
-      #results[[5]][[j]]=mle_net(data=dd,priori=G5)
-      bb5=bicfunction(data=dd,G=results[[5]][[j]])
+
+##estimate the network based on glasso
+s=cov(dd[,-c(1,2)])
+for (j in 1:length(rho[[2]])) {
+  results[[2]][[j]]=glasso(s=s,rho=rho[[2]][j])$wi
+  bb2=bicfunction(data=dd,G=as.matrix(results[[2]][[j]]),nu=nu)
+  bic2=c(bic2,bb2)
+
+}
+
+
+
+##estimate the network based on nh
+
+for (j in 1:length(rho[[3]])) {
+  GG=addition(data=dd,lambda=rho[[3]][j])
+  results[[3]][[j]]=mle_net(data=dd,priori=GG)
+  bb3=bicfunction(data=dd,G=results[[3]][[j]],nu=nu)
+  bic3=c(bic3,bb3)
+
+}
+
+##estimate the network based on CO1
+for (j in 1:length(rho[[4]])) {
+  results[[4]][[j]]=selectFast(s,family="C01",K=rho[[4]][j])$C01$G
+  comle=mle_net(data=dd,priori = results[[4]][[j]])
+    bb4=bicfunction(data=dd,comle,nu=nu)
+  bic4=c(bic4,bb4)
+}
+
+
+
+##estiamte the network based on LA
+    for (j in 1:length(rho[[5]])) {
+      results[[5]][[j]]=selectFast(s,family="LA",K=rho[[5]][j])$LA$G
+      lamle=mle_net(data=dd,priori = results[[5]][[j]])
+      bb5=bicfunction(data=dd,G=lamle,nu=nu)
       bic5=c(bic5,bb5)
     }
+
+
 G1=results[[1]][[which.min(bic1)]]$omega
 G2=results[[2]][[which.min(bic2)]]
 G3=results[[3]][[which.min(bic3)]]
 G4=results[[4]][[which.min(bic4)]]
 G5=results[[5]][[which.min(bic5)]]
+
 bb[[1]][h,]=as.numeric(comparison(graph,G1))
 bb[[2]][h,]=as.numeric(comparison(graph,G2))
 bb[[3]][h,]=as.numeric(comparison(graph,G3))
 bb[[4]][h,]=as.numeric(comparison(graph,G4))
 bb[[5]][h,]=as.numeric(comparison(graph,G5))
+
   }
 
 aa=matrix(nrow=5,ncol=2)
@@ -127,7 +143,7 @@ aa=matrix(nrow=5,ncol=2)
   }
 
 bicc=cbind(bic1,bic2,bic3,bic4,bic5)
-  return(bicc)
+  return(aa)
 }
 
 

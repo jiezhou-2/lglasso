@@ -4,7 +4,7 @@
 \alias{bicfunction}
 \title{BIC function for i.i.d normal data}
 \usage{
-bicfunction(data, G)
+bicfunction(data, G, nu = 1)
 }
 \arguments{
 \item{data}{The data of interest}

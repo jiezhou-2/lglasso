@@ -20,11 +20,11 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
   p=ncol(data)-2
   tau_em=matrix(1/alpha0,nrow = 1,ncol = m)
   is=vector("list",m)
-  tau1=rep(0,m)
+  tau1=rep(1,m)
   iidata=vector("list",m)
   k=1
   while(1){
-    print(paste("Iteration ",k,":", " Mean value of tau",":", mean(tau1),sep=""))
+  #  print(paste("Iteration ",k,":", " Mean value of tau",":", mean(tau1),sep=""))
     ll=0
     for (i in 1:m) {
       idata=data[which(data[,1]==subjectid[i]),]
@@ -35,7 +35,7 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
         z=0.5*log(det(omega0))-0.5*t(idata)%*%omega0%*%idata
       }else{
         x=seq(lower,upper,length=50)
-        z=sapply(x, logdensity,idata=idata,omega=omega0,alpha=alpha0[i],type=type)
+        z=sapply(x, ilogdensity,idata=idata,omega=omega0,alpha=alpha0[i],type=type)
         tau1[i]=x[min(which(z==max(z)))]
         if (is.na(tau1[i])){
           print(z)
@@ -44,7 +44,6 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
 ll=ll+max(z)
-save(iidata,file="iidata.rd")
 save(tau1,file="tau1.rd")
     }
     tau_em=rbind(tau_em,tau1)
@@ -140,8 +139,10 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 #' @author Jie Zhou
 #' @export
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
-logdensity=function(idata,omega,tau,alpha,type){
-  if (det(omega)<0) {stop("omega is not poitive definite matrix!")}
+ilogdensity=function(idata,omega,tau,alpha,type){
+  if (det(omega)<=10^(-20)) {
+    stop("IN ilogdensity, omega is not poitive definite matrix!")
+    }
   t=idata[,2]
   yy=scale(as.matrix(idata[,-c(1,2)]),scale = F)
   p=nrow(omega)
