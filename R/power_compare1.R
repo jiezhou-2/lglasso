@@ -88,7 +88,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter,nu){
       }else{
         aa[[j]]=lglasso(data = dd, rho = 0.5*rho[[1]][j])
       }
-      bb1=-2*aa[[j]]$ll +  0.5*length(which(aa[[j]]$omega!=0))*log(nrow(dd))*nu*1.5
+      bb1=-2*aa[[j]]$ll +  0.5*length(which(aa[[j]]$omega!=0))*log(nrow(dd))*nu*3
       bic1=c(bic1,bb1)
       results[[1]][[j]][h,]=as.numeric(comparison(graph,aa[[j]]$omega))
     }
@@ -101,7 +101,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter,nu){
       ##estiamte the network based on glasso
       s=cov(dd[,-c(1,2)])
       aa1[[j]]=glasso(s=s,rho=rho[[2]][j])$wi
-      bb2=bicfunction(data=dd,G=as.matrix(aa1[[j]]),nu=nu)
+      bb2=bicfunction(data=dd,G=as.matrix(aa1[[j]]),nu=3*nu)
       bic2=c(bic2,bb2)
       results[[2]][[j]][h,]=as.numeric(comparison(graph,aa1[[j]]))
     }
