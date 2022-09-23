@@ -101,7 +101,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter,nu){
       ##estiamte the network based on glasso
       s=cov(dd[,-c(1,2)])
       aa1[[j]]=glasso(s=s,rho=rho[[2]][j])$wi
-      bb2=bicfunction(data=dd,G=as.matrix(aa1[[j]]),nu=3*nu)
+      bb2=bicfunction(data=dd,G=as.matrix(aa1[[j]]),nu=6*nu)
       bic2=c(bic2,bb2)
       results[[2]][[j]][h,]=as.numeric(comparison(graph,aa1[[j]]))
     }
