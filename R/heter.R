@@ -141,7 +141,8 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 ilogdensity=function(idata,omega,tau,alpha,type){
   if (det(omega)<=10^(-20)) {
-    stop("IN ilogdensity, omega is not poitive definite matrix!")
+    warning("IN ilogdensity, omega is not poitive definite matrix!")
+    return(ll=-Inf)
     }
   t=idata[,2]
   yy=scale(as.matrix(idata[,-c(1,2)]),scale = F)

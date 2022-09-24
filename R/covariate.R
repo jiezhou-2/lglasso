@@ -162,7 +162,8 @@ covamle_alpha=function(data,covariates,alpha0,omega, type, tole, lower,upper){
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 icovalogdensity=function(idata,icovariates,omega,tau,coe,type){
   if (det(omega)<=10^(-20)) {
-    stop("In icovalogdensity, omega is not poitive definite matrix!")
+    warning("In icovalogdensity, omega is not poitive definite matrix!")
+    return(ll=-Inf)
   }
   if (length(icovariates)!= length(coe)){
     stop(("The length of icovariate should be equal to coeffiient coe!"))
@@ -184,7 +185,7 @@ icovalogdensity=function(idata,icovariates,omega,tau,coe,type){
     a3=exp(t(coe[-1])%*%icovariates[-1]+coe[1])
     a=a+log(a3)-a3*tau
   }
-  return(a)
+  return(ll=a)
 }
 
 
