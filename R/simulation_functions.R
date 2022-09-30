@@ -1,4 +1,8 @@
 
+
+
+
+
 #' Generate the heterogeneous data
 #'
 #' @param p An integer indicating dimension of the network
@@ -62,10 +66,44 @@ sim_homo=function(p,prob,tau,age){
       a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
     }
     data[[i]]=cbind(i,age[[i]],a)
+    colnames(data[[i]])[1:2]=c("id","age")
   }
   result=list(data=data,tau=tau,precision=K)
   return(result)
 }
+
+#' Generate the two-community homogeneous data
+#'
+#' @param p An integer indicating dimension of the network
+#' @param prob The density of the edges in the network
+#' @param tau1 The shared correlation among observations in first community.
+#' @param tau2 The correlation in second community
+#' @param age  A list with length equal to the number of subjects. Each component is a vector indicating the
+#' time points at which the observations was made.
+#' @return A list for simulated data
+#' @export
+
+sim_2homo=function(p,prob,tau1,tau2,age){
+  print("two-community homo data are generated")
+  p1=floor(p/2)
+  m=length(age)
+  data1=vector("list",m)
+  data2=vector("list",m)
+  data=vector("list",m)
+  sim1=sim_homo(p=p1, prob = prob,tau = tau1,age=age)
+  sim2=sim_homo(p=p-p1,prob = prob,tau =tau2,age=age)
+  data1=sim1[[1]]
+  data2=sim2[[1]]
+  K=bdiag(sim1[[3]],sim2[[3]])
+  for (i in 1:m) {
+  data[[i]]=merge(data1[[i]],data2[[i]],by=c("id","age"))
+  }
+  result=list(data=data,precision=K)
+  return(result)
+}
+
+
+
 
 
 #' Comparison function
