@@ -64,7 +64,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter){
     dd=do.call(rbind,simdata)
     id=unique(dd[,1])
     covariate=cbind(id,x)
-    T=log(p)/(2*log(1/prob-1))
+    Tem=log(p)/(2*log(1/prob-1))
 
     bic1=c()
     bic2=c()
@@ -89,7 +89,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter){
         aa[[j]]=lglasso(data = dd, rho = 0.5*rho[[1]][j])
       }
       bb1=-2*aa[[j]]$ll +  0.5*length(which(aa[[j]]$omega!=0))*log(nrow(dd))
-      +0.5*length(which(aa[[j]]$omega!=0))*log(p)/T
+      +0.5*length(which(aa[[j]]$omega!=0))*log(p)/Tem
       bic1=c(bic1,bb1)
       results[[1]][[j]][h,]=as.numeric(comparison(graph,aa[[j]]$omega))
     }
@@ -102,7 +102,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter){
       ##estiamte the network based on glasso
       s=cov(dd[,-c(1,2)])
       aa1[[j]]=glasso(s=s,rho=rho[[2]][j])$wi
-      bb2=bicfunction(data=dd,G=as.matrix(aa1[[j]]),T=T)
+      bb2=bicfunction(data=dd,G=as.matrix(aa1[[j]]),Tem=Tem)
       bic2=c(bic2,bb2)
       results[[2]][[j]][h,]=as.numeric(comparison(graph,aa1[[j]]))
     }
@@ -113,14 +113,14 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter){
     for (j in 1:length(rho[[3]])) {
       bb2=addition(data=dd,lambda=rho[[3]][j])
       aa2[[j]]=mle_net(data=dd,priori=bb2)
-      bb3=bicfunction(data=dd,G=aa2[[j]],T=T)
+      bb3=bicfunction(data=dd,G=aa2[[j]],Tem=Tem)
       bic3=c(bic3,bb3)
       results[[3]][[j]][h,]=as.numeric(comparison(graph,aa2[[j]]))
     }
     ## CO1
     for (j in 1:length(rho[[4]])) {
       aa3[[j]]=selectFast(s,family="C01",K=2*rho[[4]][j])$C01$G
-      bb4=bicfunction(data=dd,G=aa3[[j]],T=T)
+      bb4=bicfunction(data=dd,G=aa3[[j]],Tem=Tem)
       bic4=c(bic4,bb4)
       results[[4]][[j]][h,]=as.numeric(comparison(graph,aa3[[j]]))
 
@@ -129,7 +129,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter){
     ## la
     for (j in 1:length(rho[[5]])) {
       aa4[[j]]=selectFast(s,family="LA",K=2*rho[[5]][j])$LA$G
-      bb5=bicfunction(data=dd,G=aa4[[j]],T=T)
+      bb5=bicfunction(data=dd,G=aa4[[j]],Tem=Tem)
       bic5=c(bic5,bb5)
       results[[5]][[j]][h,]=as.numeric(comparison(graph,aa4[[j]]))
     }

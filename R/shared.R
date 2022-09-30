@@ -195,7 +195,7 @@ mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=1
 #' @param G The estimated network
 #' @export
 #' @return The value of bic
-bicfunction=function(data,G,T){
+bicfunction=function(data,G,Tem){
   if (det(G)<=0){
     warning("G is not positive definite matrix!")
     return(bic=NA)
@@ -204,7 +204,7 @@ bicfunction=function(data,G,T){
   k=length(which(G!=0))/2
   yy=scale(as.matrix(data[,-c(1,2)]))
   ll=-0.5*sum(apply(yy,1,function(x)  t(x) %*% G %*% x ))+0.5*n*log(det(G))
-  bic=-2*ll+k*log(n)+k*log(ncol(data)-2)/T
+  bic=-2*ll+k*log(n)+k*log(ncol(data)-2)/Tem
     }
   return(bic=bic)
 }
