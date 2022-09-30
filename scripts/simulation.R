@@ -1,45 +1,49 @@
 
+load("./scripts/subject=15_time=20_coef=2.302_nodes=80.Rd")
+results1520=simures
+load("./scripts/subject=15_time=40_coef=2.302_nodes=80.Rd")
+results1540=simures
+load("./scripts/subject=30_time=20_coef=2.302_nodes=80.Rd")
+results3020=simures
+load("./scripts/subject=30_time=40_coef=2.302_nodes=80.Rd")
+results3040=simures
 
-library(glasso)
-library(lglasso)
-library(BDgraph)
-library(GGMselect)
-rho=vector("list",5)
-rho[[1]]=seq(0.001,0.3,length=20)
-rho[[2]]=seq(0.001,0.3,length=20)
-rho[[3]]=seq(0.001,0.3,length=20)
-rho[[4]]=seq(0.00001,0.1,length=10)
-rho[[5]]=seq(0.00001,0.1,length=10)
-
-set.seed(51)
-results=power_compare1(m=20,n=5,p=80,coe = c(2,0,0),l=10,rho = rho,prob=0.01,heter=T,nu=0.5)
-save(results)
-load("./scripts/results.Rd")
-plot(results[[1]][[2]][,2],results[[1]][[2]][,1],ylim = c(0.1,1),xlim=c(0,1),type="l",xlab = "FPR", ylab = "TPR")
-lines(results[[1]][[3]][,2],results[[1]][[3]][,1],col=2)
-lines(results[[1]][[1]][,2],results[[1]][[1]][,1],col=3)
-lines(results[[1]][[5]][,2],results[[1]][[5]][,1],col=3)
-lines(results[[1]][[4]][,2],results[[1]][[4]][,1],col=3)
+par(mfrow=c(2,2),mar=c(4,4,2,2),oma=c(0,0,2,0))
+FPR=results1520[[1]][[1]][,2]
+TPR=results1520[[1]][[1]][,1]
+plot(FPR,TPR,ylim = c(0.2,1),xlim=c(0,1),xlab = "FPR",ylab = "TPR",type="l")
+lines(results1520[[1]][[2]][,2],results1520[[1]][[2]][,1],type="l",lty=2)
+lines(results1520[[1]][[3]][,2],results1520[[1]][[3]][,1],type="l",lty=3)
+legend(0.38,0.7,legend=c("m=15, n=20"))
 
 
-
-m=20
-n=5
-p=20
-coe = c(2,0,0)
-l=10
-
-prob=0.1
-heter=T
-nu=10
+FPR=results1540[[1]][[1]][,2]
+TPR=results1540[[1]][[1]][,1]
+plot(FPR,TPR,ylim = c(0.2,1),xlim=c(0,1),xlab = "FPR",ylab = "TPR",type="l")
+lines(results1540[[1]][[2]][,2],results1520[[1]][[2]][,1],type="l",lty=2)
+lines(results1540[[1]][[3]][,2],results1520[[1]][[3]][,1],type="l",lty=3)
+legend(0.38,0.7,legend=c("m=15, n=40"))
 
 
 
 
 
+FPR=results3020[[1]][[1]][,2]
+TPR=results3020[[1]][[1]][,1]
+plot(FPR,TPR,ylim = c(0.2,1),xlim=c(0,1),xlab = "FPR",ylab = "TPR",type="l")
+lines(results3020[[1]][[2]][,2],results3020[[1]][[2]][,1],type="l",lty=2)
+lines(results3020[[1]][[3]][,2],results3020[[1]][[3]][,1],type="l",lty=3)
+legend(0.38,0.7,legend=c("m=30, n=20"))
+
+FPR=results3040[[1]][[1]][,2]
+TPR=results3040[[1]][[1]][,1]
+plot(FPR,TPR,ylim = c(0.2,1),xlim=c(0,1),xlab = "FPR",ylab = "TPR",type="l")
+lines(results3040[[1]][[2]][,2],results3040[[1]][[2]][,1],type="l",lty=2)
+lines(results3040[[1]][[3]][,2],results3040[[1]][[3]][,1],type="l",lty=3)
+legend(0.38,0.7,legend=c("m=30, n=40"))
 
 
-
+title("Comparison of LGLASSO, GLASSO  and NH", outer=TRUE, cex=1.5)
 
 
 

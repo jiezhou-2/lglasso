@@ -12,9 +12,12 @@
 #' @return Value of likelihood function for subject i at given omega and tau
 
 lli_homo=function(idata,omega,tau,type){
-  if (det(omega)<=10^(-20)) {
-    stop("In lli_homo, omega is not poitive definite matrix!")
+
+  if (det(omega)<=0) {
+    # warning("IN ilogdensity, omega is not poitive definite matrix!")
+    return(ll=-Inf)
   }
+
   t=idata[,2]
   yy=scale(as.matrix(idata[,-c(1,2)]),scale=F)
   p=nrow(omega)
