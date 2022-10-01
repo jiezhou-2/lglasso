@@ -4,7 +4,7 @@
 \alias{sim_2heter}
 \title{Generate the heterogeneous data}
 \usage{
-sim_2heter(p, prob, alpha1, alpha2, age)
+sim_2heter(p, prob, alpha1, alpha2, age, zirate = c(0.2, 0))
 }
 \arguments{
 \item{p}{An integer indicating dimension of the network}

@@ -15,7 +15,8 @@ rho[[3]]=seq(0.001,0.3,length=20)
 rho[[4]]=seq(0.00001,0.1,length=10)
 rho[[5]]=seq(0.00001,0.1,length=10)
 set.seed(m+n+e+p)
-simures=power_compare1(m=m,n=n,p=p,coe=c(2,e,e),l=Nsim,rho=rho,prob=0.01,heter=T,community2 = T,uu=c(5,10))
+#debug(power_compare1)
+simures=power_compare1(m=m,n=n,p=p,coe=c(2,e,e),l=Nsim,rho=rho,prob=0.01,heter=T,community2 = T,uu=c(5,10),zirate = c(0.2,0.6))
 save(simures,file="subject=20_time=10_coef=0.5_nodes=80.Rd")
 q("no")
 
@@ -28,7 +29,7 @@ prob=0.01
 heter=T
 community2 = T
 uu=c(5,10)
-
+zirate=c(0.2,0.6)
 
 
 idata=idata

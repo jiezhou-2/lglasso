@@ -4,7 +4,19 @@
 \alias{power_compare1}
 \title{Main simulation function comparing five methods for network selection.}
 \usage{
-power_compare1(m, n, p, coe, l, rho, prob, heter, community2 = F, uu = c(0, 0))
+power_compare1(
+  m,
+  n,
+  p,
+  coe,
+  l,
+  rho,
+  prob,
+  heter,
+  community2 = F,
+  uu = c(0, 0),
+  zirate = c(0.2, 0)
+)
 }
 \arguments{
 \item{m}{number of subjects}
@@ -16,6 +28,10 @@ power_compare1(m, n, p, coe, l, rho, prob, heter, community2 = F, uu = c(0, 0))
 \item{coe}{coefficients for covariates}
 
 \item{l}{the simulation scale}
+
+\item{uu}{uu[1] is the dampening rate for community 1,
+uu[2] is the dampening rate for community 2.Both are in log scale and
+in alpha form.}
 
 \item{rho1}{tuning parameter for glasso}
 

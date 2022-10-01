@@ -2,6 +2,7 @@
 
 export(addition)
 export(bicfunction)
+export(cenfunction)
 export(comparison)
 export(ilogdensity)
 export(iss)

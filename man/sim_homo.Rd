@@ -4,7 +4,7 @@
 \alias{sim_homo}
 \title{Generate the homogeneous data}
 \usage{
-sim_homo(p, prob, tau, age)
+sim_homo(p, prob, tau, age, zirate = c(0.2, 0))
 }
 \arguments{
 \item{p}{An integer indicating dimension of the network}

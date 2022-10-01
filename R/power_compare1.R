@@ -9,10 +9,13 @@
 #' @param l the simulation scale
 #' @param rho1 tuning parameter for glasso
 #' @param rho2 tuning parameter for glasso
+#' @param uu uu[1] is the dampening rate for community 1,
+#'         uu[2] is the dampening rate for community 2.Both are in log scale and
+#'         in alpha form.
 #' @return list with length equal to 3.
 #' @export
 
-power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0)){
+power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0),zirate=c(0.2,0)){
   results=vector("list",length = 5) # container for the final FPR and TPR
   results[[1]]=vector("list",length = length(rho[[1]]))
   results[[2]]=vector("list",length = length(rho[[2]]))
@@ -51,17 +54,18 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0)){
     }
 
     ## generate the network data
+
     if (heter==TRUE & community2==F){
-      ss=sim_heter(p = p,prob=prob,alpha = alpha,age = age)
+      ss=sim_heter(p = p,prob=prob,alpha = alpha,age = age,zirate=zirate)
     }
     if (heter==TRUE & community2==T){
-      ss=sim_2heter(p=p,prob=prob,alpha1=uu[1],alpha2=uu[2],age=age)
+      ss=sim_2heter(p=p,prob=prob,alpha1=exp(uu[1]),alpha2=exp(uu[2]),age=age,zirate = zirate)
     }
     if (heter==F & community2==F){
-      ss=sim_homo(p = p,prob=prob,tau = 1/alpha[1],age = age)
+      ss=sim_homo(p = p,prob=prob,tau = 1/alpha[1],age = age,zirate=zirate)
     }
     if (heter==F & community2==T){
-      ss=sim_2homo(p=p,prob=prob,tau1=uu[1],tau2=uu[2],age=age)
+      ss=sim_2homo(p=p,prob=prob,tau1=exp(uu[1]),tau2=exp(uu[2]),age=age,zirate = zirate)
     }
 
     simdata=ss$data

@@ -4,7 +4,7 @@
 \alias{sim_2homo}
 \title{Generate the two-community homogeneous data}
 \usage{
-sim_2homo(p, prob, tau1, tau2, age)
+sim_2homo(p, prob, tau1, tau2, age, zirate = c(0.2, 0))
 }
 \arguments{
 \item{p}{An integer indicating dimension of the network}

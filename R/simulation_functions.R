@@ -12,7 +12,7 @@
 #' time points at which the observations was made.
 #' @return A list for the simulated data and its parameters
 #' @export
-sim_heter=function(p,prob,alpha,age){
+sim_heter=function(p,prob,alpha,age,zirate=c(0.2,0)){
   print("heter data are generated")
   m=length(age)
   data=vector("list",m)
@@ -30,7 +30,9 @@ sim_heter=function(p,prob,alpha,age){
     coe=exp(-tau[i]*abs(age[[i]][t]-age[[i]][t-1]))
     a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
   }
-    data[[i]]=cbind(i,age[[i]],a)
+    dd=cbind(i,age[[i]],a)
+      data[[i]]=cenfunction(data=dd,zirate=zirate)
+
     colnames(data[[i]])[c(1,2)]=c("id","age")
   }
   result=list(data=data,tau=tau,alpha=alpha,precision=K)
@@ -52,7 +54,7 @@ sim_heter=function(p,prob,alpha,age){
 #' time points at which the observations was made.
 #' @return A list for the simulated data and its parameters
 #' @export
-sim_2heter=function(p,prob,alpha1,alpha2,age){
+sim_2heter=function(p,prob,alpha1,alpha2,age,zirate=c(0.2,0)){
   print("two-community heter data are generated")
   p1=floor(p/2)
   m=length(age)
@@ -65,7 +67,8 @@ sim_2heter=function(p,prob,alpha1,alpha2,age){
   K=as.matrix(bdiag(K1,K2))
   data=vector("list",length(data1))
   for (i in 1:length(data1)) {
-  data[[i]]=cbind(data1[[i]],data2[[i]][,-c(1,2)])
+  dd=cbind(data1[[i]],data2[[i]][,-c(1,2)])
+  data[[i]]=cenfunction(data = dd,zirate = zirate)
   }
   result=list(data=data,precision=K)
   return(result)
@@ -84,7 +87,7 @@ sim_2heter=function(p,prob,alpha1,alpha2,age){
 #' @return A list for simulated data
 #' @export
 
-sim_homo=function(p,prob,tau,age){
+sim_homo=function(p,prob,tau,age,zirate=c(0.2,0)){
   print("homo data are generated")
   m=length(age)
   data=vector("list",m)
@@ -101,12 +104,40 @@ sim_homo=function(p,prob,tau,age){
       coe=exp(-tau*abs(age[[i]][t]-age[[i]][t-1]))
       a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
     }
-    data[[i]]=cbind(i,age[[i]],a)
+    dd=cenfunction(a,zirate = zirate)
+    data[[i]]=cbind(i,age[[i]],dd)
     colnames(data[[i]])[1:2]=c("id","age")
   }
   result=list(data=data,tau=tau,precision=K)
   return(result)
 }
+
+#' Data censor
+#'
+#' @param data Data matrix to be censored
+#' @param zirate Censor parameter, in which
+#' zirate[1] is the lower percentage of data to be censored, zirate[2] is
+#' the censor probability for the selected ones.
+#' @return A censored matrix
+#' @export
+cenfunction=function(data,zirate=c(0.2,0)){
+  if (prod(zirate==0)){
+    return(dd=data)
+    }
+  n=nrow(data)
+  p=ncol(data)-2
+  M=data[,-c(1,2)]
+ for (i in 1:n) {
+  o1=order(M[i,])
+  cenindex=o1[1:floor(p*zirate[1])]
+  cenmark=sample(x=c(1,0),size=length(cenindex),replace = T,prob = c(zirate[2],1-zirate[2]))
+  cenvalue=M[i,o1[length(cenindex)]]
+   M[i,cenindex]=ifelse(cenmark==1,cenvalue,M[i,cenindex])
+ }
+  dd=cbind(data[,c(1,2)],M)
+  return(dd)
+}
+
 
 #' Generate the two-community homogeneous data
 #'
@@ -118,8 +149,7 @@ sim_homo=function(p,prob,tau,age){
 #' time points at which the observations was made.
 #' @return A list for simulated data
 #' @export
-
-sim_2homo=function(p,prob,tau1,tau2,age){
+sim_2homo=function(p,prob,tau1,tau2,age,zirate=c(0.2,0)){
   print("two-community homo data are generated")
   p1=floor(p/2)
   m=length(age)
@@ -132,7 +162,8 @@ sim_2homo=function(p,prob,tau1,tau2,age){
   data2=sim2[[1]]
   K=as.matrix(bdiag(sim1[[3]],sim2[[3]]))
   for (i in 1:m) {
-  data[[i]]=cbind(data1[[i]],data2[[i]][,-c(1,2)])
+  dd=cbind(data1[[i]],data2[[i]][,-c(1,2)])
+  data[[i]]=cenfunction(dd,zirate = zirate)
   }
   result=list(data=data,precision=K)
   return(result)
