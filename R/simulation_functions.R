@@ -31,10 +31,45 @@ sim_heter=function(p,prob,alpha,age){
     a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
   }
     data[[i]]=cbind(i,age[[i]],a)
+    colnames(data[[i]])[c(1,2)]=c("id","age")
   }
   result=list(data=data,tau=tau,alpha=alpha,precision=K)
   return(result)
 }
+
+
+
+
+
+
+
+#' Generate the heterogeneous data
+#'
+#' @param p An integer indicating dimension of the network
+#' @param prob The density of the edges in the network
+#' @param alpha A positive number representing the parameter for the exponential distribution
+#' @param age A list with length equal to the number of subjects. Each component is a vector indicating the
+#' time points at which the observations was made.
+#' @return A list for the simulated data and its parameters
+#' @export
+sim_2heter=function(p,prob,alpha1,alpha2,age){
+  print("two-community heter data are generated")
+  p1=floor(p/2)
+  result1=sim_heter(p=p1,prob = prob,alpha = alpha1,age=age)
+  result2=sim_heter(p=p-p1,prob = prob,alpha = alpha2,age=age)
+  data1=result1[[1]]
+  K1=result1[[4]]
+  data2=result2[[1]]
+  K2=result2[[4]]
+  K=bdiag(K1,K2)
+  data=vector("list",length(data1))
+  for (i in 1:length(data1)) {
+  data[[i]]=merge(data1[[i]],data2[[i]],by=c("id","age"))
+  }
+  result=list(data=data,precision=K)
+  return(result)
+}
+
 
 
 

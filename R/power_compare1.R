@@ -12,7 +12,7 @@
 #' @return list with length equal to 3.
 #' @export
 
-power_compare1=function(m,n,p,coe,l,rho,prob,heter){
+power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0)){
   results=vector("list",length = 5) # container for the final FPR and TPR
   results[[1]]=vector("list",length = length(rho[[1]]))
   results[[2]]=vector("list",length = length(rho[[2]]))
@@ -51,11 +51,19 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter){
     }
 
     ## generate the network data
-    if (heter==TRUE){
+    if (heter==TRUE & community2==F){
       ss=sim_heter(p = p,prob=prob,alpha = alpha,age = age)
-    }else{
-      ss=sim_homo(p = p,prob=prob,tau = 1/alpha,age = age)
     }
+    if (heter==TRUE & community2==T){
+      ss=sim_2heter(p=p,prob=prob,alpha1=uu[1],alpha2=uu[2],age=age)
+    }
+    if (heter==F & community2==F){
+      ss=sim_homo(p = p,prob=prob,tau = 1/alpha[1],age = age)
+    }
+    if (heter==F & community2==T){
+      ss=sim_2homo(p=p,prob=prob,tau1=uu[1],tau2=uu[2],age=age)
+    }
+
     simdata=ss$data
     tau=ss$tau
     lower=min(abs(tau))
