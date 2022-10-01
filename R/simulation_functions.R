@@ -55,16 +55,17 @@ sim_heter=function(p,prob,alpha,age){
 sim_2heter=function(p,prob,alpha1,alpha2,age){
   print("two-community heter data are generated")
   p1=floor(p/2)
-  result1=sim_heter(p=p1,prob = prob,alpha = alpha1,age=age)
-  result2=sim_heter(p=p-p1,prob = prob,alpha = alpha2,age=age)
+  m=length(age)
+  result1=sim_heter(p=p1,prob = prob,alpha = rep(alpha1,m),age=age)
+  result2=sim_heter(p=p-p1,prob = prob,alpha = rep(alpha2,m),age=age)
   data1=result1[[1]]
   K1=result1[[4]]
   data2=result2[[1]]
   K2=result2[[4]]
-  K=bdiag(K1,K2)
+  K=as.matrix(bdiag(K1,K2))
   data=vector("list",length(data1))
   for (i in 1:length(data1)) {
-  data[[i]]=merge(data1[[i]],data2[[i]],by=c("id","age"))
+  data[[i]]=cbind(data1[[i]],data2[[i]][,-c(1,2)])
   }
   result=list(data=data,precision=K)
   return(result)
@@ -129,9 +130,9 @@ sim_2homo=function(p,prob,tau1,tau2,age){
   sim2=sim_homo(p=p-p1,prob = prob,tau =tau2,age=age)
   data1=sim1[[1]]
   data2=sim2[[1]]
-  K=bdiag(sim1[[3]],sim2[[3]])
+  K=as.matrix(bdiag(sim1[[3]],sim2[[3]]))
   for (i in 1:m) {
-  data[[i]]=merge(data1[[i]],data2[[i]],by=c("id","age"))
+  data[[i]]=cbind(data1[[i]],data2[[i]][,-c(1,2)])
   }
   result=list(data=data,precision=K)
   return(result)

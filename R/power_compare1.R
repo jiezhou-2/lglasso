@@ -65,9 +65,8 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0)){
     }
 
     simdata=ss$data
-    tau=ss$tau
-    lower=min(abs(tau))
-    upper=max(abs(tau))
+    lower=0.01
+    upper=20
     graph=ss$precision
     dd=do.call(rbind,simdata)
     id=unique(dd[,1])

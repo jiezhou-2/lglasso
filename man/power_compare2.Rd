@@ -4,7 +4,7 @@
 \alias{power_compare2}
 \title{Main simulation function comparing five methods for network selection.}
 \usage{
-power_compare2(m, n, p, coe, l, rho, prob, heter, nu)
+power_compare2(m, n, p, coe, l, rho, prob, heter)
 }
 \arguments{
 \item{m}{number of subjects}
