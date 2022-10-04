@@ -44,7 +44,6 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
         is[[i]]=iss(idata = idata,itau = tau1[i],type = type)
       }
 ll=ll+max(z)
-save(tau1,file="tau1.rd")
     }
     tau_em=rbind(tau_em,tau1)
     s=Reduce("+",is)/nrow(data)

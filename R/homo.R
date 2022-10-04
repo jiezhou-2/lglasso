@@ -73,18 +73,15 @@ ll_homo=function(data,omega,tau,type){
 #' @author Jie Zhou
 #' @return A list for estimates of precision matrix and correlation parameter for given tuning parameter
 homolongraph=function(data, rho,type, tole,lower,upper){
-  tau0=1
   omega0=diag(ncol(data)-2)
   subject=data[,1]
   subjectid=unique(subject)
   m=length(subjectid)
   p=ncol(data)-2
-  tau=tau0
   is=vector("list",m)
+  x=seq(lower,upper,length=100)
   k=1
-  #tau1=rep(0,m)
   while(1){
-    x=seq(lower,upper,length=50)
     z=sapply(x, ll_homo,data=data,omega=omega0,type=type)
     tau1=x[min(which(z==max(z)))]
     #print(paste("Iteration ",k,":","tau=",tau1))
@@ -94,16 +91,13 @@ homolongraph=function(data, rho,type, tole,lower,upper){
     }
     s=Reduce("+",is)/nrow(data)
     omega1=glasso::glasso(s=s,rho = rho)$wi
-    #G=glasso::glasso(s=s,rho = rho)$wi
-    #omega1=mle_net(data=data,priori=G)
-    if (abs(tau0-tau1)<tole & max(abs(omega0-omega1))<tole){
+    if (max(abs(omega0-omega1))<tole){
       break
     }
-    if (k>=20){
+    if (k>=15){
       warning("the algorithm does not converge")
       break
     }else{
-      tau0=tau1
       omega0=omega1
       k=k+1
     }

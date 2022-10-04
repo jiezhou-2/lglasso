@@ -65,7 +65,7 @@ power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0),zirate
       ss=sim_homo(p = p,prob=prob,tau = 1/alpha[1],age = age,zirate=zirate)
     }
     if (heter==F & community2==T){
-      ss=sim_2homo(p=p,prob=prob,tau1=exp(uu[1]),tau2=exp(uu[2]),age=age,zirate = zirate)
+      ss=sim_2homo(p=p,prob=prob,tau1=1/exp(uu[1]),tau2=1/exp(uu[2]),age=age,zirate = zirate)
     }
 
     simdata=ss$data
