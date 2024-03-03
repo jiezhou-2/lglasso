@@ -136,7 +136,7 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 #' @param alpha Parameter in exponential distribution
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-#' @export
+
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 ilogdensity=function(idata,omega,tau,alpha,type){
   if (det(omega)<=0) {

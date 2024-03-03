@@ -8,7 +8,7 @@
 #' @param tau Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-#' @export
+
 #' @return Value of likelihood function for subject i at given omega and tau
 
 lli_homo=function(idata,omega,tau,type){
@@ -47,7 +47,7 @@ return(a)
 #' @param tau  Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-#' @export
+
 #' @return  Value of likelihood function at given omega and tau
 ll_homo=function(data,omega,tau,type){
   id=unique(data[,1])

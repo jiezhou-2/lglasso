@@ -13,7 +13,7 @@
 #'         uu[2] is the dampening rate for community 2.Both are in log scale and
 #'         in alpha form.
 #' @return list with length equal to 3.
-#' @export
+
 
 power_compare1=function(m,n,p,coe,l,rho,prob,heter,community2=F,uu=c(0,0),zirate=c(0.2,0)){
   results=vector("list",length = 5) # container for the final FPR and TPR
