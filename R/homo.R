@@ -8,7 +8,7 @@
 #' @param tau Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-
+#' @noRd
 #' @return Value of likelihood function for subject i at given omega and tau
 
 lli_homo=function(idata,omega,tau,type){
@@ -47,7 +47,7 @@ return(a)
 #' @param tau  Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-
+#' @noRd
 #' @return  Value of likelihood function at given omega and tau
 ll_homo=function(data,omega,tau,type){
   id=unique(data[,1])
@@ -71,6 +71,7 @@ ll_homo=function(data,omega,tau,type){
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
 #' @author Jie Zhou
+#' @noRd
 #' @return A list for estimates of precision matrix and correlation parameter for given tuning parameter
 homolongraph=function(data, rho,type, tole,lower,upper){
   omega0=diag(ncol(data)-2)
@@ -117,6 +118,7 @@ homolongraph=function(data, rho,type, tole,lower,upper){
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
 #' @author Jie Zhou
+#' @noRd
 #' @return A list for estimates of precision matrix and correlation parameter for given tuning parameter
 mle_tau=function(data, omega, type,lower,upper){
   x=seq(lower,upper,length=50)

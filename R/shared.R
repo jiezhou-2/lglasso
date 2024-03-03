@@ -4,7 +4,7 @@
 #' @param tau correlation parameter
 #' @param type The type of correlation function, which typically take either 0,1 or 2.
 #' @author Jie Zhou
-
+#' @noRd
 #' @return A square matrix with dimension equal to the length of vector t
 phifunction=function(t,tau,type=1){
   n=length(t)
@@ -30,7 +30,7 @@ phifunction=function(t,tau,type=1){
 #' @param itau Correlation parameter
 #' @param type  Type of correlation function, which typically take either  0, 1 or 2.
 #' @author Jie Zhou
-
+#' @noRd
 #' @return Empirical quasi covariance matrix
 iss=function(idata,itau,type){
   t=idata[,2]
@@ -60,7 +60,7 @@ iss=function(idata,itau,type){
 #' @param priori Given structure of precision matrix
 #' @author Jie Zhou
 #' @return The maximum likelihood estimation
-
+#' @noRd
 mle_net=function(data,priori){
   data=data[,-c(1,2)]
   priori=priori+t(priori)
@@ -168,6 +168,7 @@ lglasso=function(data,x=NULL, rho,heter=TRUE,type=1, tole=0.01,lower=0.01,upper=
 #' @return A list which include the maximum likelihood estimate of precision matrix, correlation parameter \code{tau}. If \code{heter=TRUE},
 #' the output also include the estimate of alpha where \code{tau~exp(alpha)}
 #' @author Jie Zhou
+#' @noRd
 mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=10){
   mlenetwork=mle_net(data = data,priori = network)
   if (heter==TRUE){
@@ -193,6 +194,7 @@ mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=1
 #' @param data The data of interest
 #' @param G The estimated network
 #' @return The value of bic
+#' @noRd
 bicfunction=function(data,G,Tem){
   if (det(G)<=0){
     warning("G is not positive definite matrix!")

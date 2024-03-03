@@ -11,7 +11,7 @@
 #' @param age A list with length equal to the number of subjects. Each component is a vector indicating the
 #' time points at which the observations was made.
 #' @return A list for the simulated data and its parameters
-
+#' @noRd
 sim_heter=function(p,prob,alpha,age,zirate=c(0.2,0)){
   print("heter data are generated")
   m=length(age)
@@ -53,7 +53,7 @@ sim_heter=function(p,prob,alpha,age,zirate=c(0.2,0)){
 #' @param age A list with length equal to the number of subjects. Each component is a vector indicating the
 #' time points at which the observations was made.
 #' @return A list for the simulated data and its parameters
-
+#' @noRd
 sim_2heter=function(p,prob,alpha1,alpha2,age,zirate=c(0.2,0)){
   print("two-community heter data are generated")
   p1=floor(p/2)
@@ -85,7 +85,7 @@ sim_2heter=function(p,prob,alpha1,alpha2,age,zirate=c(0.2,0)){
 #' @param age  A list with length equal to the number of subjects. Each component is a vector indicating the
 #' time points at which the observations was made.
 #' @return A list for simulated data
-
+#' @noRd
 
 sim_homo=function(p,prob,tau,age,zirate=c(0.2,0)){
   print("homo data are generated")
@@ -119,7 +119,7 @@ sim_homo=function(p,prob,tau,age,zirate=c(0.2,0)){
 #' zirate[1] is the lower percentage of data to be censored, zirate[2] is
 #' the censor probability for the selected ones.
 #' @return A censored matrix
-
+#' @noRd
 cenfunction=function(data,zirate=c(0.2,0)){
   if (prod(zirate==0)){
     return(dd=data)
@@ -148,7 +148,7 @@ cenfunction=function(data,zirate=c(0.2,0)){
 #' @param age  A list with length equal to the number of subjects. Each component is a vector indicating the
 #' time points at which the observations was made.
 #' @return A list for simulated data
-
+#' @noRd
 sim_2homo=function(p,prob,tau1,tau2,age,zirate=c(0.2,0)){
   print("two-community homo data are generated")
   p1=floor(p/2)
@@ -179,7 +179,7 @@ sim_2homo=function(p,prob,tau1,tau2,age,zirate=c(0.2,0)){
 #' @param estimate The estimated network
 #'
 #' @return TPR and FPR
-
+#' @noRd
 comparison=function(real, estimate){
   real=real+t(real)
   diag(real)=1
@@ -216,7 +216,7 @@ comparison=function(real, estimate){
 #' @param lambda Tuning parameter for lasso
 #'
 #' @return Matrix representing the network
-
+#' @noRd
 addition=function(data,lambda){
   data=data[,-c(1,2)]
   p=ncol(data)

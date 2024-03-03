@@ -12,6 +12,7 @@
 #' @author Jie Zhou
 #' @importFrom glasso glasso
 #' @return S list with three components which are the final estimate of alpha, tau and precision matrix omega
+#' @noRd
 covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
   coe0=rep(1,ncol(covariates))
   omega0=diag(ncol(data)-2)
@@ -97,8 +98,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
 #' @param tole  Error tolerance for determination of convergence of EM algorithm
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
-#' @author Jie Zhou
-#' @importFrom glasso glasso
+#' @noRd
 
 covamle_alpha=function(data,covariates,alpha0,omega, type, tole, lower,upper){
   coe0=rep(1,ncol(covariates))
@@ -160,6 +160,7 @@ covamle_alpha=function(data,covariates,alpha0,omega, type, tole, lower,upper){
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
+#' @noRd
 icovalogdensity=function(idata,icovariates,omega,tau,coe,type){
   if (det(omega)<=10^(-20)) {
     warning("In icovalogdensity, omega is not poitive definite matrix!")

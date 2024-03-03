@@ -10,7 +10,7 @@
 #' @param rho1 tuning parameter for glasso
 #' @param rho2 tuning parameter for glasso
 #' @return list with length equal to 3.
-
+#' @noRd
 
 power_compare2=function(m,n,p,coe,l,rho,prob,heter){
   results=vector("list",length = 5) # container for the final FPR and TPR
