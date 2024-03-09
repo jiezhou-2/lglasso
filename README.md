@@ -24,5 +24,5 @@ remotes::install_github("jiezhou-2/lglasso", ref ="main")
 
 ## How to use
 
- Please checkout the tutorial on the [package website](https://szhaolab.github.io/diffdriver/).
+ Please checkout the tutorial on the [package website](https://jiezhou-2.github.io/lglasso/).
 
