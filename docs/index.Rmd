@@ -41,6 +41,8 @@ a=lglasso(data = sample_data, rho = 0.7, heter=T, ty = 1)
 (length(which(a$omega!=0))-ncol(a$omega))/2##A sub-network for first five variables
 ##A sub-network
 a$omega[1:5,1:5]
+##loglikelihood 
+a$loglikehood
 ##Compute the MLE
 estimates=mle(data = sample_data,network = a$omega,heter = TRUE,ty =   1)
 ##MLE of precision matrix
@@ -61,6 +63,8 @@ b$tau
 (length(which(b$omega!=0))-ncol(b$omega))/2
 ##A sub-network 
 b$omega[1:5,1:5]
+##loglikelihood 
+b$loglikehood
 ##Compute the MLE 
 estimates=mle(data = sample_data,network = a$omega,heter = FALSE,ty = 1)
 ##MLE of precision matrix
@@ -79,6 +83,8 @@ c$tau
 (length(which(c$omega!=0))-ncol(c$omega))/2##A sub-network for first five variables
 ##A sub-network
 c$omega[1:5,1:5]
+##loglikelihood 
+c$loglikehood
 ##Compute the MLE
 estimates=mle(data = sample_data,network = a$omega,heter = TRUE,ty = 0)
 ##MLE of precision matrix

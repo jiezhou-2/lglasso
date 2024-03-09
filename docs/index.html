@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 
 <html>
@@ -399,23 +398,26 @@ given network structure produced from function <span class="math inline">\(lglas
 <span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.01221084  0.13929301  0.00000000 -0.011420144</span></span>
 <span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; [4,] -0.054166436  0.00000000  0.00000000  0.24948162  0.000000000</span></span>
 <span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; [5,] -0.006031272 -0.02402736 -0.01141930  0.00000000  0.173281135</span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="do">##Compute the MLE</span></span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>estimates<span class="ot">=</span><span class="fu">mle</span>(<span class="at">data =</span> sample_data,<span class="at">network =</span> a<span class="sc">$</span>omega,<span class="at">heter =</span> <span class="cn">TRUE</span>,<span class="at">ty =</span>   <span class="dv">1</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="do">##MLE of precision matrix</span></span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>estimates<span class="sc">$</span>network[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]         [,5]</span></span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; [1,]  0.153874092 -0.01426075  0.00000000 -0.06386961  0.004098857</span></span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; [2,] -0.014260747  0.13899309 -0.02616401  0.00000000 -0.033777338</span></span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.02616401  0.12363421  0.00000000  0.011197661</span></span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; [4,] -0.063869612  0.00000000  0.00000000  0.28212349  0.000000000</span></span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; [5,]  0.004098857 -0.03377734  0.01119766  0.00000000  0.211890394</span></span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="do">##MLE of correlation parameters tau</span></span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>estimates<span class="sc">$</span>tau</span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt;  [1] 3.2720408 1.2332653 3.4759184 3.0681633 1.8448980 2.6604082 0.8255102</span></span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;  [8] 3.2720408 1.4371429 1.8448980 1.8448980 1.0293878 2.8642857</span></span>
-<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="do">##MLE of popular parameter alpha </span></span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>estimates<span class="sc">$</span>alpha</span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; [1] 0.4533905</span></span></code></pre></div>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="do">##loglikelihood </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>a<span class="sc">$</span>loglikehood</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; [1] 728.208</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="do">##Compute the MLE</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>estimates<span class="ot">=</span><span class="fu">mle</span>(<span class="at">data =</span> sample_data,<span class="at">network =</span> a<span class="sc">$</span>omega,<span class="at">heter =</span> <span class="cn">TRUE</span>,<span class="at">ty =</span>   <span class="dv">1</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="do">##MLE of precision matrix</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>estimates<span class="sc">$</span>network[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]         [,5]</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; [1,]  0.153874092 -0.01426075  0.00000000 -0.06386961  0.004098857</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; [2,] -0.014260747  0.13899309 -0.02616401  0.00000000 -0.033777338</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.02616401  0.12363421  0.00000000  0.011197661</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; [4,] -0.063869612  0.00000000  0.00000000  0.28212349  0.000000000</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; [5,]  0.004098857 -0.03377734  0.01119766  0.00000000  0.211890394</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="do">##MLE of correlation parameters tau</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>estimates<span class="sc">$</span>tau</span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;  [1] 3.2720408 1.2332653 3.4759184 3.0681633 1.8448980 2.6604082 0.8255102</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt;  [8] 3.2720408 1.4371429 1.8448980 1.8448980 1.0293878 2.8642857</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="do">##MLE of popular parameter alpha </span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>estimates<span class="sc">$</span>alpha</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; [1] 0.4533905</span></span></code></pre></div>
 </div>
 <div id="example-2-homogeneous-model-with-dampening-correlation." class="section level4">
 <h4>Example 2: Homogeneous model with dampening correlation.</h4>
@@ -437,19 +439,22 @@ given network structure produced from function <span class="math inline">\(lglas
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.01353843  0.144311512  0.00000000 -0.008680870</span></span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; [4,] -0.056677460  0.00000000  0.000000000  0.26442399  0.000000000</span></span>
 <span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; [5,] -0.007846583 -0.02349681 -0.008679002  0.00000000  0.176691127</span></span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="do">##Compute the MLE </span></span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>estimates<span class="ot">=</span><span class="fu">mle</span>(<span class="at">data =</span> sample_data,<span class="at">network =</span> a<span class="sc">$</span>omega,<span class="at">heter =</span> <span class="cn">FALSE</span>,<span class="at">ty =</span> <span class="dv">1</span>)</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="do">##MLE of precision matrix</span></span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>estimates<span class="sc">$</span>network[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]         [,5]</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; [1,]  0.153874092 -0.01426075  0.00000000 -0.06386961  0.004098857</span></span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt; [2,] -0.014260747  0.13899309 -0.02616401  0.00000000 -0.033777338</span></span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.02616401  0.12363421  0.00000000  0.011197661</span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; [4,] -0.063869612  0.00000000  0.00000000  0.28212349  0.000000000</span></span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; [5,]  0.004098857 -0.03377734  0.01119766  0.00000000  0.211890394</span></span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="do">##MLE of correlation parameter</span></span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>estimates<span class="sc">$</span>tau</span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; [1] 2.048776</span></span></code></pre></div>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="do">##loglikelihood </span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>b<span class="sc">$</span>loglikehood</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="do">##Compute the MLE </span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>estimates<span class="ot">=</span><span class="fu">mle</span>(<span class="at">data =</span> sample_data,<span class="at">network =</span> a<span class="sc">$</span>omega,<span class="at">heter =</span> <span class="cn">FALSE</span>,<span class="at">ty =</span> <span class="dv">1</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="do">##MLE of precision matrix</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>estimates<span class="sc">$</span>network[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]         [,5]</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; [1,]  0.153874092 -0.01426075  0.00000000 -0.06386961  0.004098857</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; [2,] -0.014260747  0.13899309 -0.02616401  0.00000000 -0.033777338</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.02616401  0.12363421  0.00000000  0.011197661</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; [4,] -0.063869612  0.00000000  0.00000000  0.28212349  0.000000000</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; [5,]  0.004098857 -0.03377734  0.01119766  0.00000000  0.211890394</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="do">##MLE of correlation parameter</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>estimates<span class="sc">$</span>tau</span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt; [1] 2.048776</span></span></code></pre></div>
 </div>
 <div id="example-3-heterogeneous-model-with-uniform-correlation." class="section level4">
 <h4>Example 3: Heterogeneous model with uniform correlation.</h4>
@@ -474,23 +479,26 @@ given network structure produced from function <span class="math inline">\(lglas
 <span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; [3,] -0.0008412687 -0.01540699  0.1417764052  0.00000000 -0.005767419</span></span>
 <span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; [4,] -0.0621495962  0.00000000  0.0000000000  0.27176081  0.000000000</span></span>
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; [5,] -0.0083712152 -0.02391680 -0.0057672289  0.00000000  0.173652244</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="do">##Compute the MLE</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>estimates<span class="ot">=</span><span class="fu">mle</span>(<span class="at">data =</span> sample_data,<span class="at">network =</span> a<span class="sc">$</span>omega,<span class="at">heter =</span> <span class="cn">TRUE</span>,<span class="at">ty =</span> <span class="dv">0</span>)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="do">##MLE of precision matrix</span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>estimates<span class="sc">$</span>network[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]         [,5]</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; [1,]  0.153874092 -0.01426075  0.00000000 -0.06386961  0.004098857</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; [2,] -0.014260747  0.13899309 -0.02616401  0.00000000 -0.033777338</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.02616401  0.12363421  0.00000000  0.011197661</span></span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; [4,] -0.063869612  0.00000000  0.00000000  0.28212349  0.000000000</span></span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; [5,]  0.004098857 -0.03377734  0.01119766  0.00000000  0.211890394</span></span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="do">##MLE of  popular parameter alpha </span></span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>estimates<span class="sc">$</span>alpha</span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt; [1] 0.1916914</span></span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="do">##MLE of correlation parameters tau</span></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>estimates<span class="sc">$</span>tau</span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt;  [1] 4.9030612 4.6991837 4.6991837 5.5146939 6.1263265 5.7185714 4.6991837</span></span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co">#&gt;  [8] 0.8255102 6.3302041 4.9030612 6.9418367 6.5340816 5.9224490</span></span></code></pre></div>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="do">##loglikelihood </span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>c<span class="sc">$</span>loglikehood</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; [1] 792.0847</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="do">##Compute the MLE</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>estimates<span class="ot">=</span><span class="fu">mle</span>(<span class="at">data =</span> sample_data,<span class="at">network =</span> a<span class="sc">$</span>omega,<span class="at">heter =</span> <span class="cn">TRUE</span>,<span class="at">ty =</span> <span class="dv">0</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="do">##MLE of precision matrix</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>estimates<span class="sc">$</span>network[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]         [,5]</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; [1,]  0.153874092 -0.01426075  0.00000000 -0.06386961  0.004098857</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; [2,] -0.014260747  0.13899309 -0.02616401  0.00000000 -0.033777338</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt; [3,]  0.000000000 -0.02616401  0.12363421  0.00000000  0.011197661</span></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt; [4,] -0.063869612  0.00000000  0.00000000  0.28212349  0.000000000</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt; [5,]  0.004098857 -0.03377734  0.01119766  0.00000000  0.211890394</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="do">##MLE of  popular parameter alpha </span></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>estimates<span class="sc">$</span>alpha</span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt; [1] 0.1916914</span></span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="do">##MLE of correlation parameters tau</span></span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>estimates<span class="sc">$</span>tau</span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co">#&gt;  [1] 4.9030612 4.6991837 4.6991837 5.5146939 6.1263265 5.7185714 4.6991837</span></span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co">#&gt;  [8] 0.8255102 6.3302041 4.9030612 6.9418367 6.5340816 5.9224490</span></span></code></pre></div>
 <p>[1] Zhou, J., Gui, J., Viles, W.D., Chen, H., Madan, J.C., Coker,
 M.O., Hoen, A.G., 2021a. Identifying Microbial Interaction Networks
 Based on Irregularly Spaced Longitudinal 16S rRNA sequence data. <a href="https://doi.org/10.1101/2021.11.26.470159" class="uri">https://doi.org/10.1101/2021.11.26.470159</a></p>
@@ -515,6 +523,3 @@ Estimation of Gaussian Graphical Models, Version: 1.11. <a href="https://CRAN.R-
 
 </body>
 </html>
-=======
-
->>>>>>> ff008635f57a077f425f656977332cb53fd33ebf

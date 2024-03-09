@@ -97,14 +97,11 @@ heterlongraph=function(data,rho, ty,tole, lower,upper){
     if (max(abs(tau_em[nrow(tau_em),]-tau_em[nrow(tau_em)-1,]),na.rm = T)<tole){
       break
     }else{
-      alpha0=alpha1
       tau0=tau1
       omega0=omega1
       k=k+1
     }
-
   }
-
   result=list(alpha=alpha1,tau=tau1,omega=omega1,loglikehood=ll)
   return(result)
 }
@@ -142,7 +139,7 @@ mle_alpha=function(data,alpha0,omega, ty, tole, lower,upper){
       idata=data[which(data[,1]==subjectid[i]),]
       x=seq(lower,upper,length=50)
       z=sapply(x, logdensity,idata=idata,omega=omega,alpha=alpha0,ty=ty)
-      tau1[i]=x[min(which(z==min(z)))]
+      tau1[i]=x[min(which(z==max(z)))]
       is[[i]]=iss(idata = idata,itau = tau1[i],ty = ty)
     }
 
@@ -186,10 +183,11 @@ logdensity=function(idata,omega,tau,alpha,ty){
   }
 
   phi=phifunction(t=t,tau = tau,ty = ty)
+  a0=(n/2)*log(det(omega))
   a1=(-p/2)*log(det(phi))
   a2=-t(y)%*%kronecker(solve(phi),omega)%*%y/2
   a3=-alpha*tau
-  a=-(a1+a2+a3)
+  a=a1+a2+a3+a0
   return(a)
 }
 
