@@ -14,9 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-This package implements the algorithms proposed in Zhou et al. (2021), which aims to estimates the microbial interaction network based on Gaussian graphical model and irregularly-spaced longitudinal data. There are two related models in Zhou et al. (2021)  which can handle two different questions.  The first model is called homogeneous stationary Gaussian graphical model (SGGM) in which all the subjects share a same auto-correlation parameter $\tau$. For homogeneous SGGM, an iterative graphical lasso algorithm is proposed to compute the $l_1$ penalized  maximum  likelihood estimate (MLE) of the network. The second model is called heterogeneous SGGM in which each subject possesses his/her own auto-correlation parameter $\tau_i$. For heterogeneous SGGM, given the complex form of its likelihood function, an expectation-maximization (EM) type algorithm is devised to compute the $l_1$ penalized MLE of the network and $\tau_i$'s, which integrates the  EM algorithm with conventional graphical lasso algorithm (Friedman (2019)) and therefore can be implemented  very efficiently. For the details of the algorithms and the output of the packages, please see Zhou et al. (2021). 
-
-
 
 
 ```{r setup}
