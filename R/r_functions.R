@@ -4,7 +4,7 @@
 #' @param tau correlation parameter
 #' @param type The type of correlation function, which typically take either 0,1 or 2.
 #' @author Jie Zhou
-#' @export
+#' @noRd
 #' @return A square matrix with dimension equal to the length of vector t
 phifunction=function(t,tau,type=1){
   n=length(t)
@@ -30,7 +30,7 @@ phifunction=function(t,tau,type=1){
 #' @param itau Correlation parameter
 #' @param type  Type of correlation function, which typically take either  0, 1 or 2.
 #' @author Jie Zhou
-#' @export
+#' @noRd
 #' @return Empirical quasi covariance matrix
 iss=function(idata,itau,type){
   t=idata[,2]
@@ -60,7 +60,7 @@ iss=function(idata,itau,type){
 #' @param priori Given structure of precision matrix
 #' @author Jie Zhou
 #' @return The maximum likelihood estimation
-#' @export
+#' @noRd
 mle_net=function(data,priori){
   data=data[,-c(1,2)]
   priori=priori+t(priori)
@@ -193,7 +193,7 @@ mle=function(data,x=NULL, network,heter=TRUE,type=1,tole=0.01,lower=0.01,upper=1
 #'
 #' @param data The data of interest
 #' @param G The estimated network
-#' @export
+#' @noRd
 #' @return The value of bic
 bicfunction=function(data,G,Tem){
   if (det(G)<=0){
@@ -225,7 +225,7 @@ bicfunction=function(data,G,Tem){
 #' @param tau Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-#' @export
+#' @noRd
 #' @return Value of likelihood function for subject i at given omega and tau
 
 lli_homo=function(idata,omega,tau,type){
@@ -264,7 +264,7 @@ lli_homo=function(idata,omega,tau,type){
 #' @param tau  Correlation parameter
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-#' @export
+#' @noRd
 #' @return  Value of likelihood function at given omega and tau
 ll_homo=function(data,omega,tau,type){
   id=unique(data[,1])
@@ -287,6 +287,7 @@ ll_homo=function(data,omega,tau,type){
 #' @param tole  Error tolerance for determination of convergence of EM algorithm
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
+#' @noRd
 #' @author Jie Zhou
 #' @return A list for estimates of precision matrix and correlation parameter for given tuning parameter
 homolongraph=function(data, rho,type, tole,lower,upper){
@@ -333,6 +334,7 @@ homolongraph=function(data, rho,type, tole,lower,upper){
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
+#' @noRd
 #' @author Jie Zhou
 #' @return A list for estimates of precision matrix and correlation parameter for given tuning parameter
 mle_tau=function(data, omega, type,lower,upper){
@@ -362,6 +364,7 @@ mle_tau=function(data, omega, type,lower,upper){
 #' @param tole Error tolerance for determination of convergence of EM algorithm
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
+#' @noRd
 #' @author Jie Zhou
 #' @importFrom glasso glasso
 #' @return S list with three components which are the final estimate of alpha, tau and precision matrix omega
@@ -444,7 +447,7 @@ heterlongraph=function(data,rho, type,tole, lower,upper){
 #' @param upper Upper bound for prediction of correlation parameter tau
 #' @author Jie Zhou
 #' @importFrom glasso glasso
-
+#' @noRd
 mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
   subject=data[,1]
   subjectid=unique(subject)
@@ -490,7 +493,7 @@ mle_alpha=function(data,alpha0,omega, type, tole, lower,upper){
 #' @param alpha Parameter in exponential distribution
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
 #' @author Jie Zhou
-#' @export
+#' @noRd
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 ilogdensity=function(idata,omega,tau,alpha,type){
   if (det(omega)<=0) {
@@ -527,6 +530,7 @@ ilogdensity=function(idata,omega,tau,alpha,type){
 #' @param tole Error tolerance for determination of convergence of EM algorithm
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
+#' @noRd
 #' @author Jie Zhou
 #' @importFrom glasso glasso
 #' @return S list with three components which are the final estimate of alpha, tau and precision matrix omega
@@ -615,6 +619,7 @@ covaheterlongraph=function(data,covariates,rho, type,tole, lower,upper){
 #' @param tole  Error tolerance for determination of convergence of EM algorithm
 #' @param lower Lower bound for prediction of correlation parameter tau
 #' @param upper Upper bound for prediction of correlation parameter tau
+#' @noRd
 #' @author Jie Zhou
 #' @importFrom glasso glasso
 
@@ -676,6 +681,7 @@ covamle_alpha=function(data,covariates,alpha0,omega, type, tole, lower,upper){
 #' @param tau Correlation parameter
 #' @param alpha Parameter in exponential distribution
 #' @param type Type of correlation function, which can take either  "abs" or "qua".
+#' @noRd
 #' @author Jie Zhou
 #' @return Value of complete likelihood function at given value of omega, tau and alpha
 icovalogdensity=function(idata,icovariates,omega,tau,coe,type){
