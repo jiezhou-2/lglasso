@@ -3,4 +3,3 @@
 usethis::use_data(sample_data, overwrite = TRUE,compress = "xz")
 
 
-
