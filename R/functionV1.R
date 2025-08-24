@@ -36,15 +36,15 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
   if (type=="general"){
     m3=length(unique(data[,2]))
     p=ncol(data)-2
-    nn=length(unique(data$subject))
-    subjects=unique(data$subject)
+    nn=length(unique(data[,1]))
+    subjects=unique(data[,1])
     if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
     A=Variable(m3,m3,PSD=T) # tissue wise inverse correlation matrix
     obj1=(p*nn)/2*log_det(A)
 
 
 
-    data_sub=split(data[,-c(1,2)],data$subject)
+    data_sub=split(data[,-c(1,2)],data[,1])
     amatrix=Reduce("+",lapply(data_sub, function(B,xx){as.matrix(xx)%*%B%*%t(as.matrix(xx))}, B=B))
     obj2=-0.5*matrix_trace(A%*%amatrix)
     obj=-(obj1+obj2)
@@ -63,17 +63,18 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
 
   if (type == "expFixed"){
     p=ncol(data)-2
-    nn=length(unique(data$subject))
-    subjects=unique(data$subject)
+    nn=length(unique(data[,1]))
+    subjects=unique(data[,1])
     if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
     #YY=Variable(p,p,PSD=TRUE)
     time_list=split(data[,2],data[,1])
-    subdata_list=split(data[,-c(1,2)],data$subject)
+    subdata_list=split(data[,-c(1,2)],data[,1])
 
     likefun=function(tau){
       obj1=0
       obj2=0
       for (i in 1:nn) {
+
         datai=as.matrix(subdata_list[[i]])
         t=time_list[[i]]
         Aa=phifunction(t=t,tau = c(tau,expFix))
@@ -96,12 +97,12 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
   ### longitudinal data
   if (type == "twoPara"){
     p=ncol(data)-2
-    nn=length(unique(data$subject))
-    subjects=unique(data$subject)
+    nn=length(unique(data[,1]))
+    subjects=unique(data[,1])
     if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
     #YY=Variable(p,p,PSD=TRUE)
     time_list=split(data[,2],data[,1])
-    subdata_list=split(data[,-c(1,2)],data$subject)
+    subdata_list=split(data[,-c(1,2)],data[,1])
 
     likefun=function(tau){
       obj1=0
@@ -141,23 +142,23 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
   if (type=="general"){
     m3=length(unique(data[,2]))
     p=ncol(data)-2
-    nn=length(unique(data$subject))
-    subjects=unique(data$subject)
+    nn=length(unique(data[,1]))
+    subjects=unique(data[,1])
     if (ncol(A)!=m3 | nrow(A)!=m3){
       stop("Inputs do not match with each other!")
     }
 
-    data_sub=split(data[,-c(1,2)],data$subject)
+    data_sub=split(data[,-c(1,2)],data[,1])
     amatrix=Reduce("+",lapply(data_sub, function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=A))
     bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1])$wi
     return(list(preMatrix=bb))
   }
   if (type == "expFixed"){
     p=ncol(data)-2
-    nn=length(unique(data$subject))
-    subjects=unique(data$subject)
+    nn=length(unique(data[,1]))
+    subjects=unique(data[,1])
 
-    data_sub=split(data[,-c(1,2)],data$subject)
+    data_sub=split(data[,-c(1,2)],data[,1])
     if (length(A)!=length(data_sub)){stop("Data do not match!")}
     bmate=0
     for (i in 1:length(A)) {
@@ -173,10 +174,10 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
 
   if (type == "twoPara"){
     p=ncol(data)-2
-    nn=length(unique(data$subject))
-    subjects=unique(data$subject)
+    nn=length(unique(data[,1]))
+    subjects=unique(data[,1])
 
-    data_sub=split(data[,-c(1,2)],data$subject)
+    data_sub=split(data[,-c(1,2)],data[,1])
     if (length(A)!=length(data_sub)){stop("Data do not match!")}
     bmate=0
     for (i in 1:length(A)) {
@@ -275,7 +276,7 @@ if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
   if (type == "expFixed"){
     if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){stop("Argument expFix is not correctly specified!")}
     p=ncol(data)-2
-    fre=table(data$subject)
+    fre=table(data[,1])
     A=vector("list",length(fre))
     for (i in 1:length(A)) {
       A[[i]]=diag(fre[i])
@@ -331,7 +332,7 @@ tau0=control$tau0
 
   if (type == "twoPara"){
     p=ncol(data)-2
-    fre=table(data$subject)
+    fre=table(data[,1])
     A=vector("list",length(fre))
     for (i in 1:length(A)) {
       A[[i]]=diag(fre[i])

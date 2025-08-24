@@ -26,68 +26,39 @@ library(lglasso)
 There are two main functions in this package. The first one is $lglasso$ which can output a sparse network representing the precision matrix by maximizing the $l_1$ penalized likelihood function. The second function if $mle$, which can compute the maximum likelihood estimates of precision matrix and the correlation parameter $\tau$ for a given network structure produced from function $lglasso$.   
 
 ```{r}
+library(devtools)
 ##The sample data are subset of a larger longitudinal data set  from a clinical project. 
 ##There are 13 clusters  are involved in the sample data.
-sample_data=lglasso:::sample_data
-sample_data[1:5,1:5]
+#load_all()
+data=lglasso:::sample_data
+data=as.data.frame(data)
+data[,1]=as.factor(data[,1])
+data[1:5,1:5]
 dim(sample_data)
-sample_data=as.matrix(sample_data)
 ```
 
-#### Example 1: Heterogeneous model with dampening correlation. 
+#### Examples: 
 ```{r}
-a=lglasso(data = sample_data, rho = 0.7, heter=T, ty = 1)
-##Number of edge in the selected network
-(length(which(a$omega!=0))-ncol(a$omega))/2##A sub-network for first five variables
+a=lglasso(data = sample_data, lambda =  0.7,type = "expFixed",expFix = 1)
+
 ##A sub-network
-a$omega[1:5,1:5]
-##Compute the MLE
-estimates=mle(data = sample_data,network = a$omega,heter = TRUE,ty =   1)
-##MLE of precision matrix
-estimates$network[1:5,1:5]
-##MLE of correlation parameters tau
-estimates$tau
-##MLE of popular parameter alpha 
-estimates$alpha
-```
+a$preMatrix[1:5,1:5]
 
 
-#### Example 2: Homogeneous model with dampening correlation. 
-```{r}
-b=lglasso(data = sample_data, rho = 0.7, heter=F,ty=1)
-##Final estimate of correlation parameters
-b$tau
-##Number of edge in the estimated network
-(length(which(b$omega!=0))-ncol(b$omega))/2
-##A sub-network 
-b$omega[1:5,1:5]
-##Compute the MLE 
-estimates=mle(data = sample_data,network = a$omega,heter = FALSE,ty = 1)
-##MLE of precision matrix
-estimates$network[1:5,1:5]
-##MLE of correlation parameter
-estimates$tau
-```
+a=lglasso(data = sample_data, lambda =  0.7,type = "expFixed",expFix = 2)
 
-
-#### Example 3: Heterogeneous model with uniform correlation. 
-```{r}
-c=lglasso(data = sample_data, rho = 0.7, heter=T, ty=0)
-##Individual level estimate of correlation parameters tau
-c$tau
-##Number of edge in the estimated network
-(length(which(c$omega!=0))-ncol(c$omega))/2##A sub-network for first five variables
 ##A sub-network
-c$omega[1:5,1:5]
-##Compute the MLE
-estimates=mle(data = sample_data,network = a$omega,heter = TRUE,ty = 0)
-##MLE of precision matrix
-estimates$network[1:5,1:5]
-##MLE of  popular parameter alpha 
-estimates$alpha
-##MLE of correlation parameters tau
-estimates$tau
+a$preMatrix[1:5,1:5]
+
+
+a=lglasso(data = sample_data, lambda =  0.7,type = "twoPara")
+
+##A sub-network
+a$preMatrix[1:5,1:5]
 ```
+
+
+
 
 
 [1] Zhou, J., Gui, J., Viles, W.D., Chen, H., Madan, J.C., Coker, M.O., Hoen, A.G., 2021a. Identifying Microbial Interaction Networks Based on Irregularly Spaced Longitudinal 16S rRNA sequence data. https://doi.org/10.1101/2021.11.26.470159

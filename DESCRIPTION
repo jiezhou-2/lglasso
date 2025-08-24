@@ -14,7 +14,8 @@ RoxygenNote: 7.3.2
 URL: https://github.com/jiezhou-2/lglasso
 Suggests: knitr, rmarkdown
 Imports: stats, glasso, CVXR
-Depends: R (>= 2.10)
+Depends: 
+    R (>= 3.5)
 Authors@R: c(person("Jie", "Zhou", role = c("aut", "cre","cph"),
                      email = "chowstat@gmail.com"),
                      person("Jiang", "Gui",role=c("aut")),
