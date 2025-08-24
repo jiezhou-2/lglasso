@@ -1,4 +1,4 @@
-
+## simulate functions
 simulate=function(n,p,m1,m2=0,m3,cc,homo=TRUE){
   ## true structure
   if (ncol(cc)!=m3){stop("Unmatched inputs!")}
