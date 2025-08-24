@@ -26,7 +26,6 @@ library(lglasso)
 There are two main functions in this package. The first one is $lglasso$ which can output a sparse network representing the precision matrix by maximizing the $l_1$ penalized likelihood function. The second function if $mle$, which can compute the maximum likelihood estimates of precision matrix and the correlation parameter $\tau$ for a given network structure produced from function $lglasso$.   
 
 ```{r}
-library(devtools)
 ##The sample data are subset of a larger longitudinal data set  from a clinical project. 
 ##There are 13 clusters  are involved in the sample data.
 #load_all()
@@ -34,24 +33,26 @@ data=lglasso:::sample_data
 data=as.data.frame(data)
 data[,1]=as.factor(data[,1])
 data[1:5,1:5]
-dim(sample_data)
+dim(data)
 ```
 
 #### Examples: 
-```{r}
-a=lglasso(data = sample_data, lambda =  0.7,type = "expFixed",expFix = 1)
+```{r, message=FALSE}
+
+
+a=lglasso(data = data, lambda =  0.7,type = "expFixed",expFix = 1)
 
 ##A sub-network
 a$preMatrix[1:5,1:5]
 
 
-a=lglasso(data = sample_data, lambda =  0.7,type = "expFixed",expFix = 2)
+a=lglasso(data = data, lambda =  0.7,type = "expFixed",expFix = 2)
 
 ##A sub-network
 a$preMatrix[1:5,1:5]
 
 
-a=lglasso(data = sample_data, lambda =  0.7,type = "twoPara")
+a=lglasso(data = data, lambda =  0.7,type = "twoPara")
 
 ##A sub-network
 a$preMatrix[1:5,1:5]
