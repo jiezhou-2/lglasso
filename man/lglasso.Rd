@@ -14,6 +14,8 @@ lglasso(
   tol = 10^(-4),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
+  cores = 1,
+  K = 1,
   ...
 )
 }

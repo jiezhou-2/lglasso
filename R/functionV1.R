@@ -136,9 +136,10 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
 
 
 
-BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
-            tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5),...){
+BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,maxit=100,
+            tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("warm","cold"),w.init=NULL,wi.init=NULL,...){
   type=match.arg(type)
+  start=match.arg(start)
   if (type=="general"){
     m3=length(unique(data[,2]))
     p=ncol(data)-2
@@ -150,7 +151,14 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
 
     data_sub=split(data[,-c(1,2)],data[,1])
     amatrix=Reduce("+",lapply(data_sub, function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=A))
-    bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1])$wi
+
+    if (start=="warm"){
+      #w.init=diag(diag(cov(data[,-c(1,2)])))
+      #wi.init=diag(1/diag(w.init))
+    bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)$wi
+    }else{
+      bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")$wi
+    }
     return(list(preMatrix=bb))
   }
   if (type == "expFixed"){
@@ -166,7 +174,14 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
       yy=solve(as.matrix(A[[i]]))
       bmate=t(xx)%*%yy%*%xx+bmate
     }
-    bb=glasso::glasso(s=bmate/nrow(data),rho = lambda[1])$wi
+
+    if (start=="warm"){
+      #w.init=cov(data[,-c(1,2)])
+      #wi.init=diag(ncol(w.init))
+      bb=glasso::glasso(s=bmat/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)$wi
+    }else{
+      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")$wi
+    }
 
     return(list(preMatrix=bb))
 
@@ -185,7 +200,15 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
       yy=solve(as.matrix(A[[i]]))
       bmate=t(xx)%*%yy%*%xx+bmate
     }
-    bb=glasso::glasso(s=bmate/nrow(data),rho = lambda[1])$wi
+
+    if (start=="warm"){
+     # w.init=cov(data[,-c(1,2)])
+    #  wi.init=diag(ncol(w.init))
+      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)$wi
+    }else{
+      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")$wi
+    }
+
 
     return(list(preMatrix=bb))
 
@@ -221,15 +244,33 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),maxit=100,
 #' @import CVXR
 #' @export
 #'
-lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,maxit=100,
-                 tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5),
+lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=100,
+                 tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
                  ...)
 
   {
+
+
 if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
   stop("Arguments (group, lambda) do not match!")
 }
+
+  if (!all(lambda>0)){
+    stop("lambda must be positive!")
+  }
+
+
+
+
   type=match.arg(type)
+  start=match.arg(start)
+
+
+  X_bar = apply(data[,-c(1,2)], 2, mean)
+  data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
+
+
+
   if (type=="general"){
     m3=length(unique(data[,2]))
     p=ncol(data)-2
@@ -242,11 +283,14 @@ if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
       # if (length(lambda)==1){
 
       A1=AA(data = data,B = B, type=type,...)$corMatrix
-      B1=BB(data=data,A=A,lambda = lambda, type=type)$preMatrix
+#browser()
+      B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)$preMatrix
 
       d1=round(max(abs(B-B1)),3)
       d2=round(max(abs(A-A1)),3)
+      if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation difference: ",d2))
+      }
       if (d1<=tol & d2<= tol ){
         if (is.null(group)){
           return(list(preMatrix=B1, corMatrix=A1))
@@ -289,13 +333,15 @@ tau0=control$tau0
 
       #A1=AA(data = data,B = B, type=type,fix=expFix, init=tau0,lower = lower,upper = upper)
       A1=AA(data = data,B = B, type=type,expFix,...)
-      B1=BB(data=data,A=A,lambda = lambda[1], type=type)$preMatrix
+      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)$preMatrix
 
       d1=round(max(abs(B-B1)),4)
       d2=round(max(abs(tau0-A1$tau)),4)
+      if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
+      }
       if (d1<=tol & d2<= tol ){
-#browser()
+
         if (is.null(group)){
           return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0))
         }else{
@@ -344,11 +390,13 @@ tau0=control$tau0
       k=k+1
 
       A1=AA(data = data,B = B, type=type, fix=fix)
-      B1=BB(data=data,A=A,lambda = lambda[1], type=type)$preMatrix
+      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init,...)$preMatrix
 
       d1=round(max(abs(B-B1)),4)
       d2=round(max(abs(tau0-A1$tau)),4)
+      if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
+      }
       if (d1<= tol & d2<= tol ){
 
         if (is.null(group)){
@@ -412,8 +460,6 @@ return(individual=S_est)
 
 
 llike=function(data,A, preMatrix, individual){
-
-
 
 }
 

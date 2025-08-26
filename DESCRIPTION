@@ -1,7 +1,7 @@
 Package: lglasso
 Type: Package
 Title: Longitudinal Graphical Lasso
-Version: 0.1.0
+Version: 1.0.0
 Description: For high-dimensional correlated observations, this package carries out the L_1 penalized maximum likelihood 
             estimation of the precision matrix (network) and the correlation parameters. The correlated data can be 
             longitudinal data (may be irregularly spaced) with dampening correlation or clustered data with uniform correlation.  
