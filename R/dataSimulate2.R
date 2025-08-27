@@ -1,4 +1,18 @@
 
+#' Title
+#'
+#' @param n
+#' @param p
+#' @param m1
+#' @param m2
+#' @param m3
+#' @param cc
+#' @param homo
+#' @import fake MASS
+#' @returns
+#' @export
+#'
+#' @examples
 simulate=function(n,p,m1,m2=0,m3,cc,homo=TRUE){
   ## true structure
   if (ncol(cc)!=m3){stop("Unmatched inputs!")}
@@ -23,7 +37,7 @@ simulate=function(n,p,m1,m2=0,m3,cc,homo=TRUE){
     theta[lower.tri(theta, diag = TRUE)] = 0
     theta = theta + t(theta) + diag(p)
     theta = theta * real_stru
-    theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
+    theta=fake::MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
     colnames(theta)=paste0("metabolite",1:p)
     rownames(theta)=paste0("metabolite",1:p)
     sigma=solve(theta)
@@ -138,6 +152,17 @@ for (i in 1:m3) {
 
 
 
+#' Title
+#'
+#' @param n
+#' @param p
+#' @param m1
+#' @param tau
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 simulate_long=function(n,p,m1,tau){
   ## true structure
   timepoint=vector("list",n)
@@ -192,6 +217,17 @@ simulate_long=function(n,p,m1,tau){
 
 
 
+#' Title
+#'
+#' @param n
+#' @param p
+#' @param m1
+#' @param alpha
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 simulate_heter=function(n,p,m1,alpha){
   ## true structure
   timepoint=vector("list",n)

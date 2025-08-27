@@ -1,5 +1,5 @@
 ---
-title: "Introduction_of_lglasso_package"
+title: "lglasso: identify networks from correlated data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction_of_lglasso_package}
@@ -19,24 +19,15 @@ This package implements the algorithms proposed in Zhou et al. (2021), which aim
 
 
 
-```{r setup}
+```{r setup, message=FALSE}
 library(lglasso)
 ```
 
 There are two main functions in this package. The first one is $lglasso$ which can output a sparse network representing the precision matrix by maximizing the $l_1$ penalized likelihood function. The second function if $mle$, which can compute the maximum likelihood estimates of precision matrix and the correlation parameter $\tau$ for a given network structure produced from function $lglasso$.   
 
 ```{r, message=FALSE}
-library(matrixcalc)
-library(fake)
-library(CVXR)
-library(expm)
-library(purrr)
-library(stors)
-library(MASS)
-library(devtools)
-load_all()
-p=50
-m1=100
+p=10
+m1=10
 m2=0
 m3=5
 n=20
@@ -44,19 +35,31 @@ rho=0.8
 
 ```
 
-#### Model 1: clustered data with no correlation structure
+## Model 1: clustered data with no correlation structure
 ```{r, message=FALSE}
 set.seed(5)
 cc=matrix(rho,ncol = m3,nrow = m3)
 diag(cc)=1
 dd=simulate(n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc,homo=T)
 ddata=dd$data
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="general",group = ddata[,2])
-aa=lglasso(data=ddata,lambda = 0.1,type="general")
- cov2cor(aa$v)
 ```
 
-#### Model 2: longitudinal data with one-parameter structured correlation 
+### estimate individual networks
+```{r}
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="general",group = ddata[,2])
+aa
+cov2cor(aa$v)
+```
+
+### estiamte general networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = 0.1,type="general")
+aa
+cov2cor(aa$v)
+```
+
+## Model 2: longitudinal data with one-parameter structured correlation 
 
 
 ```{r}
@@ -65,14 +68,26 @@ aa=lglasso(data=ddata,lambda = 0.1,type="general")
 dd=simulate_long(n=n,p=p,m1=m1,tau=c(2,1))
 ddata=dd$data
 group=rep(c(1,2),71)
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group)
-aa=lglasso(data=ddata,lambda = 0.1,,type="expFixed",expFix=1)
-aa$tauhat
-cov2cor(aa$vList[[1]])
 ```
 
 
-#### Model 3: longitudinal data with two-parameter structured correlation 
+### estimate individual networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group)
+aa
+```
+
+
+### estiamte general networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = 0.1,,type="expFixed",expFix=1)
+aa
+```
+
+
+## Model 3: longitudinal data with two-parameter structured correlation 
 
 ```{r}
 
@@ -80,10 +95,22 @@ set.seed(5)
 dd=simulate_long(n=n,p=p,m1=m1,tau=c(2,1))
 ddata=dd$data
 group=rep(c(1,2),71)
+```
+
+
+### estimate individual networks
+
+```{r}
 aa=lglasso(data=ddata,lambda = c(0.001,0.1),type="twoPara",group=group)
+aa
+```
+
+
+### estiamte general networks
+
+```{r}
 aa=lglasso(data=ddata,lambda = 0.001,type="twoPara")
-aa$tauhat
-cov2cor(aa$vList[[1]])
+aa
 ```
 
 

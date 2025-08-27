@@ -5,6 +5,7 @@
 #' @param tau length 2 vector representing the correlation parameter between time points
 #' @param type The type of correlation function, which typically take either 0,1 or 2.
 #' @author Jie Zhou
+#' @export
 #' @noRd
 #' @return A square matrix with dimension equal to the length of vector t
 phifunction=function(t,tau){
@@ -292,10 +293,10 @@ if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
       }
       if (d1<=tol & d2<= tol ){
         if (is.null(group)){
-          return(list(wi=B1$preMatrix, v=A1, w=B1$corMatrix))
+          return(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1))
           }else{
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1, v=A1, wiList=individial))
+          return(list(wi=B1$preMatrix,  wiList=individial,v=A1))
         }
 
       }else{
@@ -306,10 +307,10 @@ if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
         warning("Algorithm did not converge!")
 
         if (is.null(group)){
-          return(list(wi=B1$preMatrix, v=A1,w=B1$corMatrix))
+          return(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1))
         }else{
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1$preMatrix, v=A1, wiList=individial))
+          return(list(wi=B1$preMatrix,wiList=individial, v=A1))
         }
 
       }
@@ -345,12 +346,12 @@ tau0=control$tau0
       if (d1<=tol & d2<= tol ){
 
         if (is.null(group)){
-          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix, vList=A1$corMatrixList, tauhat=tau0))
         }else{
 
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
 
-          return(list(wi=B1, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
         }
 
 
@@ -363,11 +364,11 @@ tau0=control$tau0
       if (k>=maxit){
         warning("Algorithm did not converge!")
         if (is.null(group)){
-          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix, vList=A1$corMatrixList, tauhat=tau0))
         }else{
           #browser()
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
         }
       }
     }
@@ -401,12 +402,12 @@ tau0=control$tau0
       if (d1<= tol & d2<= tol ){
 
         if (is.null(group)){
-          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix, vList=A1$corMatrixList, tauhat=tau0))
         }else{
 
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
 
-          return(list(wi=B1, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
         }
 
       }else{
@@ -422,7 +423,7 @@ tau0=control$tau0
         }else{
           #browser()
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1,wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1$preMatrix,wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
       }
     }
     }
