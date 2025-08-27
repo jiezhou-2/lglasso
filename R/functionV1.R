@@ -155,11 +155,11 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
     if (start=="warm"){
       #w.init=diag(diag(cov(data[,-c(1,2)])))
       #wi.init=diag(1/diag(w.init))
-    bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)$wi
+    bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
     }else{
-      bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")$wi
+      bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
     }
-    return(list(preMatrix=bb))
+    return(list(preMatrix=bb$wi, corMatrix=bb$w))
   }
   if (type == "expFixed"){
     p=ncol(data)-2
@@ -178,12 +178,12 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
     if (start=="warm"){
       #w.init=cov(data[,-c(1,2)])
       #wi.init=diag(ncol(w.init))
-      bb=glasso::glasso(s=bmat/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)$wi
+      bb=glasso::glasso(s=bmat/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
     }else{
-      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")$wi
+      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
     }
 
-    return(list(preMatrix=bb))
+    return(list(preMatrix=bb$wi,corMatrix=bb$w))
 
   }
 
@@ -204,13 +204,13 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
     if (start=="warm"){
      # w.init=cov(data[,-c(1,2)])
     #  wi.init=diag(ncol(w.init))
-      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)$wi
+      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
     }else{
-      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")$wi
+      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
     }
 
 
-    return(list(preMatrix=bb))
+    return(list(preMatrix=bb$wi,corMatrix=bb$w))
 
   }
 
@@ -280,42 +280,44 @@ if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
 
     while(1){
       k=k+1
-      # if (length(lambda)==1){
 
       A1=AA(data = data,B = B, type=type,...)$corMatrix
 #browser()
-      B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)$preMatrix
+      B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
 
-      d1=round(max(abs(B-B1)),3)
+      d1=round(max(abs(B-B1$preMatrix)),3)
       d2=round(max(abs(A-A1)),3)
       if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation difference: ",d2))
       }
       if (d1<=tol & d2<= tol ){
         if (is.null(group)){
-          return(list(preMatrix=B1, corMatrix=A1))
+          return(list(wi=B1$preMatrix, v=A1, w=B1$corMatrix))
           }else{
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1, group=group)
-          return(list(preMatrix=B1, corMatrix=A1, individial=individial))
+          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
+          return(list(wi=B1, v=A1, wiList=individial))
         }
 
       }else{
         A=A1
-        B=B1
+        B=B1$preMatrix
       }
       if (k>=maxit){
         warning("Algorithm did not converge!")
 
         if (is.null(group)){
-          return(list(preMatrix=B1, corMatrix=A1))
+          return(list(wi=B1$preMatrix, v=A1,w=B1$corMatrix))
         }else{
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1, group=group)
-          return(list(preMatrix=B1, corMatrix=A1, individial=individial))
+          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
+          return(list(wi=B1$preMatrix, v=A1, wiList=individial))
         }
 
       }
     }
   }
+
+
+
 
   if (type == "expFixed"){
     if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){stop("Argument expFix is not correctly specified!")}
@@ -333,9 +335,9 @@ tau0=control$tau0
 
       #A1=AA(data = data,B = B, type=type,fix=expFix, init=tau0,lower = lower,upper = upper)
       A1=AA(data = data,B = B, type=type,expFix,...)
-      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)$preMatrix
+      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)
 
-      d1=round(max(abs(B-B1)),4)
+      d1=round(max(abs(B-B1$preMatrix)),4)
       d2=round(max(abs(tau0-A1$tau)),4)
       if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
@@ -343,29 +345,29 @@ tau0=control$tau0
       if (d1<=tol & d2<= tol ){
 
         if (is.null(group)){
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
         }else{
 
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1, group=group)
+          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
 
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0, individual=individial))
+          return(list(wi=B1, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
         }
 
 
 
       }else{
         A=A1$corMatrixList
-        B=B1
+        B=B1$preMatrix
         tau0=A1$tau
       }
       if (k>=maxit){
         warning("Algorithm did not converge!")
         if (is.null(group)){
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
         }else{
           #browser()
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1, group=group)
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0, individual=individial))
+          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
+          return(list(wi=B1, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
         }
       }
     }
@@ -388,11 +390,10 @@ tau0=control$tau0
 tau0=control$tau0
     while(1){
       k=k+1
-
       A1=AA(data = data,B = B, type=type, fix=fix)
-      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init,...)$preMatrix
+      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init,...)
 
-      d1=round(max(abs(B-B1)),4)
+      d1=round(max(abs(B-B1$preMatrix)),4)
       d2=round(max(abs(tau0-A1$tau)),4)
       if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
@@ -400,28 +401,28 @@ tau0=control$tau0
       if (d1<= tol & d2<= tol ){
 
         if (is.null(group)){
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
         }else{
 
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1, group=group)
+          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
 
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0, individual=individial))
+          return(list(wi=B1, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
         }
 
       }else{
         A=A1$corMatrixList
-        B=B1
+        B=B1$preMatrix
         tau0=A1$tau
       }
       if (k>= maxit){
         warning("Algorithm did not converge!")
 
         if (is.null(group)){
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0))
+          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
         }else{
           #browser()
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1, group=group)
-          return(list(preMatrix=B1, corMatrixList=A1$corMatrixList, tauhat=tau0, individual=individial))
+          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
+          return(list(wi=B1,wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
       }
     }
     }
@@ -462,4 +463,61 @@ return(individual=S_est)
 llike=function(data,A, preMatrix, individual){
 
 }
+
+
+
+
+cvErrori=function(data,bi, K){
+  n=nrow(data)
+  p=ncol(data)-2
+  ind = sample(n)
+
+
+  if (K<=1 | K%%1 !=0){
+    stop("K should be an integer greater than 1!")
+  }
+
+  #if (any(lambda)<=0) {stop("tuning parameter lambda should be positive!")}
+
+  if (any(! bi %in% c(0,1,2))) {stop("entries of vector bi should be 0 or 1!")}
+  i=which(bi==2)
+  X=data[,-c(1,2)]
+  cv_error=rep(0,length=K)
+
+
+  for (k in 1:K) {
+
+    leave.out = ind[(1 + floor((k - 1) * n/K)):floor(k *
+                                                       n/K)]
+    X.train = X[-leave.out, , drop = FALSE]
+    X_bar = apply(X.train, 2, mean)
+    X.train = scale(X.train, center = X_bar, scale = FALSE)
+    X.valid = X[leave.out, , drop = FALSE]
+    X.valid = scale(X.valid, center = X_bar, scale = FALSE)
+
+
+    index=which(bi==1)
+    if (length(index)==0){
+      cv_error[k]=var(X.valid[,i])
+
+    }else{
+      y=X.train[,i]
+      x=X.train[,index]
+      coef.train=lm(y~x)$coef
+      yy=X.valid[,i]
+      if(length(leave.out)>1){
+        xx=cbind(1,X.valid[,index])
+      }else{
+        xx=c(1,X.valid[index])}
+      #browser()
+      cv_error[k]=mean(yy-xx%*%coef.train)^2
+      if (is.na(cv_error[k])) {browser()}
+    }
+  }
+  return(mean(cv_error))
+}
+
+
+
+
 

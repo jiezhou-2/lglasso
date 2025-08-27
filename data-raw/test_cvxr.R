@@ -16,13 +16,7 @@ rho=0.8
 set.seed(5)
 
 ## clustered data with no correlation structure
-cc=matrix(rho,ncol = m3,nrow = m3)
-diag(cc)=1
-dd=simulate(n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc,homo=T)
-ddata=dd$data
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="general",group = ddata[,2], start = "cold", trace=T)
-aa=lglasso(data=ddata,lambda = 0.01,type="general",start="cold", trace=F)
- cov2cor(aa$corMatrix)
+
 
 ## longitudinal data with structured homogeneous dampening rate
  set.seed(5)
@@ -32,7 +26,7 @@ group=rep(c(1,2),71)
 aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, start="cold")
 aa=lglasso(data=ddata,lambda = 0.1,,type="expFixed",expFix=1)
 aa$tauhat
-cov2cor(aa$corMatrixList[[1]])
+cov2cor(aa$vList[[1]])
 
 
 ## longitudinal data with structured homogeneous dampening rate
@@ -43,7 +37,7 @@ group=rep(c(1,2),71)
 aa=lglasso(data=ddata,lambda = c(0.001,0.1),type="twoPara",group=group, trace = TRUE)
 aa=lglasso(data=ddata,lambda = 0.001,type="twoPara")
 aa$tauhat
-cov2cor(aa$corMatrixList[[1]])
+cov2cor(aa$vList[[1]])
 
 
 
