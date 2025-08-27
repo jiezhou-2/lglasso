@@ -10,12 +10,15 @@ lglasso(
   type = c("general", "expFixed", "twoPara"),
   expFix = 1,
   group = NULL,
+  diagonal = TRUE,
   maxit = 100,
   tol = 10^(-4),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
-  cores = 1,
-  K = 1,
+  start = c("cold", "warm"),
+  w.init = NULL,
+  wi.init = NULL,
+  trace = FALSE,
   ...
 )
 }

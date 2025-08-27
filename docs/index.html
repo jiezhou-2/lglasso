@@ -369,85 +369,34 @@ given network structure produced from function <span class="math inline">\(lglas
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(matrixcalc)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(fake)</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(CVXR)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;CVXR&#39;</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:matrixcalc&#39;:</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;     vec</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:stats&#39;:</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;     power</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">library</span>(expm)</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;expm&#39;</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:Matrix&#39;:</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt;     expm</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;purrr&#39;</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:CVXR&#39;:</span></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt;     is_vector</span></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="fu">library</span>(stors)</span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;MASS&#39;</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:CVXR&#39;:</span></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt;     huber</span></span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; Loading required package: usethis</span></span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="fu">load_all</span>()</span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt; ℹ Loading lglasso</span></span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">50</span></span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>m1<span class="ot">=</span><span class="dv">100</span></span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>m2<span class="ot">=</span><span class="dv">0</span></span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>m3<span class="ot">=</span><span class="dv">5</span></span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>n<span class="ot">=</span><span class="dv">20</span></span>
-<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>rho<span class="ot">=</span><span class="fl">0.8</span></span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(expm)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">library</span>(stors)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">load_all</span>()</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">50</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>m1<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>m2<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>m3<span class="ot">=</span><span class="dv">5</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>n<span class="ot">=</span><span class="dv">20</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>rho<span class="ot">=</span><span class="fl">0.8</span></span></code></pre></div>
 <div id="model-1-clustered-data-with-no-correlation-structure" class="section level4">
 <h4>Model 1: clustered data with no correlation structure</h4>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>cc<span class="ot">=</span><span class="fu">matrix</span>(rho,<span class="at">ncol =</span> m3,<span class="at">nrow =</span> m3)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">diag</span>(cc)<span class="ot">=</span><span class="dv">1</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>dd<span class="ot">=</span><span class="fu">simulate</span>(<span class="at">n=</span>n,<span class="at">p=</span>p,<span class="at">m1=</span>m1,<span class="at">m2=</span>m2,<span class="at">m3=</span>m3,<span class="at">cc=</span>cc,<span class="at">homo=</span>T)</span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.1</span>),<span class="at">type=</span><span class="st">&quot;general&quot;</span>,<span class="at">group =</span> ddata[,<span class="dv">2</span>])</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 5.803 /correlation difference: 0.18&quot;</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 1.12 /correlation difference: 0.323&quot;</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 1.115 /correlation difference: 0.18&quot;</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.371 /correlation difference: 0.16&quot;</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.255 /correlation difference: 0.051&quot;</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.071 /correlation difference: 0.034&quot;</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.044 /correlation difference: 0.009&quot;</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.012 /correlation difference: 0.006&quot;</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.007 /correlation difference: 0.002&quot;</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.002 /correlation difference: 0.001&quot;</span></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.001 /correlation difference: 0&quot;</span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0 /correlation difference: 0&quot;</span></span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,<span class="at">type=</span><span class="st">&quot;general&quot;</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 5.803 /correlation difference: 0.18&quot;</span></span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 1.12 /correlation difference: 0.323&quot;</span></span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 1.115 /correlation difference: 0.18&quot;</span></span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.371 /correlation difference: 0.16&quot;</span></span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.255 /correlation difference: 0.051&quot;</span></span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.071 /correlation difference: 0.034&quot;</span></span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.044 /correlation difference: 0.009&quot;</span></span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.012 /correlation difference: 0.006&quot;</span></span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.007 /correlation difference: 0.002&quot;</span></span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.002 /correlation difference: 0.001&quot;</span></span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.001 /correlation difference: 0&quot;</span></span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0 /correlation difference: 0&quot;</span></span>
-<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a> <span class="fu">cov2cor</span>(aa<span class="sc">$</span>corMatrix)</span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.5152023 0.5201650 0.5218374 0.5206374</span></span>
-<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; [2,] 0.5152023 1.0000000 0.5161497 0.5233417 0.5132476</span></span>
-<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; [3,] 0.5201650 0.5161497 1.0000000 0.5302264 0.5141983</span></span>
-<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; [4,] 0.5218374 0.5233417 0.5302264 1.0000000 0.5378608</span></span>
-<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; [5,] 0.5206374 0.5132476 0.5141983 0.5378608 1.0000000</span></span></code></pre></div>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,<span class="at">type=</span><span class="st">&quot;general&quot;</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a> <span class="fu">cov2cor</span>(aa<span class="sc">$</span>v)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.5039027 0.5114935 0.5129590 0.5123945</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; [2,] 0.5039027 1.0000000 0.5050763 0.5122512 0.5026856</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; [3,] 0.5114935 0.5050763 1.0000000 0.5216989 0.5061777</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [4,] 0.5129590 0.5122512 0.5216989 1.0000000 0.5299371</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; [5,] 0.5123945 0.5026856 0.5061777 0.5299371 1.0000000</span></span></code></pre></div>
 </div>
 <div id="model-2-longitudinal-data-with-one-parameter-structured-correlation" class="section level4">
 <h4>Model 2: longitudinal data with one-parameter structured
@@ -458,104 +407,16 @@ correlation</h4>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>group<span class="ot">=</span><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dv">71</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.1</span>),<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,<span class="at">group =</span> group)</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 4.2249 /correlation tau difference: 0.6533&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 2.5558 /correlation tau difference: 0.9492&quot;</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 1.9388 /correlation tau difference: 0.9113&quot;</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 1.7802 /correlation tau difference: 0.76&quot;</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 1.6534 /correlation tau difference: 0.7125&quot;</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 1.469 /correlation tau difference: 0.6506&quot;</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 1.4065 /correlation tau difference: 0.5916&quot;</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 1.1976 /correlation tau difference: 0.5616&quot;</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 1.1646 /correlation tau difference: 0.4897&quot;</span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.9356 /correlation tau difference: 0.4741&quot;</span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.9177 /correlation tau difference: 0.3914&quot;</span></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.7005 /correlation tau difference: 0.383&quot;</span></span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.6891 /correlation tau difference: 0.2954&quot;</span></span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.4974 /correlation tau difference: 0.2907&quot;</span></span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 15 precision difference: 0.4911 /correlation tau difference: 0.2085&quot;</span></span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 16 precision difference: 0.3314 /correlation tau difference: 0.2059&quot;</span></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 17 precision difference: 0.3279 /correlation tau difference: 0.1373&quot;</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 18 precision difference: 0.2078 /correlation tau difference: 0.1359&quot;</span></span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 19 precision difference: 0.2059 /correlation tau difference: 0.0853&quot;</span></span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 20 precision difference: 0.1245 /correlation tau difference: 0.0845&quot;</span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 21 precision difference: 0.1234 /correlation tau difference: 0.0508&quot;</span></span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 22 precision difference: 0.0725 /correlation tau difference: 0.0504&quot;</span></span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 23 precision difference: 0.0719 /correlation tau difference: 0.0295&quot;</span></span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 24 precision difference: 0.0414 /correlation tau difference: 0.0292&quot;</span></span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 25 precision difference: 0.0411 /correlation tau difference: 0.0168&quot;</span></span>
-<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 26 precision difference: 0.0234 /correlation tau difference: 0.0167&quot;</span></span>
-<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 27 precision difference: 0.0233 /correlation tau difference: 0.0095&quot;</span></span>
-<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 28 precision difference: 0.0132 /correlation tau difference: 0.0094&quot;</span></span>
-<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 29 precision difference: 0.0131 /correlation tau difference: 0.0054&quot;</span></span>
-<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 30 precision difference: 0.0074 /correlation tau difference: 0.0053&quot;</span></span>
-<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 31 precision difference: 0.0074 /correlation tau difference: 0.003&quot;</span></span>
-<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 32 precision difference: 0.0042 /correlation tau difference: 0.003&quot;</span></span>
-<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 33 precision difference: 0.0041 /correlation tau difference: 0.0017&quot;</span></span>
-<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 34 precision difference: 0.0023 /correlation tau difference: 0.0017&quot;</span></span>
-<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 35 precision difference: 0.0023 /correlation tau difference: 9e-04&quot;</span></span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 36 precision difference: 0.0013 /correlation tau difference: 9e-04&quot;</span></span>
-<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 37 precision difference: 0.0013 /correlation tau difference: 5e-04&quot;</span></span>
-<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 38 precision difference: 7e-04 /correlation tau difference: 5e-04&quot;</span></span>
-<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 39 precision difference: 7e-04 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 40 precision difference: 4e-04 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 41 precision difference: 4e-04 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 42 precision difference: 2e-04 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 43 precision difference: 2e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 44 precision difference: 1e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>)</span>
-<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 4.2249 /correlation tau difference: 0.6533&quot;</span></span>
-<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 2.5558 /correlation tau difference: 0.9492&quot;</span></span>
-<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 1.9388 /correlation tau difference: 0.9113&quot;</span></span>
-<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 1.7802 /correlation tau difference: 0.76&quot;</span></span>
-<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 1.6534 /correlation tau difference: 0.7125&quot;</span></span>
-<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 1.469 /correlation tau difference: 0.6506&quot;</span></span>
-<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 1.4065 /correlation tau difference: 0.5916&quot;</span></span>
-<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 1.1976 /correlation tau difference: 0.5616&quot;</span></span>
-<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 1.1646 /correlation tau difference: 0.4897&quot;</span></span>
-<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.9356 /correlation tau difference: 0.4741&quot;</span></span>
-<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.9177 /correlation tau difference: 0.3914&quot;</span></span>
-<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.7005 /correlation tau difference: 0.383&quot;</span></span>
-<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.6891 /correlation tau difference: 0.2954&quot;</span></span>
-<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.4974 /correlation tau difference: 0.2907&quot;</span></span>
-<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 15 precision difference: 0.4911 /correlation tau difference: 0.2085&quot;</span></span>
-<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 16 precision difference: 0.3314 /correlation tau difference: 0.2059&quot;</span></span>
-<span id="cb4-68"><a href="#cb4-68" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 17 precision difference: 0.3279 /correlation tau difference: 0.1373&quot;</span></span>
-<span id="cb4-69"><a href="#cb4-69" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 18 precision difference: 0.2078 /correlation tau difference: 0.1359&quot;</span></span>
-<span id="cb4-70"><a href="#cb4-70" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 19 precision difference: 0.2059 /correlation tau difference: 0.0853&quot;</span></span>
-<span id="cb4-71"><a href="#cb4-71" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 20 precision difference: 0.1245 /correlation tau difference: 0.0845&quot;</span></span>
-<span id="cb4-72"><a href="#cb4-72" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 21 precision difference: 0.1234 /correlation tau difference: 0.0508&quot;</span></span>
-<span id="cb4-73"><a href="#cb4-73" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 22 precision difference: 0.0725 /correlation tau difference: 0.0504&quot;</span></span>
-<span id="cb4-74"><a href="#cb4-74" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 23 precision difference: 0.0719 /correlation tau difference: 0.0295&quot;</span></span>
-<span id="cb4-75"><a href="#cb4-75" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 24 precision difference: 0.0414 /correlation tau difference: 0.0292&quot;</span></span>
-<span id="cb4-76"><a href="#cb4-76" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 25 precision difference: 0.0411 /correlation tau difference: 0.0168&quot;</span></span>
-<span id="cb4-77"><a href="#cb4-77" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 26 precision difference: 0.0234 /correlation tau difference: 0.0167&quot;</span></span>
-<span id="cb4-78"><a href="#cb4-78" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 27 precision difference: 0.0233 /correlation tau difference: 0.0095&quot;</span></span>
-<span id="cb4-79"><a href="#cb4-79" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 28 precision difference: 0.0132 /correlation tau difference: 0.0094&quot;</span></span>
-<span id="cb4-80"><a href="#cb4-80" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 29 precision difference: 0.0131 /correlation tau difference: 0.0054&quot;</span></span>
-<span id="cb4-81"><a href="#cb4-81" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 30 precision difference: 0.0074 /correlation tau difference: 0.0053&quot;</span></span>
-<span id="cb4-82"><a href="#cb4-82" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 31 precision difference: 0.0074 /correlation tau difference: 0.003&quot;</span></span>
-<span id="cb4-83"><a href="#cb4-83" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 32 precision difference: 0.0042 /correlation tau difference: 0.003&quot;</span></span>
-<span id="cb4-84"><a href="#cb4-84" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 33 precision difference: 0.0041 /correlation tau difference: 0.0017&quot;</span></span>
-<span id="cb4-85"><a href="#cb4-85" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 34 precision difference: 0.0023 /correlation tau difference: 0.0017&quot;</span></span>
-<span id="cb4-86"><a href="#cb4-86" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 35 precision difference: 0.0023 /correlation tau difference: 9e-04&quot;</span></span>
-<span id="cb4-87"><a href="#cb4-87" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 36 precision difference: 0.0013 /correlation tau difference: 9e-04&quot;</span></span>
-<span id="cb4-88"><a href="#cb4-88" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 37 precision difference: 0.0013 /correlation tau difference: 5e-04&quot;</span></span>
-<span id="cb4-89"><a href="#cb4-89" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 38 precision difference: 7e-04 /correlation tau difference: 5e-04&quot;</span></span>
-<span id="cb4-90"><a href="#cb4-90" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 39 precision difference: 7e-04 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb4-91"><a href="#cb4-91" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 40 precision difference: 4e-04 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb4-92"><a href="#cb4-92" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 41 precision difference: 4e-04 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb4-93"><a href="#cb4-93" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 42 precision difference: 2e-04 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb4-94"><a href="#cb4-94" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 43 precision difference: 2e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb4-95"><a href="#cb4-95" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 44 precision difference: 1e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb4-96"><a href="#cb4-96" tabindex="-1"></a>aa<span class="sc">$</span>tauhat</span>
-<span id="cb4-97"><a href="#cb4-97" tabindex="-1"></a><span class="co">#&gt; [1] 1.018155</span></span>
-<span id="cb4-98"><a href="#cb4-98" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>corMatrixList[[<span class="dv">1</span>]])</span>
-<span id="cb4-99"><a href="#cb4-99" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
-<span id="cb4-100"><a href="#cb4-100" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.9288002 0.6167360 0.5825999 0.3111864</span></span>
-<span id="cb4-101"><a href="#cb4-101" tabindex="-1"></a><span class="co">#&gt; [2,] 0.9288002 1.0000000 0.6640137 0.6272608 0.3350413</span></span>
-<span id="cb4-102"><a href="#cb4-102" tabindex="-1"></a><span class="co">#&gt; [3,] 0.6167360 0.6640137 1.0000000 0.9446504 0.5045699</span></span>
-<span id="cb4-103"><a href="#cb4-103" tabindex="-1"></a><span class="co">#&gt; [4,] 0.5825999 0.6272608 0.9446504 1.0000000 0.5341340</span></span>
-<span id="cb4-104"><a href="#cb4-104" tabindex="-1"></a><span class="co">#&gt; [5,] 0.3111864 0.3350413 0.5045699 0.5341340 1.0000000</span></span></code></pre></div>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>aa<span class="sc">$</span>tauhat</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; [1] 1.042969</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>vList[[<span class="dv">1</span>]])</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.9271306 0.6095173 0.5749827 0.3024617</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [2,] 0.9271306 1.0000000 0.6574234 0.6201744 0.3262342</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; [3,] 0.6095173 0.6574234 1.0000000 0.9433410 0.4962315</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; [4,] 0.5749827 0.6201744 0.9433410 1.0000000 0.5260362</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [5,] 0.3024617 0.3262342 0.4962315 0.5260362 1.0000000</span></span></code></pre></div>
 </div>
 <div id="model-3-longitudinal-data-with-two-parameter-structured-correlation" class="section level4">
 <h4>Model 3: longitudinal data with two-parameter structured
@@ -566,92 +427,16 @@ correlation</h4>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>group<span class="ot">=</span><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dv">71</span>)</span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fu">c</span>(<span class="fl">0.001</span>,<span class="fl">0.1</span>),<span class="at">type=</span><span class="st">&quot;twoPara&quot;</span>,<span class="at">group=</span>group)</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 21.5536 /correlation tau difference: 0.3248&quot;</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 13.5652 /correlation tau difference: 6.3446&quot;</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 11.7643 /correlation tau difference: 6.2396&quot;</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 9.7133 /correlation tau difference: 1.8493&quot;</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 8.5757 /correlation tau difference: 1.7193&quot;</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 6.3494 /correlation tau difference: 1.6136&quot;</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 5.8416 /correlation tau difference: 1.44&quot;</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 3.8279 /correlation tau difference: 1.3939&quot;</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 3.5952 /correlation tau difference: 1.1863&quot;</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 2.1401 /correlation tau difference: 0.3546&quot;</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 2.0302 /correlation tau difference: 0.2035&quot;</span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 1.1197 /correlation tau difference: 0.1936&quot;</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 1.0672 /correlation tau difference: 0.1038&quot;</span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.5613 /correlation tau difference: 0.099&quot;</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 15 precision difference: 0.536 /correlation tau difference: 0.0514&quot;</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 16 precision difference: 0.2757 /correlation tau difference: 0.0491&quot;</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 17 precision difference: 0.2634 /correlation tau difference: 0.0251&quot;</span></span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 18 precision difference: 0.1336 /correlation tau difference: 0.024&quot;</span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 19 precision difference: 0.1277 /correlation tau difference: 0.0122&quot;</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 20 precision difference: 0.0647 /correlation tau difference: 0.0116&quot;</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 21 precision difference: 0.0618 /correlation tau difference: 0.0059&quot;</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 22 precision difference: 0.0314 /correlation tau difference: 0.0057&quot;</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 23 precision difference: 0.03 /correlation tau difference: 0.0029&quot;</span></span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 24 precision difference: 0.0152 /correlation tau difference: 0.0027&quot;</span></span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 25 precision difference: 0.0146 /correlation tau difference: 0.0014&quot;</span></span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 26 precision difference: 0.0074 /correlation tau difference: 0.0013&quot;</span></span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 27 precision difference: 0.0071 /correlation tau difference: 7e-04&quot;</span></span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 28 precision difference: 0.0036 /correlation tau difference: 6e-04&quot;</span></span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 29 precision difference: 0.0034 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 30 precision difference: 0.0017 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 31 precision difference: 0.0017 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 32 precision difference: 8e-04 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 33 precision difference: 8e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 34 precision difference: 4e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 35 precision difference: 4e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 36 precision difference: 2e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 37 precision difference: 2e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 38 precision difference: 1e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.001</span>,<span class="at">type=</span><span class="st">&quot;twoPara&quot;</span>)</span>
-<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 21.5536 /correlation tau difference: 0.3248&quot;</span></span>
-<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 13.5652 /correlation tau difference: 6.3446&quot;</span></span>
-<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 11.7643 /correlation tau difference: 6.2396&quot;</span></span>
-<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 9.7133 /correlation tau difference: 1.8493&quot;</span></span>
-<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 8.5757 /correlation tau difference: 1.7193&quot;</span></span>
-<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 6.3494 /correlation tau difference: 1.6136&quot;</span></span>
-<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 5.8416 /correlation tau difference: 1.44&quot;</span></span>
-<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 3.8279 /correlation tau difference: 1.3939&quot;</span></span>
-<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 3.5952 /correlation tau difference: 1.1863&quot;</span></span>
-<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 2.1401 /correlation tau difference: 0.3546&quot;</span></span>
-<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 2.0302 /correlation tau difference: 0.2035&quot;</span></span>
-<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 1.1197 /correlation tau difference: 0.1936&quot;</span></span>
-<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 1.0672 /correlation tau difference: 0.1038&quot;</span></span>
-<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.5613 /correlation tau difference: 0.099&quot;</span></span>
-<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 15 precision difference: 0.536 /correlation tau difference: 0.0514&quot;</span></span>
-<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 16 precision difference: 0.2757 /correlation tau difference: 0.0491&quot;</span></span>
-<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 17 precision difference: 0.2634 /correlation tau difference: 0.0251&quot;</span></span>
-<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 18 precision difference: 0.1336 /correlation tau difference: 0.024&quot;</span></span>
-<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 19 precision difference: 0.1277 /correlation tau difference: 0.0122&quot;</span></span>
-<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 20 precision difference: 0.0647 /correlation tau difference: 0.0116&quot;</span></span>
-<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 21 precision difference: 0.0618 /correlation tau difference: 0.0059&quot;</span></span>
-<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 22 precision difference: 0.0314 /correlation tau difference: 0.0057&quot;</span></span>
-<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 23 precision difference: 0.03 /correlation tau difference: 0.0029&quot;</span></span>
-<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 24 precision difference: 0.0152 /correlation tau difference: 0.0027&quot;</span></span>
-<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 25 precision difference: 0.0146 /correlation tau difference: 0.0014&quot;</span></span>
-<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 26 precision difference: 0.0074 /correlation tau difference: 0.0013&quot;</span></span>
-<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 27 precision difference: 0.0071 /correlation tau difference: 7e-04&quot;</span></span>
-<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 28 precision difference: 0.0036 /correlation tau difference: 6e-04&quot;</span></span>
-<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 29 precision difference: 0.0034 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 30 precision difference: 0.0017 /correlation tau difference: 3e-04&quot;</span></span>
-<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 31 precision difference: 0.0017 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 32 precision difference: 8e-04 /correlation tau difference: 2e-04&quot;</span></span>
-<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 33 precision difference: 8e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 34 precision difference: 4e-04 /correlation tau difference: 1e-04&quot;</span></span>
-<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 35 precision difference: 4e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 36 precision difference: 2e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 37 precision difference: 2e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 38 precision difference: 1e-04 /correlation tau difference: 0&quot;</span></span>
-<span id="cb5-84"><a href="#cb5-84" tabindex="-1"></a>aa<span class="sc">$</span>tauhat</span>
-<span id="cb5-85"><a href="#cb5-85" tabindex="-1"></a><span class="co">#&gt; [1] 1.465072 1.190806</span></span>
-<span id="cb5-86"><a href="#cb5-86" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>corMatrixList[[<span class="dv">1</span>]])</span>
-<span id="cb5-87"><a href="#cb5-87" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
-<span id="cb5-88"><a href="#cb5-88" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.8811274 0.4368780 0.3962691 0.1353166</span></span>
-<span id="cb5-89"><a href="#cb5-89" tabindex="-1"></a><span class="co">#&gt; [2,] 0.8811274 1.0000000 0.4958171 0.4497296 0.1535722</span></span>
-<span id="cb5-90"><a href="#cb5-90" tabindex="-1"></a><span class="co">#&gt; [3,] 0.4368780 0.4958171 1.0000000 0.9070474 0.3097355</span></span>
-<span id="cb5-91"><a href="#cb5-91" tabindex="-1"></a><span class="co">#&gt; [4,] 0.3962691 0.4497296 0.9070474 1.0000000 0.3414767</span></span>
-<span id="cb5-92"><a href="#cb5-92" tabindex="-1"></a><span class="co">#&gt; [5,] 0.1353166 0.1535722 0.3097355 0.3414767 1.0000000</span></span></code></pre></div>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.001</span>,<span class="at">type=</span><span class="st">&quot;twoPara&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>aa<span class="sc">$</span>tauhat</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] 1.497429 1.204115</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>vList[[<span class="dv">1</span>]])</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.8773989 0.4249223 0.3841668 0.1265450</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; [2,] 0.8773989 1.0000000 0.4842978 0.4378474 0.1442274</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; [3,] 0.4249223 0.4842978 1.0000000 0.9040871 0.2978073</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; [4,] 0.3841668 0.4378474 0.9040871 1.0000000 0.3294012</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; [5,] 0.1265450 0.1442274 0.2978073 0.3294012 1.0000000</span></span></code></pre></div>
 <p>[1] Zhou, J., Gui, J., Viles, W.D., Chen, H., Madan, J.C., Coker,
 M.O., Hoen, A.G., 2021a. Identifying Microbial Interaction Networks
 Based on Irregularly Spaced Longitudinal 16S rRNA sequence data. <a href="https://doi.org/10.1101/2021.11.26.470159" class="uri">https://doi.org/10.1101/2021.11.26.470159</a></p>
