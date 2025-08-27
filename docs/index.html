@@ -360,21 +360,25 @@ EM algorithm with conventional graphical lasso algorithm (Friedman
 (2019)) and therefore can be implemented very efficiently. For the
 details of the algorithms and the output of the packages, please see
 Zhou et al. (2021).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(lglasso)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt; Warning: replacing previous import &#39;CVXR::huber&#39; by &#39;MASS::huber&#39; when loading</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt; &#39;lglasso&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(lglasso)</span></code></pre></div>
 <p>There are two main functions in this package. The first one is <span class="math inline">\(lglasso\)</span> which can output a sparse network
 representing the precision matrix by maximizing the <span class="math inline">\(l_1\)</span> penalized likelihood function. The
 second function if <span class="math inline">\(mle\)</span>, which can
 compute the maximum likelihood estimates of precision matrix and the
 correlation parameter <span class="math inline">\(\tau\)</span> for a
 given network structure produced from function <span class="math inline">\(lglasso\)</span>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">10</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>m1<span class="ot">=</span><span class="dv">10</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>m2<span class="ot">=</span><span class="dv">0</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>m3<span class="ot">=</span><span class="dv">5</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>n<span class="ot">=</span><span class="dv">20</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>rho<span class="ot">=</span><span class="fl">0.8</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># number of nodes</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">10</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># number of edge in general network</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>m1<span class="ot">=</span><span class="dv">10</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># the difference between the number of edges in individual networks and general network</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>m2<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#  number of clusters</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>m3<span class="ot">=</span><span class="dv">5</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co"># number of subjects</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>n<span class="ot">=</span><span class="dv">20</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># correlation between cluster</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>rho<span class="ot">=</span><span class="fl">0.8</span></span></code></pre></div>
 <div id="model-1-clustered-data-with-no-correlation-structure" class="section level2">
 <h2>Model 1: clustered data with no correlation structure</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>

@@ -19,18 +19,24 @@ This package implements the algorithms proposed in Zhou et al. (2021), which aim
 
 
 
-```{r setup, message=FALSE}
+```{r setup, message=FALSE,warning=FALSE}
 library(lglasso)
 ```
 
 There are two main functions in this package. The first one is $lglasso$ which can output a sparse network representing the precision matrix by maximizing the $l_1$ penalized likelihood function. The second function if $mle$, which can compute the maximum likelihood estimates of precision matrix and the correlation parameter $\tau$ for a given network structure produced from function $lglasso$.   
 
 ```{r, message=FALSE}
+# number of nodes
 p=10
+# number of edge in general network
 m1=10
+# the difference between the number of edges in individual networks and general network
 m2=0
+#  number of clusters
 m3=5
+# number of subjects
 n=20
+# correlation between cluster
 rho=0.8
 
 ```
