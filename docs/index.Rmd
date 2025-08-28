@@ -28,11 +28,11 @@ library(lglasso)
 
 ```{r, message=FALSE}
 # number of nodes
-p=50
+p=10
 # number of edge in general network
-m1=200
+m1=10
 # the difference between the number of edges in individual networks and general network
-m2=50
+m2=0
 #  number of clusters
 m3=5
 # number of subjects

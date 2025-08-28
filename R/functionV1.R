@@ -228,22 +228,29 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #'
 #' @param data a \code{n} by \code{(p+2)} data frame in which the first column is subject ID, the second column is
 #' the time point for longitudinal data or tissue ID.
-#' @param lambda  a vector of length 1 or 2,  which
+#' @param lambda   vector of length 1 or 2,  which
 #' is the tuning parameter for the identification of the networks. For details, see the explanations in the below.
 #' @param type a string specifying which model need to be fitted. There are three models available,
 #' which are refered as \code{general, expFixed} and \code{twoPara} respectively.
 #'  Please see the details in the below for the meaning of each.
-#' @param expFix a nemeric number used in the model specification
-#' @param group a vector  of length \code{n} if supplied which specify which data
+#' @param expFix  numeric number used in the model specification
+#' @param group  vector  of length \code{n} if supplied which specify which data
 #'  points need to be grouped together to infer a network for each of them.
 #' @param maxit the maximum iterations for the estimation.
 #' @param tol the minimum value for  convergence criterion
-#' @param lower a vector of length 1 or 2 which specifies the lower bounds for the optimization algorithm
-#' @param upper a vector of length 1 or 2 which specifies the upper bounds for the optimization algorithm
+#' @param lower  vector of length 1 or 2 which specifies the lower bounds for the optimization algorithm
+#' @param upper  vector of length 1 or 2 which specifies the upper bounds for the optimization algorithm
 #' @param ... other inputs
-#' @import glasso glasso
+#' @import glasso
 #' @import CVXR
 #' @export
+#' @return  \code{w} the general covariance matrix estimate
+#' @return  \code{wList} list representing the individual covariance matrix estimate
+#' @return \code{wi} the general precision matrix estimate
+#' @return  \code{wiList} list representing the individual precision matrix estimate
+#' @return \code{v} the correlation matrix between specified classes
+#' @return \code{vList} list representing the individual correlation matrix
+#' @return \code{tauhat} the correlation parameters for longitudinal data
 #'
 lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=100,
                  tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
@@ -435,6 +442,17 @@ tau0=control$tau0
 
 
 
+#' Title
+#'
+#' @param data
+#' @param lambda
+#' @param homo
+#' @param group
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 heternetwork=function(data,lambda,homo, group){
   if (length(group)!=nrow(data)){
     stop("Argument group doens not match data!")

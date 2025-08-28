@@ -26,27 +26,42 @@ lglasso(
 \item{data}{a \code{n} by \code{(p+2)} data frame in which the first column is subject ID, the second column is
 the time point for longitudinal data or tissue ID.}
 
-\item{lambda}{a vector of length 1 or 2,  which
+\item{lambda}{vector of length 1 or 2,  which
 is the tuning parameter for the identification of the networks. For details, see the explanations in the below.}
 
 \item{type}{a string specifying which model need to be fitted. There are three models available,
 which are refered as \code{general, expFixed} and \code{twoPara} respectively.
  Please see the details in the below for the meaning of each.}
 
-\item{expFix}{a nemeric number used in the model specification}
+\item{expFix}{numeric number used in the model specification}
 
-\item{group}{a vector  of length \code{n} if supplied which specify which data
+\item{group}{vector  of length \code{n} if supplied which specify which data
 points need to be grouped together to infer a network for each of them.}
 
 \item{maxit}{the maximum iterations for the estimation.}
 
 \item{tol}{the minimum value for  convergence criterion}
 
-\item{lower}{a vector of length 1 or 2 which specifies the lower bounds for the optimization algorithm}
+\item{lower}{vector of length 1 or 2 which specifies the lower bounds for the optimization algorithm}
 
-\item{upper}{a vector of length 1 or 2 which specifies the upper bounds for the optimization algorithm}
+\item{upper}{vector of length 1 or 2 which specifies the upper bounds for the optimization algorithm}
 
 \item{...}{other inputs}
+}
+\value{
+\code{w} the general covariance matrix estimate
+
+\code{wList} list representing the individual covariance matrix estimate
+
+\code{wi} the general precision matrix estimate
+
+\code{wiList} list representing the individual precision matrix estimate
+
+\code{v} the correlation matrix between specified classes
+
+\code{vList} list representing the individual correlation matrix
+
+\code{tauhat} the correlation parameters for longitudinal data
 }
 \description{
 This is the main function of the package, which identifies the underlying  network model from clustered data. Here
