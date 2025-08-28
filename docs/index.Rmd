@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This package implements the algorithms proposed in Zhou et al. (2021), which aims to estimates the microbial interaction network based on Gaussian graphical model and irregularly-spaced longitudinal data. There are two related models in Zhou et al. (2021)  which can handle two different questions.  The first model is called homogeneous stationary Gaussian graphical model (SGGM) in which all the subjects share a same auto-correlation parameter $\tau$. For homogeneous SGGM, an iterative graphical lasso algorithm is proposed to compute the $l_1$ penalized  maximum  likelihood estimate (MLE) of the network. The second model is called heterogeneous SGGM in which each subject possesses his/her own auto-correlation parameter $\tau_i$. For heterogeneous SGGM, given the complex form of its likelihood function, an expectation-maximization (EM) type algorithm is devised to compute the $l_1$ penalized MLE of the network and $\tau_i$'s, which integrates the  EM algorithm with conventional graphical lasso algorithm (Friedman (2019)) and therefore can be implemented  very efficiently. For the details of the algorithms and the output of the packages, please see Zhou et al. (2021). 
+The initial version of the package implemented the algorithms proposed in Zhou et al. (2021), which can estimate the high-dimensional  networks  from longitudinal data using Gassian grapical models. The current version includes several important extensions and improvements compared to the previous ones. The overarching goal however is the same, i.e., utilize the possible correlations between high-dimensional data to improve the estimations of networks.  Specifically, currently the package implements three network models which correspond to three different way how the correlated data are modeled. Furthermore, the package can also estimate the individual networks for each cohorts which is particular useful in clinical studies. 
 
 
 
@@ -23,15 +23,15 @@ This package implements the algorithms proposed in Zhou et al. (2021), which aim
 library(lglasso)
 ```
 
-There are two main functions in this package. The first one is $lglasso$ which can output a sparse network representing the precision matrix by maximizing the $l_1$ penalized likelihood function. The second function if $mle$, which can compute the maximum likelihood estimates of precision matrix and the correlation parameter $\tau$ for a given network structure produced from function $lglasso$.   
+There are two main functions in this package. The first one is $lglasso$ which output sparse networks representing the general precision matrix or individual networks, depending on how the input arguments are set up.   The second function, $cv.lglasso$, try to search for the optimal tuning parameters for $lglasso$ using cross validation method.   
 
 ```{r, message=FALSE}
 # number of nodes
-p=10
+p=50
 # number of edge in general network
-m1=10
+m1=200
 # the difference between the number of edges in individual networks and general network
-m2=0
+m2=50
 #  number of clusters
 m3=5
 # number of subjects
@@ -70,7 +70,7 @@ cov2cor(aa$v)
 
 ```{r}
 
- set.seed(5)
+set.seed(5)
 dd=simulate_long(n=n,p=p,m1=m1,tau=c(2,1))
 ddata=dd$data
 group=rep(c(1,2),71)

@@ -6,15 +6,14 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The package lglasso  implements the algorithms proposed in Zhou et al. (2021), 
-which aims to estimates the microbial interaction network (modeled by Gaussian graphical model) 
-based on irregularly-spaced longitudinal abundance data. 
-There are two models in Zhou et al. (2021)  which correspond two scenarios. 
-The first model is homogeneous stationary Gaussian graphical model (SGGM) 
-in which all the subjects share a same auto-correlation parameter $\tau$.
-The second model is heterogeneous SGGM in which each subject possesses 
-his/her own auto-correlation parameter $\tau_i$. 
-For the details of the algorithms and the output of the packages, please see Zhou et al. (2021). The package also has been published on CRAN. 
+The initial version of the package implemented the algorithms proposed in Zhou et al. (2021), 
+which can estimate the high-dimensional  networks  from longitudinal data using Gassian grapical models. 
+The current version includes several important extensions and improvements compared to the previous ones. 
+The overarching goal however is the same, i.e., utilize the possible correlations between high-dimensional 
+data to improve the estimations of networks.  
+Specifically, currently the package implements three network models which correspond to three 
+different way how the correlated data are modeled. Furthermore, the package can also estimate 
+the individual networks for each cohorts which is particular useful in clinical studies. 
 
 ## Installation
 
