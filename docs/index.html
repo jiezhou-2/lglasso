@@ -341,24 +341,7 @@ data</h1>
 
 
 
-<p>The initial version of the package implemented the algorithms
-proposed in Zhou et al. (2021), which can estimate the high-dimensional
-networks from longitudinal data using Gassian grapical models. The
-current version includes several important extensions and improvements
-compared to the previous ones. The overarching goal however is the same,
-i.e., utilize the possible correlations between high-dimensional data to
-improve the estimations of networks. Specifically, currently the package
-implements three network models which correspond to three different way
-how the correlated data are modeled. Furthermore, the package can also
-estimate the individual networks for each cohorts which is particular
-useful in clinical studies.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(lglasso)</span></code></pre></div>
-<p>There are two main functions in this package. The first one is <span class="math inline">\(lglasso\)</span> which output sparse networks
-representing the general precision matrix or individual networks,
-depending on how the input arguments are set up. The second function,
-<span class="math inline">\(cv.lglasso\)</span>, try to search for the
-optimal tuning parameters for <span class="math inline">\(lglasso\)</span> using cross validation
-method.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># number of nodes</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">50</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># number of edge in general network</span></span>
