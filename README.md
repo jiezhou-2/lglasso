@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-<div style="text-align: left">
+<div style="text-align: justify">
 
 The initial version of the package implemented the algorithms proposed
 in Zhou et al. (2021), which can estimate the high-dimensional networks
