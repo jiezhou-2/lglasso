@@ -1,13 +1,4 @@
 
-#' Construct the temporal component fo correlation function
-#'
-#' @param t Time points of observations
-#' @param tau length 2 vector representing the correlation parameter between time points
-#' @param type The type of correlation function, which typically take either 0,1 or 2.
-#' @author Jie Zhou
-#' @export
-#' @noRd
-#' @return A square matrix with dimension equal to the length of vector t
 phifunction=function(t,tau){
   n=length(t)
   #print(tau)
@@ -252,16 +243,24 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #' @return \code{vList} list representing the individual correlation matrix
 #' @return \code{tauhat} the correlation parameters for longitudinal data
 #'
-lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=100,
+lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=30,
                  tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
                  ...)
 
   {
 
 
-if (is.null(group) & length(lambda)!=1 | !is.null(group) & length(lambda) !=2) {
+if (is.null(group))  {
+ if (length(lambda)!=1){
   stop("Arguments (group, lambda) do not match!")
+ }
 }
+
+  if (!is.null(group))  {
+    if (any(!is.matrix(lambda) | !ncol(lambda)!=2)){
+      stop("Arguments (group, lambda) do not match!")
+    }
+  }
 
   if (!all(lambda>0)){
     stop("lambda must be positive!")
@@ -439,21 +438,8 @@ tau0=control$tau0
 }
 
 
-
-
-
-#' Title
-#'
-#' @param data
-#' @param lambda
-#' @param homo
-#' @param group
-#'
-#' @returns
-#' @export
-#'
-#' @examples
 heternetwork=function(data,lambda,homo, group){
+
   if (length(group)!=nrow(data)){
     stop("Argument group doens not match data!")
     }
@@ -486,6 +472,16 @@ llike=function(data,A, preMatrix, individual){
 
 
 
+#' Title
+#'
+#' @param data
+#' @param bi
+#' @param K
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 cvErrori=function(data,bi, K){
   n=nrow(data)
   p=ncol(data)-2
@@ -498,7 +494,7 @@ cvErrori=function(data,bi, K){
 
   #if (any(lambda)<=0) {stop("tuning parameter lambda should be positive!")}
 
-  if (any(! bi %in% c(0,1,2))) {stop("entries of vector bi should be 0 or 1!")}
+  if (any(! bi %in% c(0,1,2))) {stop("entries of vector bi should be 0,  1 or 2!")}
   i=which(bi==2)
   X=data[,-c(1,2)]
   cv_error=rep(0,length=K)
@@ -520,6 +516,11 @@ cvErrori=function(data,bi, K){
       cv_error[k]=var(X.valid[,i])
 
     }else{
+      if (length(index)>= nrow(X.train)){
+        print(paste("number of variable ", length(index)))
+        stop("network is too dense for model training!")
+      }
+
       y=X.train[,i]
       x=X.train[,index]
       coef.train=lm(y~x)$coef
@@ -528,7 +529,6 @@ cvErrori=function(data,bi, K){
         xx=cbind(1,X.valid[,index])
       }else{
         xx=c(1,X.valid[index])}
-      #browser()
       cv_error[k]=mean(yy-xx%*%coef.train)^2
       if (is.na(cv_error[k])) {browser()}
     }
@@ -537,6 +537,86 @@ cvErrori=function(data,bi, K){
 }
 
 
+#' Title
+#'
+#' @param data data frame
+#' @param B given network
+#' @param K number of cross validation
+#'
+#' @returns list
+#' @export
+#'
 
 
+cvNetwork=function(type=c("general","expFixed","twoPara"), group=NULL,data,lambda, K, expFix=1){
+
+  type=match.arg(type)
+
+  if (! type %in% c("general","expFixed","twoPara")){stop("Specification of type is incorrect!")}
+
+  if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
+  {stop("group and lamda does not match!")}
+
+  if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
+
+
+  #aa=apply(B, 2, cvErrori,data=data,K=K)
+
+   if (type=="general" && is.null(group)){
+    aa= sapply(lambda, function(x) lglasso(data=data,lambda=x,type=type)$wi, simplify = FALSE)
+    cc=lapply(aa, function(B){
+    M=ifelse(abs(B)<=10^(-2), 0,1)
+    diag(M)=2
+    M
+    })
+#browser()
+    bb=lapply(cc, function(B) apply(B,2,cvErrori,data=data,K=K))
+   }
+
+
+  if (type=="general" && !is.null(group)){
+    aa=apply(lambda, 1, function(x) lglasso(data=data,lambda=x,type=type, group=group)$wiList )
+    cc=lapply(aa, function(B){
+      lapply(B, function(Z){    M=ifelse(abs(Z)<=10^(-2), 0,1)
+             diag(M)=2
+             M
+             }
+             )
+
+    }
+    )
+#browser()
+    bb=lapply(cc, function(B){
+      lapply(B, function(Z){
+        apply(Z, 2,cvErrori,data=data,K=K)
+      }
+      )
+    }
+    )
+  }
+
+
+  if (type=="expFixed" && is.null(group)){
+   aa= sapply(lambda, function(x) lglasso(data=data,lambda=x,type=type,expFix=expFix)$wi, simplify = FALSE)
+
+  }
+
+  if (type=="expFixed" && !is.null(group)){
+   aa= apply(lambda, 2, function(x) lglasso(data=data,lambda=x,type=type,expFix=expFix, group=group)$wiList)
+  }
+
+  if (type=="twoPara" && is.null(group)){
+   aa= sapply(lambda, function(x)lglasso(data=data,lambda=x,type=type)$wi, simplify = FALSE)
+  }
+
+  if (type=="twoPara" && !is.null(group)){
+   aa= apply(lambda, 2, function(x)lglasso(data=data,lambda=x,type=type, group=group)$wiList)
+  }
+
+
+
+
+
+return(bb)
+}
 

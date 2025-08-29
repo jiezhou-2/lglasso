@@ -32,6 +32,7 @@ Imports:
     CVXR,
     expm,
     fake,
+    glasso,
     MASS,
     matrixcalc,
     stors

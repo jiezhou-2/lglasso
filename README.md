@@ -6,23 +6,43 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The initial version of the package implemented the algorithms proposed in Zhou et al. (2021),  which can estimate the high-dimensional  networks  from longitudinal data using Gassian grapical models. The current version includes several important extensions and improvements compared to the previous ones. The overarching goal however is the same, i.e., utilize the possible correlations between high-dimensional data to improve the estimations of networks.  Specifically, currently the package implements three network models which correspond to three different way how the correlated data are modeled. Furthermore, the package can also estimate the individual networks for each cohorts which is particular useful in clinical studies.  There are two main functions in this package. The first one is $lglasso$ which output sparse networks representing the general precision matrix or individual networks, depending on how the input arguments are set up.   The second function, $cv.lglasso$, try to search for the optimal tuning parameters for $lglasso$ using cross validation method.   
+<div style="text-align: left">
+
+The initial version of the package implemented the algorithms proposed
+in Zhou et al. (2021), which can estimate the high-dimensional networks
+from longitudinal data using Gassian grapical models. The current 1.0.0
+version includes some interesting extensions, e.g., be able to handle
+data from different tissues within one subject, a more flexible modeling
+of the longitudinal data, use more stable optimization algorithms etc.
+The overarching goal however is the same, i.e., explore the possible
+correlations between high-dimensional data to improve the estimations of
+networks. Specifically, the package implements three network models
+which correspond to three different way how the correlated data are
+modeled. Furthermore, the package can also estimate the individual
+networks for each cohorts which is particular useful in clinical
+studies. There are two main functions in this package. The first one is
+$lglasso$ which output sparse networks representing the general
+precision matrix or individual networks, depending on how the input
+arguments are set up. The second function, $cv.lglasso$, try to search
+for the optimal tuning parameters for $lglasso$ using cross validation
+method.
+
+</div>
 
 ## Installation
 
+You can install the development version of lglasso from
+[GitHub](https://github.com/) with:
+
 First, install the package remotes:
 
-```
-install.packages("remotes")
-```
+    install.packages("remotes")
 
 Then install lglasso :
 
-```
-remotes::install_github("jiezhou-2/lglasso", ref ="main") 
-```
+    remotes::install_github("jiezhou-2/lglasso", ref ="main") 
 
 ## How to use
 
- Please checkout the tutorial on the [package website](https://jiezhou-2.github.io/lglasso/).
-
+Please check out the vignette, [package
+website](https://jiezhou-2.github.io/lglasso/).

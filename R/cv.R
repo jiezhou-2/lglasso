@@ -61,7 +61,7 @@ cv.lglasso=function (data = NULL,  nlam=10,lam.min.ratio=0.01, lam = NULL, type=
 
 
 
-  for (k in 1:K) {
+
     if (K > 1) {
       leave.out = ind[(1 + floor((k - 1) * n/K)):floor(k *
                                                          n/K)]
@@ -74,13 +74,16 @@ cv.lglasso=function (data = NULL,  nlam=10,lam.min.ratio=0.01, lam = NULL, type=
       S.valid = crossprod(X.valid)/(dim(X.valid)[1])
     }
 
-    init = S.train
-    initOmega = diag(ncol(S.train))
+    # init = S.train
+    # initOmega = diag(ncol(S.train))
+
+lapply(lamda, lglasso)
+
 
     for (i in 1:length(lam)) {
-      lam_ = lam[i]
+      #lam_ = lam[i]
 
-        diag(init) = diag(S.train) + lam_
+       # diag(init) = diag(S.train) + lam_
 
       LGLASSO = lglasso(data = data, lambda =   lam_, tol = tol,
                       maxit = maxit, penalize.diagonal = TRUE,
@@ -107,7 +110,7 @@ cv.lglasso=function (data = NULL,  nlam=10,lam.min.ratio=0.01, lam = NULL, type=
     if (trace == "print") {
       cat("\nFinished fold ", paste(k, sep = ""))
     }
-  }
+
   AVG = apply(CV_errors, 1, mean)
   best_lam = lam[which.min(AVG)]
   error = min(AVG)

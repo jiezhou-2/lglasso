@@ -1,19 +1,5 @@
 
-#' Title
-#'
-#' @param n
-#' @param p
-#' @param m1
-#' @param m2
-#' @param m3
-#' @param cc
-#' @param homo
-#' @import fake MASS
-#' @returns
-#' @export
-#'
-#' @examples
-simulate=function(n,p,m1,m2=0,m3,cc,homo=TRUE){
+simulate_general=function(n,p,m1,m2=0,m3,cc){
   ## true structure
   if (ncol(cc)!=m3){stop("Unmatched inputs!")}
   real_stru=matrix(0, nrow = p, ncol = p)
@@ -31,20 +17,6 @@ simulate=function(n,p,m1,m2=0,m3,cc,homo=TRUE){
   ## tissue specific structure
 
   if (m2==0){
-    if (homo==TRUE){
-    mmlist=list()
-    theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
-    theta[lower.tri(theta, diag = TRUE)] = 0
-    theta = theta + t(theta) + diag(p)
-    theta = theta * real_stru
-    theta=fake::MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
-    colnames(theta)=paste0("metabolite",1:p)
-    rownames(theta)=paste0("metabolite",1:p)
-    sigma=solve(theta)
-    fullCovariance= kronecker(cc,sigma)
-    }
-
-    if (homo==FALSE){
       for (i in 1:m3) {
         Sigma[[i]]=list()
         Precision[[i]]=list()
@@ -77,7 +49,7 @@ simulate=function(n,p,m1,m2=0,m3,cc,homo=TRUE){
       fullCovariance=do.call(rbind,mmlist)
       fullCovariance=MakePositiveDefinite(fullCovariance,pd_strategy = "diagonally_dominant",scale = T)$omega
 
-    }
+
 
     }
 
@@ -152,17 +124,7 @@ for (i in 1:m3) {
 
 
 
-#' Title
-#'
-#' @param n
-#' @param p
-#' @param m1
-#' @param tau
-#'
-#' @returns
-#' @export
-#'
-#' @examples
+
 simulate_long=function(n,p,m1,tau){
   ## true structure
   timepoint=vector("list",n)
@@ -217,17 +179,6 @@ simulate_long=function(n,p,m1,tau){
 
 
 
-#' Title
-#'
-#' @param n
-#' @param p
-#' @param m1
-#' @param alpha
-#'
-#' @returns
-#' @export
-#'
-#' @examples
 simulate_heter=function(n,p,m1,alpha){
   ## true structure
   timepoint=vector("list",n)
@@ -285,7 +236,39 @@ simulate_heter=function(n,p,m1,alpha){
 
 
 
+#' Title
+#'
+#' @param type what type of dat should be generated
+#' @param n number of subjects
+#' @param p number of nodes
+#' @param m1 number of edges
+#' @param m2 number of edges between general and individual network
+#' @param m3 number of correlated data within one subject
+#' @param cc correlation matrix between tissues
+#' @param tau parameters in correlation matrix
+#' @param alpha parameter in correlation matrix
+#' @importFrom fake MakePositiveDefinite
+#' @importFrom MASS mvrnorm
+#' @returns data frame
+#' @export
+Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,cc=diag(m3),tau=c(2,1),alpha=2){
+  type=match.arg(type)
 
+  if (type=="general"){
+data=simulate_general(n=n,p=p,m1=m1,m2=m2,m3=m3,cc)
+  }
+
+  if (type=="longihomo"){
+    data=simulate_long(n=n,p=p,m1=m1,tau=tau)
+  }
+
+  if (type=="longiheter"){
+
+    data=simulate_heter(n=n, p=p,m1=m1, alpha=alpha)
+  }
+
+  return(data)
+}
 
 
 
