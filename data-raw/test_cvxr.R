@@ -27,7 +27,7 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
 lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
-bb=cvNetwork(type="general",data=ddata,lambda = lambda1,K=5)
+system.time(cvNetwork(type="general",data=ddata,lambda = lambda1,K=5))
 group=c(rep(1,30),rep(2,30))
 bb=cvNetwork(type="general",group=group,data=ddata,lambda = lambda,K=5)
 

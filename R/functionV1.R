@@ -37,6 +37,7 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
 
 
     data_sub=split(data[,-c(1,2)],data[,1])
+    #browser()
     amatrix=Reduce("+",lapply(data_sub, function(B,xx){as.matrix(xx)%*%B%*%t(as.matrix(xx))}, B=B))
     obj2=-0.5*matrix_trace(A%*%amatrix)
     obj=-(obj1+obj2)
@@ -287,7 +288,6 @@ if (is.null(group))  {
 
     while(1){
       k=k+1
-
       A1=AA(data = data,B = B, type=type,...)$corMatrix
 #browser()
       B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
@@ -474,66 +474,66 @@ llike=function(data,A, preMatrix, individual){
 
 #' Title
 #'
-#' @param data
-#' @param bi
-#' @param K
+#' @param data.train traning data set
+#' @param data.valid validation dat set
+#' @param bi given column in network matrix
 #'
-#' @returns
+#' @returns a scalar
 #' @export
-#'
-#' @examples
-cvErrori=function(data,bi, K){
-  n=nrow(data)
-  p=ncol(data)-2
-  ind = sample(n)
 
-
-  if (K<=1 | K%%1 !=0){
-    stop("K should be an integer greater than 1!")
-  }
-
-  #if (any(lambda)<=0) {stop("tuning parameter lambda should be positive!")}
+cvErrori=function(data.train,data.valid,bi){
 
   if (any(! bi %in% c(0,1,2))) {stop("entries of vector bi should be 0,  1 or 2!")}
   i=which(bi==2)
-  X=data[,-c(1,2)]
-  cv_error=rep(0,length=K)
-
-
-  for (k in 1:K) {
-
-    leave.out = ind[(1 + floor((k - 1) * n/K)):floor(k *
-                                                       n/K)]
-    X.train = X[-leave.out, , drop = FALSE]
-    X_bar = apply(X.train, 2, mean)
-    X.train = scale(X.train, center = X_bar, scale = FALSE)
-    X.valid = X[leave.out, , drop = FALSE]
-    X.valid = scale(X.valid, center = X_bar, scale = FALSE)
+  cv_error=c()
 
 
     index=which(bi==1)
     if (length(index)==0){
-      cv_error[k]=var(X.valid[,i])
+      cv_error=var(data.valid[,i+2])
 
     }else{
-      if (length(index)>= nrow(X.train)){
+      if (length(index)>= nrow(data.train)){
         print(paste("number of variable ", length(index)))
         stop("network is too dense for model training!")
       }
 
-      y=X.train[,i]
-      x=X.train[,index]
+      y=data.train[,i+2]
+      x=as.matrix(data.train[,index+2])
+      #browser()
       coef.train=lm(y~x)$coef
-      yy=X.valid[,i]
-      if(length(leave.out)>1){
-        xx=cbind(1,X.valid[,index])
-      }else{
-        xx=c(1,X.valid[index])}
-      cv_error[k]=mean(yy-xx%*%coef.train)^2
-      if (is.na(cv_error[k])) {browser()}
+      yy=data.valid[,i+2, drop=FALSE]
+      # if(nrow(data.valid)>1 && ncol(data.valid>1)){
+      #   xx=cbind(1,X.valid[,index])
+      # }else{
+      #   xx=c(1,c(X.valid[index]))}
+
+      xx=as.matrix(cbind(1,data.valid[,index+2,drop=FALSE]))
+      err=(yy-xx%*%coef.train)^2
+      cv_error=c(cv_error,mean(err[,,drop=T]))
+      if (any(is.na(cv_error))) {
+        print("cv error is missing!")
+        browser()}
     }
-  }
+
   return(mean(cv_error))
+}
+
+
+
+#' Title
+#'
+#' @param data.train training data set
+#' @param data.valid validation dat set
+#' @param B network matrix
+#'
+#' @returns a scalar
+#' @export
+#'
+
+cvError=function(data.train,data.valid,B){
+ a= mean(apply(B, 2, function(bi) cvErrori(data.train=data.train,data.valid=data.valid,bi=bi)))
+
 }
 
 
@@ -548,52 +548,112 @@ cvErrori=function(data,bi, K){
 #'
 
 
-cvNetwork=function(type=c("general","expFixed","twoPara"), group=NULL,data,lambda, K, expFix=1){
+cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1){
 
   type=match.arg(type)
 
-  if (! type %in% c("general","expFixed","twoPara")){stop("Specification of type is incorrect!")}
 
   if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
-  {stop("group and lamda does not match!")}
+  {stop("group and lambda does not match!")}
 
   if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
 
+  if (any(lambda<=0)) {stop("tuning parameter lambda should be positive!")}
 
-  #aa=apply(B, 2, cvErrori,data=data,K=K)
+  if (any(K<=1 | K%%1 !=0)){
+    stop("K should be an integer greater than 1!")
+  }
 
-   if (type=="general" && is.null(group)){
-    aa= sapply(lambda, function(x) lglasso(data=data,lambda=x,type=type)$wi, simplify = FALSE)
-    cc=lapply(aa, function(B){
-    M=ifelse(abs(B)<=10^(-2), 0,1)
-    diag(M)=2
-    M
-    })
+
+  n=length(unique(data[,1]))
+  subjects=unique(data[,1])
+  p=ncol(data)-2
+  ind = sample(n)
+
+  X=data[,-c(1,2)]
+  cv_error=rep(0,length=K)
+
+  S = (nrow(X) - 1)/nrow(X) * cov(X)
+  # crit.cv = match.arg(crit.cv)
+  # start = match.arg(start)
+
+  Sminus = S
+  diag(Sminus) = 0
+  if (is.null(lambda)) {
+    if (!((lam.min.ratio <= 1) && (lam.min.ratio > 0))) {
+      cat("\nlam.min.ratio must be in (0, 1]... setting to 1e-2!")
+      lam.min.ratio = 0.01
+    }
+    if (!((nlam > 0) && (nlam%%1 == 0))) {
+      cat("\nnlam must be a positive integer... setting to 10!")
+      nlam = 10
+    }
+    lam.max = max(abs(Sminus))
+    lam.min = lam.min.ratio * lam.max
+    lambda = 10^seq(log10(lam.min), log10(lam.max), length = nlam)
+    if (!is.null(group)){
+      lambda=cbind(lambda,lambda)
+    }
+  }
+  else {
+    if (is.null(group)){
+      lambda = sort(lambda)
+      }
+  }
+
+
+
+  for (k in 1:K) {
+      leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
+                                                         n/K)]]
 #browser()
-    bb=lapply(cc, function(B) apply(B,2,cvErrori,data=data,K=K))
-   }
+      indexValid=which(data[,1] %in% leave.out)
+      data.train = data[-indexValid, , drop = FALSE]
+      data_bar = apply(data.train[,-c(1,2)], 2, mean)
+      data.train[,-c(1,2)] = scale(data.train[,-c(1,2)], center = data_bar, scale = FALSE)
+      data.valid = data[indexValid,, drop = FALSE]
+      data.valid[,-c(1,2)] = scale(data.valid[,-c(1,2)], center = data_bar, scale = FALSE)
+      #S.train = crossprod(data.train[,-c(1,2)])/(dim(data.train)[1])
+      #S.valid = crossprod(data.valid[,-c(1,2)])/(dim(data.valid)[1])
+
+
+
+
+    if (type=="general" && is.null(group)){
+      aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+      cc=lapply(aa, function(B){
+        M=ifelse(abs(B)<=10^(-2), 0,1)
+        diag(M)=2
+        M
+      })
+      bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+    }
+
 
 
   if (type=="general" && !is.null(group)){
-    aa=apply(lambda, 1, function(x) lglasso(data=data,lambda=x,type=type, group=group)$wiList )
+
+    aa=apply(lambda, 1,function(x){lglasso(data=data,lambda=x,type=type, group=group)$wiList} )
+
+
     cc=lapply(aa, function(B){
-      lapply(B, function(Z){    M=ifelse(abs(Z)<=10^(-2), 0,1)
+      lapply(B, function(Z){
+        M=ifelse(abs(Z)<=10^(-2), 0,1)
              diag(M)=2
              M
              }
              )
+    }
+    )
 
-    }
-    )
-#browser()
-    bb=lapply(cc, function(B){
-      lapply(B, function(Z){
-        apply(Z, 2,cvErrori,data=data,K=K)
+    bb=lapply(cc, function(BB){
+      lapply(BB, function(B){
+      cvError(data.train=data.train,data.valid=data.valid,B=B)
       }
-      )
+              )
     }
     )
-  }
+}
 
 
   if (type=="expFixed" && is.null(group)){
@@ -614,7 +674,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), group=NULL,data,lambd
   }
 
 
-
+}
 
 
 return(bb)

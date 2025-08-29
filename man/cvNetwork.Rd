@@ -6,9 +6,11 @@
 \usage{
 cvNetwork(
   type = c("general", "expFixed", "twoPara"),
-  group = NULL,
   data,
-  lambda,
+  group = NULL,
+  lambda = NULL,
+  nlam = 10,
+  lam.min.ratio = 0.01,
   K,
   expFix = 1
 )

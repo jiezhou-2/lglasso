@@ -77,7 +77,7 @@ cv.lglasso=function (data = NULL,  nlam=10,lam.min.ratio=0.01, lam = NULL, type=
     # init = S.train
     # initOmega = diag(ncol(S.train))
 
-lapply(lamda, lglasso)
+
 
 
     for (i in 1:length(lam)) {
