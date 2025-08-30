@@ -28,7 +28,12 @@ lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
 system.time(cvNetwork(type="general",data=ddata,lambda = lambda1,K=5))
-group=c(rep(1,30),rep(2,30))
+freq=table(ddata[,1])
+group=c()
+for (i in 1:length(freq)) {
+  group=c(group,1:freq[i])
+}
+group=ifelse(group==1,1,2)
 bb=cvNetwork(type="general",group=group,data=ddata,lambda = lambda,K=5)
 
 
@@ -43,6 +48,12 @@ lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
 bb=cvNetwork(type="expFixed",data=ddata,lambda = lambda1,K=5)
+freq=table(ddata[,1])
+group=c()
+for (i in 1:length(freq)) {
+  group=c(group,1:freq[i])
+}
+group=ifelse(group==1,1,2)
 bb=cvNetwork(type="expFixed",group=group,data=ddata,lambda = lambda,K=5)
 
 
@@ -58,6 +69,12 @@ lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
 bb=cvNetwork(type="twoPara",data=ddata,lambda = lambda1,K=5)
+freq=table(ddata[,1])
+group=c()
+for (i in 1:length(freq)) {
+  group=c(group,1:freq[i])
+}
+group=ifelse(group==1,1,2)
 bb=cvNetwork(type="twoPara",group=group,data=ddata,lambda = lambda,K=5)
 
 
