@@ -470,14 +470,7 @@ return(individual=S_est)
 
 
 
-#' Title
-#'
-#' @param data.train traning data set
-#' @param data.valid validation dat set
-#' @param bi given column in network matrix
-#'
-#' @returns a scalar
-#' @export
+
 
 cvErrorji=function(data.train,data.valid,bi){
 
@@ -525,15 +518,6 @@ cvErrorj=function(data.train,data.valid,B){
 
 
 
-#' Title
-#'
-#' @param data.train training data set
-#' @param data.valid validation dat set
-#' @param B network matrix
-#'
-#' @returns a scalar
-#' @export
-#'
 
 cvError=function(data.train,data.valid,BB,group.train,group.valid){
 #browser()
@@ -577,7 +561,8 @@ return(mean(a))
 #'
 
 
-cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1){
+cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+                   lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
 
   type=match.arg(type)
 
@@ -600,7 +585,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
   ind = sample(n)
 
   X=data[,-c(1,2)]
-  cv_error=rep(0,length=K)
+
 
   S = (nrow(X) - 1)/nrow(X) * cov(X)
   # crit.cv = match.arg(crit.cv)
@@ -631,11 +616,15 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
   }
 
 
+nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
+cv_error=matrix(0,nrow=nnlambda,ncol=K)
+  if (trace) {
+    progress = txtProgressBar(max = K, style = 3)
+  }
 
   for (k in 1:K) {
       leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
                                                          n/K)]]
-#browser()
       indexValid=which(data[,1] %in% leave.out)
       data.train = data[-indexValid, , drop = FALSE]
       data_bar = apply(data.train[,-c(1,2)], 2, mean)
@@ -658,6 +647,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
         M
       })
       bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+      bb=do.call(c,bb)
     }
 
 
@@ -681,6 +671,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
       cvError(data.train=data.train,data.valid=data.valid,BB=BB, group=group.valid, group.train = group.train)
     }
     )
+    bb=do.call(c,bb)
 }
 
 
@@ -693,7 +684,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
      M
    })
    bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
-
+   bb=do.call(c,bb)
   }
 
   if (type=="expFixed" && !is.null(group)){
@@ -709,6 +700,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
    )
 
    bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+   bb=do.call(c,bb)
   }
 
   if (type=="twoPara" && is.null(group)){
@@ -719,6 +711,7 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
       M
     })
     bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+    bb=do.call(c,bb)
   }
 
   if (type=="twoPara" && !is.null(group)){
@@ -735,12 +728,14 @@ cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,lambd
     )
 
     bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+    bb=do.call(c,bb)
   }
+cv_error[,k]=bb
 
-
+if (trace) {
+  setTxtProgressBar(progress,  k-1)
 }
-
-
-return(bb)
+}
+return(cv.error=cv_error)
 }
 
