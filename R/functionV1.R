@@ -299,10 +299,10 @@ if (is.null(group))  {
       }
       if (d1<=tol & d2<= tol ){
         if (is.null(group)){
-          return(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1))
+          output=structure(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1), class="lglasso")
           }else{
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1$preMatrix,  wiList=individial,v=A1))
+          output=structure(list(wi=B1$preMatrix,  wiList=individial,v=A1), class="lglasso")
         }
 
       }else{
@@ -313,13 +313,14 @@ if (is.null(group))  {
         warning("Algorithm did not converge!")
 
         if (is.null(group)){
-          return(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1))
+          output=structure(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1), class="lglasso")
         }else{
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1$preMatrix,wiList=individial, v=A1))
+          output=structure(list(wi=B1$preMatrix,wiList=individial, v=A1), class="lglasso")
         }
-
+        break
       }
+
     }
   }
 
@@ -352,12 +353,11 @@ tau0=control$tau0
       if (d1<=tol & d2<= tol ){
 
         if (is.null(group)){
-          return(list(wi=B1$preMatrix, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wiList=NULL, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }else{
 
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-
-          return(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }
 
 
@@ -370,13 +370,16 @@ tau0=control$tau0
       if (k>=maxit){
         warning("Algorithm did not converge!")
         if (is.null(group)){
-          return(list(wi=B1$preMatrix, vList=A1$corMatrixList, tauhat=tau0))
+
+          output=structure(list(wi=B1$preMatrix, wiList=NULL, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
+
         }else{
-          #browser()
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }
-      }
+        break
+           }
+
     }
   }
 
@@ -408,12 +411,11 @@ tau0=control$tau0
       if (d1<= tol & d2<= tol ){
 
         if (is.null(group)){
-          return(list(wi=B1$preMatrix, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }else{
 
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-
-          return(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }
 
       }else{
@@ -425,16 +427,20 @@ tau0=control$tau0
         warning("Algorithm did not converge!")
 
         if (is.null(group)){
-          return(list(wi=B1, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
+
         }else{
           #browser()
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          return(list(wi=B1$preMatrix,wiList=individial, vList=A1$corMatrixList, tauhat=tau0))
+          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
       }
-    }
+        break
+          }
+
     }
 
   }
+  return(output)
 }
 
 
@@ -519,7 +525,7 @@ cvErrorj=function(data.train,data.valid,B){
 
 
 
-cvError=function(data.train,data.valid,BB,group.train,group.valid){
+cvError=function(data.train,data.valid,BB,group.train=NULL,group.valid=NULL){
 #browser()
   if (any(nrow(data.train)!=length(group.train) | nrow(data.valid)!=length(group.valid) )){
     stop("group does not match dat sets!")
@@ -561,7 +567,7 @@ return(mean(a))
 #'
 
 
-cvNetwork=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+cv.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
 
   type=match.arg(type)
@@ -666,7 +672,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
              )
     }
     )
-#browser()
+
     bb=lapply(cc, function(BB){
       cvError(data.train=data.train,data.valid=data.valid,BB=BB, group=group.valid, group.train = group.train)
     }
@@ -733,9 +739,26 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
 cv_error[,k]=bb
 
 if (trace) {
-  setTxtProgressBar(progress,  k-1)
+  setTxtProgressBar(progress,  k)
 }
+  }
+output=structure(list(cv_error=cv_error, lambda=lambda),class="cvlglsso")
+return(output)
 }
-return(cv.error=cv_error)
+
+
+
+plot.cvlglasso=function(x){
+  lambda=x$lambda
+  cv_error=x$cv_error
+  err=apply(cv_error, 1, mean)
+  if (is.vector(lamda)){
+    plot(lambda,err, type="l")
+  }
+  if (is.matrix(cv_error)){
+
+  }
+
 }
+
 

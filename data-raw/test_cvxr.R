@@ -27,14 +27,14 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
 lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
-bb=cvNetwork(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE)
+bb=cv.lglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE)
 freq=table(ddata[,1])
 group=c()
 for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-bb=cvNetwork(type="general",group=group,data=ddata,lambda = lambda,K=5)
+bb=cv.lglasso(type="general",group=group,data=ddata,lambda = lambda,K=5)
 
 
 ## longitudinal data with structured homogeneous dampening rate
@@ -47,14 +47,14 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group, tr
 lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
-bb=cvNetwork(type="expFixed",data=ddata,lambda = lambda1,K=5)
+bb=cv.lglasso(type="expFixed",data=ddata,lambda = lambda1,K=5)
 freq=table(ddata[,1])
 group=c()
 for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-bb=cvNetwork(type="expFixed",group=group,data=ddata,lambda = lambda,K=5)
+bb=cv.lglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5)
 
 
 ## longitudinal data with structured homogeneous dampening rate
@@ -68,14 +68,14 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group)
 lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=as.matrix(cbind(lambda1,lambda2))
-bb=cvNetwork(type="twoPara",data=ddata,lambda = lambda1,K=5)
+bb=cv.lglasso(type="twoPara",data=ddata,lambda = lambda1,K=5)
 freq=table(ddata[,1])
 group=c()
 for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-bb=cvNetwork(type="twoPara",group=group,data=ddata,lambda = lambda,K=5)
+bb=cv.lglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5)
 
 
 
