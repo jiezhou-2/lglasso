@@ -39,4 +39,5 @@ Imports:
     matrixcalc,
     parallel,
     pheatmap,
+    RColorBrewer,
     stors

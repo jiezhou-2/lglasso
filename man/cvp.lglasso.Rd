@@ -18,7 +18,28 @@ cvp.lglasso(
 )
 }
 \arguments{
-\item{cores}{}
+\item{type}{model type}
+
+\item{data}{raw data}
+
+\item{group}{group variable}
+
+\item{lambda}{tuning parameter}
+
+\item{nlam}{number of tuning parameter}
+
+\item{lam.min.ratio}{ratio of largest lambda vs smallest lambda}
+
+\item{K}{cv folds}
+
+\item{expFix}{given parameter}
+
+\item{trace}{whether show the process}
+
+\item{cores}{parallel computing}
+}
+\value{
+list
 }
 \description{
 Title

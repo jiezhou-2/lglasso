@@ -128,7 +128,6 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
 
 
 
-
 BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,maxit=100,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("warm","cold"),w.init=NULL,wi.init=NULL,...){
   type=match.arg(type)
@@ -525,8 +524,27 @@ cvErrorj=function(data.train,data.valid,B){
 
 
 
+#' Title
+#'
+#' @param data.train trainng data
+#' @param data.valid testing data
+#' @param BB given network
+#' @param group.train group in training data
+#' @param group.valid group in testing data
+#'
+#' @returns a matrix
+#' @export
+#'
 cvError=function(data.train,data.valid,BB,group.train=NULL,group.valid=NULL){
 #browser()
+
+  if (is.matrix(BB)){
+    a=  cvErrorj(data.train=data.train,data.valid=data.valid,B=BB)
+
+  }
+
+  if (is.list(BB)){
+
   if (any(nrow(data.train)!=length(group.train) | nrow(data.valid)!=length(group.valid) )){
     stop("group does not match dat sets!")
   }
@@ -534,7 +552,7 @@ cvError=function(data.train,data.valid,BB,group.train=NULL,group.valid=NULL){
   data.train.sub=split(data.train,group.train)
   data.valid.sub=split(data.valid,group.valid)
 
-  if (is.list(BB)){
+
 if (any(names(data.train.sub)!=names(BB)) | any(names(data.valid.sub)!= names(BB))) {
   stop("the names of data sets do not match!")
 }
@@ -546,13 +564,8 @@ a=c()
     a=c(a,cvErrorj(data.train=dd1,data.valid=dd2,B=B))
 
 }
-  }
-
-if (is.matrix(BB)){
- a=  cvErrorj(data.train=data.train,data.valid=data.valid,B=BB)
 }
-
-return(mean(a))
+  return(a=mean(a))
 }
 
 
@@ -591,6 +604,8 @@ cv.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
   ind = sample(n)
 
   X=data[,-c(1,2)]
+
+
 
 
   S = (nrow(X) - 1)/nrow(X) * cov(X)
@@ -652,7 +667,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
         diag(M)=2
         M
       })
-      bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+      bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
       bb=do.call(c,bb)
     }
 
@@ -674,7 +689,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
     )
 
     bb=lapply(cc, function(BB){
-      cvError(data.train=data.train,data.valid=data.valid,BB=BB, group=group.valid, group.train = group.train)
+      cvError(data.train=data.train,data.valid=data.valid,BB=BB, group.valid=group.valid, group.train = group.train)
     }
     )
     bb=do.call(c,bb)
@@ -689,7 +704,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
      diag(M)=2
      M
    })
-   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
    bb=do.call(c,bb)
   }
 
@@ -705,7 +720,8 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
    }
    )
 
-   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+                                      group.valid =   group.valid,group.train = group.train))
    bb=do.call(c,bb)
   }
 
@@ -716,7 +732,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
       diag(M)=2
       M
     })
-    bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+    bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
     bb=do.call(c,bb)
   }
 
@@ -733,7 +749,8 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
     }
     )
 
-    bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+    bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+                                       group.valid =   group.valid,group.train = group.train))
     bb=do.call(c,bb)
   }
 cv_error[,k]=bb
@@ -755,6 +772,7 @@ return(output)
 #'
 #' @returns error plot
 #' @importFrom pheatmap pheatmap
+#' @import RColorBrewer
 #' @export
 #'
 
@@ -1078,21 +1096,21 @@ Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=
 
 #' Title
 #'
-#' @param type
-#' @param data
-#' @param group
-#' @param lambda
-#' @param nlam
-#' @param lam.min.ratio
-#' @param K
-#' @param expFix
-#' @param trace
-#' @param cores
+#' @param type model type
+#' @param data raw data
+#' @param group group variable
+#' @param lambda tuning parameter
+#' @param nlam number of tuning parameter
+#' @param lam.min.ratio ratio of largest lambda vs smallest lambda
+#' @param K cv folds
+#' @param expFix given parameter
+#' @param trace whether show the process
+#' @param cores parallel computing
 #'
-#' @returns
+#' @returns list
 #' @export
 #' @import parallel foreach doParallel
-#' @examples
+
 cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                      lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
 
@@ -1191,7 +1209,7 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                      diag(M)=2
                      M
                    })
-                   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
                    bb=do.call(c,bb)
                  }
 
@@ -1213,7 +1231,7 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    )
 
                    bb=lapply(cc, function(BB){
-                     cvError(data.train=data.train,data.valid=data.valid,BB=BB, group=group.valid, group.train = group.train)
+                     cvError(data.train=data.train,data.valid=data.valid,BB=BB, group.valid=group.valid, group.train = group.train)
                    }
                    )
                    bb=do.call(c,bb)
@@ -1228,7 +1246,7 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                      diag(M)=2
                      M
                    })
-                   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
                    bb=do.call(c,bb)
                  }
 
@@ -1244,7 +1262,8 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    }
                    )
 
-                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+                                                      group.valid=group.valid, group.train = group.train))
                    bb=do.call(c,bb)
                  }
 
@@ -1255,7 +1274,7 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                      diag(M)=2
                      M
                    })
-                   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
                    bb=do.call(c,bb)
                  }
 
@@ -1272,7 +1291,8 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    }
                    )
 
-                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+                                                      group.valid=group.valid, group.train = group.train))
                    bb=do.call(c,bb)
                  }
                  cv_error=bb
