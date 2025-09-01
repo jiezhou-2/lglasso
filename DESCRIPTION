@@ -35,4 +35,5 @@ Imports:
     glasso,
     MASS,
     matrixcalc,
+    pheatmap,
     stors

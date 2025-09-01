@@ -24,9 +24,9 @@ dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
 ddata=dd$data
 aa=lglasso(data=ddata,lambda = 0.1,type="general")
 aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
-lambda1=exp(seq(-2,0,length=10))
+lambda1=exp(seq(-2,0,length=4))
 lambda2=lambda1
-lambda=as.matrix(cbind(lambda1,lambda2))
+lambda=expand.grid(lambda1,lambda2)
 bb=cv.lglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE)
 freq=table(ddata[,1])
 group=c()

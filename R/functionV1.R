@@ -748,17 +748,52 @@ return(output)
 
 
 
+#' Title
+#'
+#' @param x cvlglasso object
+#'
+#' @returns error plot
+#' @importFrom pheatmap pheatmao
+#' @export
+#'
+
 plot.cvlglasso=function(x){
   lambda=x$lambda
-  cv_error=x$cv_error
-  err=apply(cv_error, 1, mean)
-  if (is.vector(lamda)){
+  err=apply(x$cv_error, 1, mean)
+  if (is.vector(lambda)){
     plot(lambda,err, type="l")
   }
-  if (is.matrix(cv_error)){
-
+  if (is.matrix(as.matrix(lambda))){
+a1=unique(lambda[,1])
+a2=unique(lambda[,2])
+err_matrix=matrix(0,nrow=length(a1),ncol=length(a2))
+for (i in 1:length(a1)) {
+  for (j in 1:length(a2)) {
+    index=which(apply(lambda,1,function(x) all(x==c(a1[i],a2[j]))))
+    err_matrix[i,j]=err[index]
   }
-
 }
 
 
+  heat_plot <- pheatmap(err_matrix,
+                        col = brewer.pal(8, 'OrRd'), # choose a colour scale for your data
+                        cluster_rows = F, cluster_cols = F, # set to FALSE if you want to remove the dendograms
+                        clustering_distance_cols = 'euclidean',
+                        clustering_distance_rows = 'euclidean',
+                        clustering_method = 'ward.D',
+                        #annotation_row = gene_functions_df, # row (gene) annotations
+                        #annotation_col = ann_df, # column (sample) annotations
+                        #annotation_colors = ann_colors, # colours for your annotations
+                        #annotation_names_row = F,
+                        #annotation_names_col = F,
+                        fontsize_row = 10,          # row label font size
+                        fontsize_col = 7,          # column label font size
+                        angle_col = 45, # sample names at an angle
+                        legend_breaks = c(-2, 0, 2), # legend customisation
+                        legend_labels = c("Low", "Medium", "High"), # legend customisation
+                        show_colnames = T, show_rownames = F, # displaying column and row names
+                        main = "CV error") # a title for our heatmap
+
+}
+
+}
