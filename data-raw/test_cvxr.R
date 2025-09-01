@@ -24,17 +24,17 @@ dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
 ddata=dd$data
 aa=lglasso(data=ddata,lambda = 0.1,type="general")
 aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
-lambda1=exp(seq(-2,0,length=4))
+lambda1=exp(seq(-2,0,length=10))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
-bb=cv.lglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE)
+bb=cvp.lglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE, cores = 5)
 freq=table(ddata[,1])
 group=c()
 for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-bb=cv.lglasso(type="general",group=group,data=ddata,lambda = lambda,K=5)
+bb=cvp.lglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=5)
 
 
 ## longitudinal data with structured homogeneous dampening rate

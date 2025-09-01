@@ -30,10 +30,13 @@ Repository: CRAN
 Date/Publication: 2022-01-15 08:52:46 UTC
 Imports: 
     CVXR,
+    doParallel,
     expm,
     fake,
+    foreach,
     glasso,
     MASS,
     matrixcalc,
+    parallel,
     pheatmap,
     stors

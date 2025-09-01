@@ -54,3 +54,11 @@ heat_plot <- pheatmap(data,
                       legend_labels = c("Low", "Medium", "High"), # legend customisation
                       show_colnames = T, show_rownames = F, # displaying column and row names
                       main = "Super heatmap with annotations") # a title for our heatmap
+
+
+
+
+
+
+
+

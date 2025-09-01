@@ -737,11 +737,12 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
     bb=do.call(c,bb)
   }
 cv_error[,k]=bb
-
 if (trace) {
   setTxtProgressBar(progress,  k)
 }
   }
+
+
 output=structure(list(cv_error=cv_error, lambda=lambda),class="cvlglsso")
 return(output)
 }
@@ -1073,6 +1074,220 @@ Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=
   return(data)
 }
 
+
+
+#' Title
+#'
+#' @param type
+#' @param data
+#' @param group
+#' @param lambda
+#' @param nlam
+#' @param lam.min.ratio
+#' @param K
+#' @param expFix
+#' @param trace
+#' @param cores
+#'
+#' @returns
+#' @export
+#' @import parallel foreach doParallel
+#' @examples
+cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+                     lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
+
+  type=match.arg(type)
+
+
+  if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
+  {stop("group and lambda does not match!")}
+
+  if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
+
+  if (any(lambda<=0)) {stop("tuning parameter lambda should be positive!")}
+
+  if (any(K<=1 | K%%1 !=0)){
+    stop("K should be an integer greater than 1!")
+  }
+
+  num_cores=detectCores()
+  if (cores > num_cores) {
+    cat("\nOnly detected", paste(num_cores, "cores...", sep = " "))
+  }
+  if (cores > K) {
+    cat("\nNumber of cores exceeds K... setting cores = K")
+    cores = K
+  }
+  cluster = makeCluster(cores)
+  registerDoParallel(cluster)
+  n=length(unique(data[,1]))
+  subjects=unique(data[,1])
+  p=ncol(data)-2
+  ind = sample(n)
+
+  X=data[,-c(1,2)]
+
+
+  S = (nrow(X) - 1)/nrow(X) * cov(X)
+  # crit.cv = match.arg(crit.cv)
+  # start = match.arg(start)
+
+  Sminus = S
+  diag(Sminus) = 0
+  if (is.null(lambda)) {
+    if (!((lam.min.ratio <= 1) && (lam.min.ratio > 0))) {
+      cat("\nlam.min.ratio must be in (0, 1]... setting to 1e-2!")
+      lam.min.ratio = 0.01
+    }
+    if (!((nlam > 0) && (nlam%%1 == 0))) {
+      cat("\nnlam must be a positive integer... setting to 10!")
+      nlam = 10
+    }
+    lam.max = max(abs(Sminus))
+    lam.min = lam.min.ratio * lam.max
+    lambda = 10^seq(log10(lam.min), log10(lam.max), length = nlam)
+    if (!is.null(group)){
+      lambda=expand.grid(lambda,lambda)
+    }
+  }
+  else {
+    if (is.null(group)){
+      lambda = sort(lambda)
+    }
+  }
+
+
+  nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
+  cv_error=matrix(0,nrow=nnlambda,ncol=K)
+
+  k=NULL
+  CV = foreach(k = 1:K, .packages = "CVglasso", .combine = "cbind",
+               .inorder = FALSE) %dopar% {
+
+                 if (trace) {
+                   progress = txtProgressBar(max = K, style = 3)
+                 }
+
+                 leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
+                                                                            n/K)]]
+                 indexValid=which(data[,1] %in% leave.out)
+                 data.train = data[-indexValid, , drop = FALSE]
+                 data_bar = apply(data.train[,-c(1,2)], 2, mean)
+                 data.train[,-c(1,2)] = scale(data.train[,-c(1,2)], center = data_bar, scale = FALSE)
+                 data.valid = data[indexValid,, drop = FALSE]
+                 data.valid[,-c(1,2)] = scale(data.valid[,-c(1,2)], center = data_bar, scale = FALSE)
+                 group.train=group[-indexValid]
+                 group.valid=group[indexValid]
+                 #S.train = crossprod(data.train[,-c(1,2)])/(dim(data.train)[1])
+                 #S.valid = crossprod(data.valid[,-c(1,2)])/(dim(data.valid)[1])
+
+
+
+
+                 if (type=="general" && is.null(group)){
+                   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+                   cc=lapply(aa, function(B){
+                     M=ifelse(abs(B)<=10^(-2), 0,1)
+                     diag(M)=2
+                     M
+                   })
+                   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=do.call(c,bb)
+                 }
+
+
+
+                 if (type=="general" && !is.null(group)){
+
+                   aa=apply(lambda, 1,function(x){lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList} )
+
+
+                   cc=lapply(aa, function(B){
+                     lapply(B, function(Z){
+                       M=ifelse(abs(Z)<=10^(-1), 0,1)
+                       diag(M)=2
+                       M
+                     }
+                     )
+                   }
+                   )
+
+                   bb=lapply(cc, function(BB){
+                     cvError(data.train=data.train,data.valid=data.valid,BB=BB, group=group.valid, group.train = group.train)
+                   }
+                   )
+                   bb=do.call(c,bb)
+                 }
+
+
+                 if (type=="expFixed" && is.null(group)){
+
+                   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type, expFix = expFix)$wi, simplify = FALSE)
+                   cc=lapply(aa, function(B){
+                     M=ifelse(abs(B)<=10^(-2), 0,1)
+                     diag(M)=2
+                     M
+                   })
+                   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=do.call(c,bb)
+                 }
+
+                 if (type=="expFixed" && !is.null(group)){
+                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, expFix = expFix, group=group.train)$wiList})
+                   cc=lapply(aa, function(B){
+                     lapply(B, function(Z){
+                       M=ifelse(abs(Z)<=10^(-1), 0,1)
+                       diag(M)=2
+                       M
+                     }
+                     )
+                   }
+                   )
+
+                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+                   bb=do.call(c,bb)
+                 }
+
+                 if (type=="twoPara" && is.null(group)){
+                   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+                   cc=lapply(aa, function(B){
+                     M=ifelse(abs(B)<=10^(-2), 0,1)
+                     diag(M)=2
+                     M
+                   })
+                   bb=lapply(cc, function(B) cvErrorj(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=do.call(c,bb)
+                 }
+
+                 if (type=="twoPara" && !is.null(group)){
+                   # browser()
+                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList})
+                   cc=lapply(aa, function(B){
+                     lapply(B, function(Z){
+                       M=ifelse(abs(Z)<=10^(-1), 0,1)
+                       diag(M)=2
+                       M
+                     }
+                     )
+                   }
+                   )
+
+                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB, group = group.valid))
+                   bb=do.call(c,bb)
+                 }
+                 cv_error=bb
+
+                 if (trace) {
+                   setTxtProgressBar(progress,  k)
+                 }
+
+                 return(cv_error=cv_error)
+               }
+
+  stopCluster(cluster)
+  output=structure(list(cv_error=CV, lambda=lambda),class="cvlglsso")
+  return(output)
+}
 
 
 
