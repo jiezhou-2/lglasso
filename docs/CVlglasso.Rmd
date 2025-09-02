@@ -21,16 +21,18 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE}
-library(lglasso)
+#library(lglasso)
+library(devtools)
+load_all()
 ```
 
 
 
 ```{r, message=FALSE}
 # number of nodes
-p=10
+p=20
 # number of edge in general network
-m1=10
+m1=100
 # the difference between the number of edges in individual networks and general network
 m2=0
 #  number of clusters
@@ -42,7 +44,7 @@ rho=0.8
 
 ```
 
-## Model 1: clustered data with no correlation structure 
+## Model 1: cross validation plot for clustered data with no correlation structure 
 
 ```{r, message=FALSE}
 set.seed(5)
@@ -53,7 +55,7 @@ ddata=dd$data
 ```
 
 
-### estimate general networks
+
 
 ```{r}
 ## clustered data with no correlation structure
@@ -63,90 +65,73 @@ for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-lambda1=exp(seq(-2,0,length=3))
+lambda1=exp(seq(-5,-4,length=10))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
-system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE))
-system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE, cores=5))
-system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5))
-system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=10))
+
+bb=CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, cores=5)
 plot.cvlglasso(bb)
+
+bb=CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=5)
+plot.cvlglasso(bb)
+
 ```
 
-### estimate individual networks
-```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
-aa
-cov2cor(aa$v)
-```
-
-
-
-## Model 2: longitudinal data with one-parameter structured correlation 
-
+## Model 2: cross validation plot for longitudinal data with one-parameter structured correlation 
 
 ```{r}
-
 set.seed(5)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
 ddata=dd$data
-group=rep(c(1,2),71)
+freq=table(ddata[,1])
+group=c()
+for (i in 1:length(freq)) {
+  group=c(group,1:freq[i])
+}
+group=ifelse(group==1,1,2)
+lambda1=exp(seq(-5,-4,length=10))
+lambda2=lambda1
+lambda=expand.grid(lambda1,lambda2)
+```
+
+```{r}
+bb=CVlglasso(type="expFixed",data=ddata,lambda = lambda1,K=5,cores=5)
+plot.cvlglasso(bb)
+bb=CVlglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5,cores=5)
+plot.cvlglasso(bb)
+
 ```
 
 
-### estimate general networks
+## Model 3: cross validation plot for longitudinal data with two-parameter structured correlation 
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1)
-aa
-```
-
-### estimate individual networks
-
-```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group)
-aa
-```
-
-
-
-
-
-## Model 3: longitudinal data with two-parameter structured correlation 
-
-```{r}
-
 set.seed(5)
 dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2)
 ddata=dd$data
-group=rep(c(1,2),78)
+freq=table(ddata[,1])
+group=c()
+for (i in 1:length(freq)) {
+  group=c(group,1:freq[i])
+}
+group=ifelse(group==1,1,2)
+lambda1=exp(seq(-3,0,length=10))
+lambda2=exp(seq(-3,0,length=10))
+lambda=expand.grid(lambda1,lambda2)
+
 ```
 
-
-### estimate general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 1,type="twoPara")
-aa
-```
 
-
-### estimate individual networks
-
-```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group)
-aa
+bb=CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5)
+plot.cvlglasso(bb)
+bb=CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=5)
+plot.cvlglasso(bb)
 ```
 
 
 
-
-
-
-
-[1] Zhou, J., Gui, J., Viles, W.D., Chen, H., Madan, J.C., Coker, M.O., Hoen, A.G., 2021a. Identifying Microbial Interaction Networks Based on Irregularly Spaced Longitudinal 16S rRNA sequence data. https://doi.org/10.1101/2021.11.26.470159
-
-
-
+[1] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen AG. Identifying stationary microbial interaction networks based on irregularly spaced longitudinal 16S rRNA gene sequencing data. Front Microbiomes. 2024;3:1366948. doi: 10.3389/frmbi.2024.1366948. Epub 2024 Jun 2. PMID: 40687607; PMCID: PMC12276884.
 [2] Friedman J., Hastie T., Tibshirani R. (2019)  Graphical Lasso: Estimation of Gaussian Graphical Models, Version: 1.11. https://CRAN.R-project.org/package=glasso. 
 

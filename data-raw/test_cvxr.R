@@ -35,10 +35,16 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = group)
 lambda1=exp(seq(-2,0,length=3))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
+
 system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE))
 system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE, cores=5))
 system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5))
 system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=10))
+
+bb=CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE)
+plot.cvlglasso(bb)
+
+bb=CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=10)
 plot.cvlglasso(bb)
 
 ## longitudinal data with structured homogeneous dampening rate

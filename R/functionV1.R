@@ -783,7 +783,8 @@ plot.cvlglasso=function(x){
   if (is.vector(lambda)){
     plot(lambda,err, type="l")
   }
-  if (is.matrix(as.matrix(lambda))){
+  if (is.data.frame(lambda)){lambda=as.matrix(lambda)}
+  if (is.matrix(lambda)){
 a1=unique(lambda[,1])
 a2=unique(lambda[,2])
 err_matrix=matrix(0,nrow=length(a1),ncol=length(a2))
