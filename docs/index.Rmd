@@ -17,10 +17,10 @@ knitr::opts_chunk$set(
 
 
 
-[lglasso examples](lglasso.html)
+[lglasso examples](lglasso)
 
 
-[CVlglasso examples](CVlglasso.html)
+[CVlglasso examples](CVlglasso)
 
 
 
