@@ -53,12 +53,24 @@ ddata=dd$data
 ```
 
 
-### estiamte general networks
+### estimate general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 0.1,type="general")
-aa
-cov2cor(aa$v)
+## clustered data with no correlation structure
+freq=table(ddata[,1])
+group=c()
+for (i in 1:length(freq)) {
+  group=c(group,1:freq[i])
+}
+group=ifelse(group==1,1,2)
+lambda1=exp(seq(-2,0,length=3))
+lambda2=lambda1
+lambda=expand.grid(lambda1,lambda2)
+system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE))
+system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE, cores=5))
+system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5))
+system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=10))
+plot.cvlglasso(bb)
 ```
 
 ### estimate individual networks
@@ -82,7 +94,7 @@ group=rep(c(1,2),71)
 ```
 
 
-### estiamte general networks
+### estimate general networks
 
 ```{r}
 aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1)
@@ -111,7 +123,7 @@ group=rep(c(1,2),78)
 ```
 
 
-### estiamte general networks
+### estimate general networks
 
 ```{r}
 aa=lglasso(data=ddata,lambda = 1,type="twoPara")

@@ -56,16 +56,19 @@ ddata=dd$data
 ### estiamte general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 0.01,type="general")
-aa
+aa=lglasso(data=ddata,lambda = 0.1,type="general",tol = 0.01, trace=TRUE)
+
+## precision matrix
+aa$wi
+
+## correlation between different tissues
 cov2cor(aa$v)
 ```
 
 ### estimate individual networks
 ```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
-aa
-cov2cor(aa$v)
+aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2], ,tol = 0.01, trace=TRUE)
+aa$wiList
 ```
 
 ## Model 2: longitudinal data with one-parameter structured correlation 
@@ -86,16 +89,16 @@ group=rep(c(1,2),71)
 ### estiamte general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1)
-aa
+aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1,,tol = 0.01, trace=TRUE)
+aa$wi
 ```
 
 
 ### estimate individual networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group)
-aa
+aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group, ,tol = 0.01, trace=TRUE)
+aa$wiList
 ```
 
 
@@ -113,18 +116,18 @@ group=rep(c(1,2),78)
 
 
 
-### estiamte general networks
+### estimate general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 1,type="twoPara")
-aa
+aa=lglasso(data=ddata,lambda = 1,type="twoPara", ,tol = 0.01, trace=TRUE)
+aa$wi
 ```
 
 ### estimate individual networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group)
-aa
+aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group, ,tol = 0.01, trace=TRUE)
+aa$wiList
 ```
 
 

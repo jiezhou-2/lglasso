@@ -285,26 +285,31 @@ if (is.null(group))  {
     while(1){
       k=k+1
       A1=AA(data = data,B = B, type=type,...)$corMatrix
-#browser()
       B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
 
       d1=round(max(abs(B-B1$preMatrix)),3)
       d2=round(max(abs(A-A1)),3)
+
+
       if (trace){
       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation difference: ",d2))
       }
-      if (d1<=tol & d2<= tol ){
+
+      #browser()
+      if (d1<=tol && d2<= tol ){
         if (is.null(group)){
           output=structure(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1), class="lglasso")
           }else{
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
           output=structure(list(wi=B1$preMatrix,  wiList=individial,v=A1), class="lglasso")
         }
-
+          break
       }else{
         A=A1
         B=B1$preMatrix
       }
+
+
       if (k>=maxit){
         warning("Algorithm did not converge!")
 
@@ -356,7 +361,7 @@ tau0=control$tau0
           output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }
 
-
+        break
 
       }else{
         A=A1$corMatrixList
@@ -413,7 +418,7 @@ tau0=control$tau0
           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
           output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
         }
-
+        break
       }else{
         A=A1$corMatrixList
         B=B1$preMatrix
