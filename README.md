@@ -33,7 +33,7 @@ several essential extensions, which mainly include
     way how the correlated data are modeled.
 
 4)  Besides the main function $lglasso$, this version also provide a
-    function $cv.lglasso$ for selecting the optimal tuning parameter.
+    function $CVlglasso$ for selecting the optimal tuning parameter.
 
 </div>
 
@@ -52,8 +52,7 @@ Then install lglasso :
 
 ## How to use
 
-Please se the vignette, [package
-website](https://jiezhou-2.github.io/lglasso/).
+Please see [package website](https://jiezhou-2.github.io/lglasso/).
 
 \[1\] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen
 AG. Identifying stationary microbial interaction networks based on

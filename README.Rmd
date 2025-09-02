@@ -29,7 +29,7 @@ The initial version of the package implemented the algorithms proposed in Zhou e
 (3) This version provide  more flexible modelings of the longitudinal data, and use more stable optimization algorithms. The package implements three network models which correspond to three different way how the correlated data are modeled.  
 
 
-(4) Besides the main function  $lglasso$, this version also provide a function $cv.lglasso$ for selecting the optimal tuning parameter.  
+(4) Besides the main function  $lglasso$, this version also provide a function $CVlglasso$ for selecting the optimal tuning parameter.  
 
 
 </div>
@@ -53,7 +53,7 @@ remotes::install_github("jiezhou-2/lglasso", ref ="main")
 
 ## How to use
 
- Please se the vignette, [package website](https://jiezhou-2.github.io/lglasso/). 
+ Please see [package website](https://jiezhou-2.github.io/lglasso/). 
  
 
 
