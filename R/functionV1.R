@@ -775,7 +775,7 @@ return(output)
 #' @importFrom pheatmap pheatmap
 #' @import RColorBrewer
 #' @export
-#'
+#' @method plot cvlglasso
 
 plot.cvlglasso=function(x){
   lambda=x$lambda
