@@ -12,7 +12,7 @@ lglasso(
   group = NULL,
   diagonal = TRUE,
   maxit = 30,
-  tol = 10^(-4),
+  tol = 10^(-3),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
   start = c("cold", "warm"),

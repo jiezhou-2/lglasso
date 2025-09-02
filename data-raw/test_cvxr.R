@@ -7,8 +7,8 @@ library(stors)
 library(MASS)
 library(devtools)
 #document()
-#load_all()
-library(lglasso)
+load_all()
+#library(lglasso)
 p=20
 m1=20
 m2=0
@@ -30,15 +30,15 @@ for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-aa=lglasso(data=ddata,lambda = 0.1,type="general")
+aa=lglasso(data=ddata,lambda = 0.0001,type="general",maxit = 50)
 aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = group)
 lambda1=exp(seq(-2,0,length=3))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
-system.time(cv.lglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE))
-system.time(cvp.lglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE, cores=5))
-system.time(cv.lglasso(type="general",group=group,data=ddata,lambda = lambda,K=5))
-system.time(cvp.lglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=10))
+system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE))
+system.time(CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, trace=TRUE, cores=5))
+system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5))
+system.time(CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=10))
 plot.cvlglasso(bb)
 
 ## longitudinal data with structured homogeneous dampening rate
@@ -56,10 +56,10 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group, tr
 lambda1=exp(seq(-2,0,length=3))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
-system.time(cv.lglasso(type="expFixed",data=ddata,lambda = lambda1,K=5))
-system.time(cvp.lglasso(type="expFixed",data=ddata,lambda = lambda1,K=5,cores=5))
-system.time(cv.lglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5))
-system.time(cvp.lglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5,cores=10))
+system.time(CVlglasso(type="expFixed",data=ddata,lambda = lambda1,K=5))
+system.time(CVlglasso(type="expFixed",data=ddata,lambda = lambda1,K=5,cores=5))
+system.time(CVlglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5))
+system.time(CVlglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5,cores=10))
 
 
 ## longitudinal data with structured homogeneous dampening rate
@@ -78,10 +78,10 @@ aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group)
 lambda1=exp(seq(-2,0,length=3))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
-system.time(cv.lglasso(type="twoPara",data=ddata,lambda = lambda1,K=5))
-system.time(cvp.lglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5))
-system.time(cv.lglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5))
-system.time(cvp.lglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=10))
+system.time(CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5))
+system.time(CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5))
+system.time(CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5))
+system.time(CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=10))
 
 
 

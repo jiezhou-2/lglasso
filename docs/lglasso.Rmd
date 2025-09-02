@@ -1,0 +1,136 @@
+---
+title: " Identify networks from correlated data (1)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction_of_lglasso_package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+
+
+
+
+```{r setup, message=FALSE,warning=FALSE}
+library(lglasso)
+```
+
+
+
+```{r, message=FALSE}
+# number of nodes
+p=10
+# number of edge in general network
+m1=10
+# the difference between the number of edges in individual networks and general network
+m2=0
+#  number of clusters
+m3=4
+# number of subjects
+n=20
+# correlation between cluster
+rho=0.8
+
+```
+
+## Model 1: clustered data with no correlation structure
+```{r, message=FALSE}
+set.seed(5)
+cc=matrix(rho,ncol = m3,nrow = m3)
+diag(cc)=1
+dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
+ddata=dd$data
+```
+
+
+
+### estiamte general networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = 0.01,type="general")
+aa
+cov2cor(aa$v)
+```
+
+### estimate individual networks
+```{r}
+aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2])
+aa
+cov2cor(aa$v)
+```
+
+## Model 2: longitudinal data with one-parameter structured correlation 
+
+
+```{r}
+
+set.seed(5)
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
+ddata=dd$data
+group=rep(c(1,2),71)
+```
+
+
+
+
+
+### estiamte general networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1)
+aa
+```
+
+
+### estimate individual networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group)
+aa
+```
+
+
+## Model 3: longitudinal data with two-parameter structured correlation 
+
+```{r}
+
+set.seed(5)
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2)
+ddata=dd$data
+group=rep(c(1,2),78)
+```
+
+
+
+
+
+### estiamte general networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = 1,type="twoPara")
+aa
+```
+
+### estimate individual networks
+
+```{r}
+aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group)
+aa
+```
+
+
+[1] Zhou, J., Gui, J., Viles, W.D., Chen, H., Madan, J.C., Coker, M.O., Hoen, A.G., 2021a. Identifying Microbial Interaction Networks Based on Irregularly Spaced Longitudinal 16S rRNA sequence data. https://doi.org/10.1101/2021.11.26.470159
+
+
+
+[2] Friedman J., Hastie T., Tibshirani R. (2019)  Graphical Lasso: Estimation of Gaussian Graphical Models, Version: 1.11. https://CRAN.R-project.org/package=glasso. 
+

@@ -21,7 +21,7 @@ phifunction=function(t,tau){
 
 
 
-AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
+AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=30,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5),...){
   ### clustered data
   type=match.arg(type)
@@ -42,9 +42,6 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=100,
     obj2=-0.5*matrix_trace(A%*%amatrix)
     obj=-(obj1+obj2)
     constr=list(CVXR::diag(A)==1)
-
-
-
     prob=Problem(Minimize(obj),constr)
     results=CVXR::solve(prob)
     corMatrix=solve(results$getValue(A))
@@ -244,7 +241,7 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #' @return \code{tauhat} the correlation parameters for longitudinal data
 #'
 lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=30,
-                 tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
+                 tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
                  ...)
 
   {
@@ -576,11 +573,10 @@ a=c()
 #' @param K number of cross validation
 #'
 #' @returns list
-#' @export
-#'
 
 
-cv.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+
+cvlglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
 
   type=match.arg(type)
@@ -839,40 +835,18 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
   ## tissue specific structure
 
   if (m2==0){
-    for (i in 1:m3) {
-      Sigma[[i]]=list()
-      Precision[[i]]=list()
-      for (j in 1:m3) {
-        if (j<i){
-          Precision[[i]][[j]]=Precision[[j]][[i]]
-          Sigma[[i]][[j]]=Sigma[[j]][[i]]
-          next()
-        }else{
           ## generate the precision matrices
           theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
-          theta[lower.tri(theta, diag = TRUE)] = 0
-          theta = theta + t(theta) + diag(p)
+          theta = theta + t(theta)
+          diag(theta)=1
           ### apply the required sparsity
           theta = theta * real_stru
 
           # force it to be positive definite
           theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
-          colnames(theta)=paste0("metabolite",1:p)
-          rownames(theta)=paste0("metabolite",1:p)
-          Precision[[i]][[j]]=theta
-          Sigma[[i]][[j]]=solve(theta)*cc[i,j]
-        }
-      }
-    }
-    mmlist=list()
-    for (k in 1:m3) {
-      mmlist[[k]]=do.call(cbind,Sigma[[k]])
-    }
-    fullCovariance=do.call(rbind,mmlist)
-    fullCovariance=MakePositiveDefinite(fullCovariance,pd_strategy = "diagonally_dominant",scale = T)$omega
-
-
-
+          Precision=theta
+          Sigma=kronecker(cc,solve(theta))
+    fullCovariance=Sigma
   }
 
   if (m2!=0){
@@ -896,13 +870,14 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
           prior_stru=(real_stru+distrubance)%%2
 
           diag(prior_stru)=1
-          colnames(prior_stru)=paste0("metabolite",1:p)
-          rownames(prior_stru)=paste0("metabolite",1:p)
+          #colnames(prior_stru)=paste0("metabolite",1:p)
+          #rownames(prior_stru)=paste0("metabolite",1:p)
           Structure[[i]][[j]]=prior_stru
           ## generate the precision matrices
           theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
-          theta[lower.tri(theta, diag = TRUE)] = 0
-          theta = theta + t(theta) + diag(p)
+          #theta[lower.tri(theta, diag = TRUE)] = 0
+          theta = theta + t(theta)
+          diag(theta)=1
           ### apply the required sparsity
           theta = theta * prior_stru
 
@@ -1030,8 +1005,8 @@ simulate_heter=function(n,p,m1,alpha){
 
   mmlist=list()
   theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
-  theta[lower.tri(theta, diag = TRUE)] = 0
-  theta = theta + t(theta) + diag(p)
+  theta = theta + t(theta)
+  diag(theta)=1
   theta = theta * real_stru
   theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
   #colnames(theta)=paste0("metabolite",1:p)
@@ -1106,12 +1081,10 @@ Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=
 #' @param expFix given parameter
 #' @param trace whether show the process
 #' @param cores parallel computing
-#'
 #' @returns list
-#' @export
 #' @import parallel foreach doParallel
 
-cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                      lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
 
   type=match.arg(type)
@@ -1310,6 +1283,36 @@ cvp.lglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 }
 
 
+#' Title
+#'
+#' @param type model type
+#' @param data raw data
+#' @param group group variable
+#' @param lambda tuning parameter
+#' @param nlam number of tuning parameter
+#' @param lam.min.ratio ratio of largest lambda vs smallest lambda
+#' @param K cv folds
+#' @param expFix given parameter
+#' @param trace whether show the process
+#' @param cores parallel computing
+#'
+#' @returns list
+#' @export
+#' @import parallel foreach doParallel
+#'
+CVlglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=NULL){
+if (is.null(cores)){
 
+  results=cvlglasso(type=type,data=data,group=group,lambda = lambda,nlam=nlam,
+                    lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace)
+
+}else{
+
+  results=cvplglasso(type=type,data=data,group=group,lambda = lambda,nlam=nlam,
+                    lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace,cores=cores)
+}
+  return(results)
+}
 
 
