@@ -14,26 +14,20 @@ networks from longitudinal data using Gassian grapical models. Though
 the overarching goal of the package is the same as previous version,
 i.e., explore the possible correlations between high-dimensional data to
 improve the estimations of networks. this updated version does add
-several essential extensions, which mainly include
+several extensions, which include
 
-1)  Estimate networks for given sub data sets. If we call the network
-    estimated from the whole data set general network, then such sub
-    data sets derived networks are called individal networks. They might
-    correspond to the data for given tissue, or the data before
-    vaccination etc. In these cases, a single general network is not
-    enough to account for the difference between different tisses or
-    befor and after vaccination;
+1)  Heterogeneous networks. The models in previous version (i.e., in the
+    2024 paper) assumed a stationary process for the longitudinal data.
+    This might not be the case in many situations, e.g, the antibodies
+    network before and after vaccination, metabolites network before and
+    after the initialization of the treatment for cancer patients. Also,
+    the metabolites in different tissues e.g., colon vs blood vs ileum,
+    can also interact with each other in different way. In this version
+    of , the function are extended to accommodate s such important
+    scenarios.
 
-2)  Compared to previous version, the current version can handle data
-    from different tissues within one subject;
-
-3)  This version provide more flexible modelings of the longitudinal
-    data, and use more stable optimization algorithms. The package
-    implements three network models which correspond to three different
-    way how the correlated data are modeled.
-
-4)  Besides the main function $lglasso$, this version also provide a
-    function $CVlglasso$ for selecting the optimal tuning parameter.
+2)  This version lglasso provide function to facilitate the selection of
+    tuning parameter.
 
 </div>
 
