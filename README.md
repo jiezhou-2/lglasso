@@ -47,6 +47,8 @@ Then install lglasso :
 
 Please see [package website](https://jiezhou-2.github.io/lglasso/).
 
+**Reference**
+
 \[1\] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen
 AG. Identifying stationary microbial interaction networks based on
 irregularly spaced longitudinal 16S rRNA gene sequencing data. Front
