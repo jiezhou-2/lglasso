@@ -8,26 +8,25 @@
 
 <div style="text-align: justify">
 
-The initial version of the package implemented the algorithms proposed
-in Zhou et al. (2024), which aims to estimate the high-dimensional
-networks from longitudinal data using Gassian grapical models. Though
-the overarching goal of the package is the same as previous version,
-i.e., explore the possible correlations between high-dimensional data to
-improve the estimations of networks. this updated version does add
-several extensions, which include
+The previous version implementes the algorithms proposed in *Zhou et
+al. (2024)*, which aims to estimate the high-dimensional networks from
+longitudinal data using Gassian grapical models. Though the overarching
+goal of the package is the same, i.e., explore the possible associations
+between high-dimensional data to improve the estimations of networks.
+this updated version add two important functionalities, which are
 
-1)  Heterogeneous networks. The models in previous version (i.e., in the
-    2024 paper) assumed a stationary process for the longitudinal data.
-    This might not be the case in many situations, e.g, the antibodies
-    network before and after vaccination, metabolites network before and
-    after the initialization of the treatment for cancer patients. Also,
-    the metabolites in different tissues e.g., colon vs blood vs ileum,
-    can also interact with each other in different way. In this version
-    of , the function are extended to accommodate s such important
-    scenarios.
+1)  Estimation of heterogeneous networks. The models in previous version
+    (i.e., in the 2024 paper) assumed a stationary process for the
+    longitudinal data. This might not be the case in many situations,
+    e.g, the antibodies network before and after vaccination,
+    metabolites network before and after the initialization of the
+    treatment for cancer patients. Also, the metabolites in different
+    tissues e.g., colon vs blood vs ileum, can also interact with each
+    other in different way. In this version of *lglasso*, the function
+    *lglasso* are extended to accommodate s such important scenarios.
 
-2)  This version lglasso provide function to facilitate the selection of
-    tuning parameter.
+2)  This version provide function *CVlglasso* to facilitate the
+    selection of tuning parameter.
 
 </div>
 
@@ -56,4 +55,6 @@ Jun 2. PMID: 40687607; PMCID: PMC12276884.
 
 \[2\] Friedman J., Hastie T., Tibshirani R. (2019) Graphical Lasso:
 Estimation of Gaussian Graphical Models, Version: 1.11.
-<https://CRAN.R-project.org/package=glasso>.
+
+\[3\] Matt Galloway (2025), CVglasso: Lasso Penalized Precision Matrix
+Estimation, version 1.0
