@@ -4,18 +4,18 @@
 \alias{cvError}
 \title{Title}
 \usage{
-cvError(data.train, data.valid, BB, group.train = NULL, group.valid = NULL)
+cvError(data.train, data.valid, B, group.train = NULL, group.valid = NULL)
 }
 \arguments{
 \item{data.train}{trainng data}
 
 \item{data.valid}{testing data}
 
-\item{BB}{given network}
-
 \item{group.train}{group in training data}
 
 \item{group.valid}{group in testing data}
+
+\item{BB}{given network}
 }
 \value{
 a matrix

@@ -36,15 +36,15 @@ which are refered as \code{general, expFixed} and \code{twoPara} respectively.
 \item{expFix}{numeric number used in the model specification}
 
 \item{group}{vector  of length \code{n} if supplied which specify which data
-points need to be grouped together to infer a network for each of them.}
+points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.}
 
 \item{maxit}{the maximum iterations for the estimation.}
 
 \item{tol}{the minimum value for  convergence criterion}
 
-\item{lower}{vector of length 1 or 2 which specifies the lower bounds for the optimization algorithm}
+\item{lower}{vector of length 1 or 2 which specifies the lower bounds for (\alpha_1, \alpha_2) in the optimization algorithm}
 
-\item{upper}{vector of length 1 or 2 which specifies the upper bounds for the optimization algorithm}
+\item{upper}{vector of length 1 or 2 which specifies the upper bounds for (\alpha_1, \alpha_2) in the optimization algorithm}
 
 \item{...}{other inputs}
 }
@@ -68,4 +68,15 @@ This is the main function of the package, which identifies the underlying  netwo
  clustered data include longitudinal data, or spatially correlated data,
  e.g, metabolites in different tissues of a same subject.  .
  or more broadly, clustered data for given tuning parameters.
+}
+\details{
+This function implements three statistical models for  network inference, according to how the
+ correlations is specified between time points (or tissues or contents in some clinical studies).
+ These three models are referred as
+\code{general, expFixed} and \code{twoPara}. Let's say we have two time points,\code{t_i,t_j},
+then in model \code{general}, the correlation is \tau_{ij}, while in model $expFixed$, we have
+\tau=exp(-\alpha_1*|t_1-t_2|^{-\alpha_2}) with \alpha_2 is pre-specified (default is \alpha_2=1).
+In model $twoPara$, both \alpha_1 and \alpha_2 is unknown and need to be inferred from the data.
+For longitudinal data, model $expFixed$ is recommended while for omic data from different tissues or contents,
+model \code{general} should be adopted.
 }

@@ -223,11 +223,11 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #'  Please see the details in the below for the meaning of each.
 #' @param expFix  numeric number used in the model specification
 #' @param group  vector  of length \code{n} if supplied which specify which data
-#'  points need to be grouped together to infer a network for each of them.
+#'  points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.
 #' @param maxit the maximum iterations for the estimation.
 #' @param tol the minimum value for  convergence criterion
-#' @param lower  vector of length 1 or 2 which specifies the lower bounds for the optimization algorithm
-#' @param upper  vector of length 1 or 2 which specifies the upper bounds for the optimization algorithm
+#' @param lower  vector of length 1 or 2 which specifies the lower bounds for (\alpha_1, \alpha_2) in the optimization algorithm
+#' @param upper  vector of length 1 or 2 which specifies the upper bounds for (\alpha_1, \alpha_2) in the optimization algorithm
 #' @param ... other inputs
 #' @import glasso
 #' @import CVXR
@@ -239,7 +239,16 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #' @return \code{v} the correlation matrix between specified classes
 #' @return \code{vList} list representing the individual correlation matrix
 #' @return \code{tauhat} the correlation parameters for longitudinal data
-#'
+#' @details
+#' This function implements three statistical models for  network inference, according to how the
+#'  correlations is specified between time points (or tissues or contents in some clinical studies).
+#'  These three models are referred as
+#' \code{general, expFixed} and \code{twoPara}. Let's say we have two time points,\code{t_i,t_j},
+#' then in model \code{general}, the correlation is \tau_{ij}, while in model $expFixed$, we have
+#' \tau=exp(-\alpha_1*|t_1-t_2|^{-\alpha_2}) with \alpha_2 is pre-specified (default is \alpha_2=1).
+#' In model $twoPara$, both \alpha_1 and \alpha_2 is unknown and need to be inferred from the data.
+#' For longitudinal data, model $expFixed$ is recommended while for omic data from different tissues or contents,
+#' model \code{general} should be adopted.
 lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=30,
                  tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
                  ...)
@@ -535,17 +544,16 @@ cvErrorj=function(data.train,data.valid,B){
 #' @param group.valid group in testing data
 #'
 #' @returns a matrix
-#' @export
 #'
-cvError=function(data.train,data.valid,BB,group.train=NULL,group.valid=NULL){
+cvError=function(data.train,data.valid,B,group.train=NULL,group.valid=NULL){
 #browser()
 
-  if (is.matrix(BB)){
-    a=  cvErrorj(data.train=data.train,data.valid=data.valid,B=BB)
+  if (is.matrix(B)){
+    a=  cvErrorj(data.train=data.train,data.valid=data.valid,B=B)
 
   }
 
-  if (is.list(BB)){
+  if (is.list(B)){
 
   if (any(nrow(data.train)!=length(group.train) | nrow(data.valid)!=length(group.valid) )){
     stop("group does not match dat sets!")
@@ -555,15 +563,15 @@ cvError=function(data.train,data.valid,BB,group.train=NULL,group.valid=NULL){
   data.valid.sub=split(data.valid,group.valid)
 
 
-if (any(names(data.train.sub)!=names(BB)) | any(names(data.valid.sub)!= names(BB))) {
+if (any(names(data.train.sub)!=names(B)) | any(names(data.valid.sub)!= names(B))) {
   stop("the names of data sets do not match!")
 }
 a=c()
-  for (i in 1:length(BB)) {
+  for (i in 1:length(B)) {
     dd1=data.train.sub[[i]]
     dd2=data.valid.sub[[i]]
-    B=BB[[i]]
-    a=c(a,cvErrorj(data.train=dd1,data.valid=dd2,B=B))
+    Bi=B[[i]]
+    a=c(a,cvErrorj(data.train=dd1,data.valid=dd2,B=Bi))
 
 }
 }
@@ -690,7 +698,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
     )
 
     bb=lapply(cc, function(BB){
-      cvError(data.train=data.train,data.valid=data.valid,BB=BB, group.valid=group.valid, group.train = group.train)
+      cvError(data.train=data.train,data.valid=data.valid,B=BB, group.valid=group.valid, group.train = group.train)
     }
     )
     bb=do.call(c,bb)
@@ -721,7 +729,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
    }
    )
 
-   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
                                       group.valid =   group.valid,group.train = group.train))
    bb=do.call(c,bb)
   }
@@ -750,7 +758,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
     }
     )
 
-    bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+    bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
                                        group.valid =   group.valid,group.train = group.train))
     bb=do.call(c,bb)
   }
@@ -1244,7 +1252,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    )
 
                    bb=lapply(cc, function(BB){
-                     cvError(data.train=data.train,data.valid=data.valid,BB=BB, group.valid=group.valid, group.train = group.train)
+                     cvError(data.train=data.train,data.valid=data.valid,B=BB, group.valid=group.valid, group.train = group.train)
                    }
                    )
                    bb=do.call(c,bb)
@@ -1275,7 +1283,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    }
                    )
 
-                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
                                                       group.valid=group.valid, group.train = group.train))
                    bb=do.call(c,bb)
                  }
@@ -1304,7 +1312,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    }
                    )
 
-                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,BB=BB,
+                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
                                                       group.valid=group.valid, group.train = group.train))
                    bb=do.call(c,bb)
                  }
