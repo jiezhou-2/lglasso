@@ -39,7 +39,8 @@ CVlglasso(
 \item{cores}{parallel computing}
 }
 \value{
-list
+list of which the first component is the cross validation errors and the second component is the corresponding
+tuning parameters
 }
 \description{
 The function computes the cross validation errors for one of the three network models in \code{lglasso} command.

@@ -775,16 +775,16 @@ return(output)
 
 
 
+
 #' Title
 #'
-#' @param x cvlglasso object
+#' @param x CVlglasso object
+#' @param xvar character which specify the x axis of the plot
+#' @param ...
 #'
-#' @returns error plot
-#' @importFrom pheatmap pheatmap
-#' @import RColorBrewer
+#' @returns If \code{group} is NULL in \code{CVlglasso}, then a line plot will produced; otherwise, a heatmap will be produced.
 #' @export
-#' @method plot cvlglasso
-
+#'
 plot.cvlglasso=function(x, xvar=c("lambda","step"),...){
   xvar=match.arg(xvar)
   if (!inherits(x, "cvlglasso")) {
@@ -1345,7 +1345,8 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 #' @param trace whether show the process
 #' @param cores parallel computing
 #'
-#' @returns list
+#' @returns list of which the first component is the cross validation errors and the second component is the corresponding
+#' tuning parameters
 #' @export
 #' @import parallel foreach doParallel
 #'

@@ -7,10 +7,14 @@
 \method{plot}{cvlglasso}(x, xvar = c("lambda", "step"), ...)
 }
 \arguments{
-\item{x}{cvlglasso object}
+\item{x}{CVlglasso object}
+
+\item{xvar}{character which specify the x axis of the plot}
+
+\item{...}{}
 }
 \value{
-error plot
+If \code{group} is NULL in \code{CVlglasso}, then a line plot will produced; otherwise, a heatmap will be produced.
 }
 \description{
 Title
