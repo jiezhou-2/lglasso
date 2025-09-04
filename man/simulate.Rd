@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{Simulate}
 \alias{Simulate}
-\title{Title}
+\title{Simulate data from a given network model}
 \usage{
 Simulate(
   type = c("general", "longihomo", "longiheter"),
@@ -17,7 +17,8 @@ Simulate(
 )
 }
 \arguments{
-\item{type}{what type of dat should be generated}
+\item{type}{what type of dat should be generated. There are three types of data that can be simulated through the function, which are
+\code{general}, \code{longihomo} and \code{longiheter} respecitvely.}
 
 \item{n}{number of subjects}
 
@@ -39,5 +40,6 @@ Simulate(
 data frame
 }
 \description{
-Title
+This function generates three types of data based on the given network type. These data can then be used to test the
+efficiency of algorithms.
 }

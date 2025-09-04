@@ -4,6 +4,9 @@
 # lglasso
 
 <!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/lglasso)](https://CRAN.R-project.org/package=lglasso)
 <!-- badges: end -->
 
 <div style="text-align: justify">
@@ -13,19 +16,27 @@ al. (2024)*, which aims to estimate the high-dimensional networks from
 longitudinal data using Gassian grapical models. Though the overarching
 goal of the package is the same, i.e., explore the possible associations
 between high-dimensional data to improve the estimations of networks.
-this updated version add two important functionalities, which are
+this updated version add three important functionalities, which are
 
-1)  Estimation of heterogeneous networks. The models in previous version
-    (i.e., in the 2024 paper) assumed a stationary process for the
-    longitudinal data. This might not be the case in many situations,
-    e.g, the antibodies network before and after vaccination,
-    metabolites network before and after the initialization of the
-    treatment for cancer patients. Also, the metabolites in different
-    tissues e.g., colon vs blood vs ileum, can also interact with each
-    other in different way. In this version of *lglasso*, the function
-    *lglasso* are extended to accommodate s such important scenarios.
+1)  Estimation of heterogeneous networks for longitudinal data. The
+    models in previous version (i.e., in the 2024 paper) assumed a
+    stationary process for the longitudinal data. This might not be the
+    case in many situations, e.g, the antibody network before and after
+    vaccination, metabolite network before and after the initialization
+    of the treatment for cancer patients. In this version of *lglasso*,
+    the function *lglasso* are extended to accommodate such important
+    scenarios.
 
-2)  This version provide function *CVlglasso* to facilitate the
+2)  Extension to general clustered data. This extension is motivated by
+    our study of metabolome data in different tissues of mice. We have
+    the metabolome data in colon, ileum, portal blood peripheral blood
+    from same mouse. It has been observed that these data are closely
+    correlated which is not a surprise since they are from same mouse.
+    When it comes to interaction networks, this package extends the
+    algorithms for longitudinal data to such general clustered data and
+    can estimate both general and tissue-wise networks.
+
+3)  This version provide function *CVlglasso* to facilitate the
     selection of tuning parameter.
 
 </div>

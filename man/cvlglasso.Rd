@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{CVlglasso}
 \alias{CVlglasso}
-\title{Title}
+\title{Cross validation for \code{lglasso}}
 \usage{
 CVlglasso(
   type = c("general", "expFixed", "twoPara"),
@@ -18,7 +18,7 @@ CVlglasso(
 )
 }
 \arguments{
-\item{type}{model type}
+\item{type}{underlying model type, either \code{general}, \code{longihomo} or \code{longiheter}.}
 
 \item{data}{raw data}
 
@@ -42,5 +42,5 @@ CVlglasso(
 list
 }
 \description{
-Title
+The function computes the cross validation errors for one of the three network models in \code{lglasso} command.
 }

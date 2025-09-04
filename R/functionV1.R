@@ -1039,9 +1039,12 @@ simulate_heter=function(n,p,m1,alpha){
 
 
 
-#' Title
-#'
-#' @param type what type of dat should be generated
+#' @title Simulate data from a given network model
+#' @description
+#' This function generates three types of data based on the given network type. These data can then be used to test the
+#' efficiency of algorithms.
+#' @param type what type of dat should be generated. There are three types of data that can be simulated through the function, which are
+#' \code{general}, \code{longihomo} and \code{longiheter} respecitvely.
 #' @param n number of subjects
 #' @param p number of nodes
 #' @param m1 number of edges
@@ -1289,9 +1292,10 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 }
 
 
-#' Title
-#'
-#' @param type model type
+#' @title Cross validation for \code{lglasso}
+#' @description
+#' The function computes the cross validation errors for one of the three network models in \code{lglasso} command.
+#' @param type underlying model type, either \code{general}, \code{longihomo} or \code{longiheter}.
 #' @param data raw data
 #' @param group group variable
 #' @param lambda tuning parameter

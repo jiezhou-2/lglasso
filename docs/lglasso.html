@@ -348,11 +348,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>m1<span class="ot">=</span><span class="dv">10</span></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># the difference between the number of edges in individual networks and general network</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>m2<span class="ot">=</span><span class="dv">0</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#  number of clusters</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#  number of tissues</span></span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>m3<span class="ot">=</span><span class="dv">4</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co"># number of subjects</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>n<span class="ot">=</span><span class="dv">20</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># correlation between cluster</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># correlation between tissues</span></span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>rho<span class="ot">=</span><span class="fl">0.8</span></span></code></pre></div>
 <div id="model-1-clustered-data-with-no-correlation-structure" class="section level2">
 <h2>Model 1: clustered data with no correlation structure</h2>
@@ -361,8 +361,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">diag</span>(cc)<span class="ot">=</span><span class="dv">1</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>dd<span class="ot">=</span><span class="fu">Simulate</span>(<span class="at">type=</span><span class="st">&quot;general&quot;</span>,<span class="at">n=</span>n,<span class="at">p=</span>p,<span class="at">m1=</span>m1,<span class="at">m2=</span>m2,<span class="at">m3=</span>m3,<span class="at">cc=</span>cc)</span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span></code></pre></div>
-<div id="estiamte-general-networks" class="section level3">
-<h3>estiamte general networks</h3>
+<div id="estimate-general-networks" class="section level3">
+<h3>estimate general networks</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,<span class="at">type=</span><span class="st">&quot;general&quot;</span>,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 3.702 /correlation difference: 0.319&quot;</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 1.062 /correlation difference: 0.225&quot;</span></span>
@@ -522,8 +522,8 @@ correlation</h2>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>dd<span class="ot">=</span><span class="fu">Simulate</span>(<span class="at">type=</span><span class="st">&quot;longihomo&quot;</span>,<span class="at">n=</span>n,<span class="at">p=</span>p,<span class="at">m1=</span>m1,<span class="at">tau=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>group<span class="ot">=</span><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dv">71</span>)</span></code></pre></div>
-<div id="estiamte-general-networks-1" class="section level3">
-<h3>estiamte general networks</h3>
+<div id="estimate-general-networks-1" class="section level3">
+<h3>estimate general networks</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="dv">1</span>,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 0.4368 /correlation tau difference: 0.4929&quot;</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 0.2394 /correlation tau difference: 0.1774&quot;</span></span>
@@ -640,7 +640,7 @@ correlation</h2>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>dd<span class="ot">=</span><span class="fu">Simulate</span>(<span class="at">type=</span><span class="st">&quot;longiheter&quot;</span>,<span class="at">n=</span>n,<span class="at">p=</span>p,<span class="at">m1=</span>m1,<span class="at">alpha=</span><span class="dv">2</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>group<span class="ot">=</span><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dv">78</span>)</span></code></pre></div>
-<div id="estimate-general-networks" class="section level3">
+<div id="estimate-general-networks-2" class="section level3">
 <h3>estimate general networks</h3>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="dv">1</span>,<span class="at">type=</span><span class="st">&quot;twoPara&quot;</span>, ,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 0.3518 /correlation tau difference: 0.6193&quot;</span></span>
