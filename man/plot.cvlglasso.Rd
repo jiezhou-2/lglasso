@@ -4,7 +4,7 @@
 \alias{plot.cvlglasso}
 \title{Title}
 \usage{
-\method{plot}{cvlglasso}(x)
+\method{plot}{cvlglasso}(x, xvar = c("lambda", "step"), ...)
 }
 \arguments{
 \item{x}{cvlglasso object}

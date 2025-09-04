@@ -21,8 +21,7 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE, echo=FALSE}
-library(devtools)
-load_all()
+library(lglasso)
 ```
 
 
@@ -47,6 +46,7 @@ rho=0.8
 
 ```{r, message=FALSE}
 set.seed(5)
+library(lglasso)
 cc=matrix(rho,ncol = m3,nrow = m3)
 diag(cc)=1
 dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
@@ -69,10 +69,10 @@ lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
 
 bb=CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, cores=5)
-plot.cvlglasso(bb)
+a=plot(bb)
 
 bb=CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=5)
-plot.cvlglasso(bb)
+plot(bb)
 
 ```
 
@@ -95,9 +95,9 @@ lambda=expand.grid(lambda1,lambda2)
 
 ```{r}
 bb=CVlglasso(type="expFixed",data=ddata,lambda = lambda1,K=5,cores=5)
-plot.cvlglasso(bb)
+plot(bb)
 bb=CVlglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5,cores=5)
-plot.cvlglasso(bb)
+plot(bb)
 
 ```
 
@@ -124,13 +124,14 @@ lambda=expand.grid(lambda1,lambda2)
 ```{r}
 
 bb=CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5)
-plot.cvlglasso(bb)
+plot(bb)
 bb=CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=5)
-plot.cvlglasso(bb)
+plot(bb)
 ```
 
 
 
 [1] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen AG. Identifying stationary microbial interaction networks based on irregularly spaced longitudinal 16S rRNA gene sequencing data. Front Microbiomes. 2024;3:1366948. doi: 10.3389/frmbi.2024.1366948. Epub 2024 Jun 2. PMID: 40687607; PMCID: PMC12276884.
-[2] Friedman J., Hastie T., Tibshirani R. (2019)  Graphical Lasso: Estimation of Gaussian Graphical Models, Version: 1.11. https://CRAN.R-project.org/package=glasso. 
+
+[2] Matt Galloway (2025),  CVglasso: Lasso Penalized Precision Matrix Estimation, version 1.0 
 

@@ -761,7 +761,7 @@ if (trace) {
   }
 
 
-output=structure(list(cv_error=cv_error, lambda=lambda),class="cvlglsso")
+output=structure(list(cv_error=cv_error, lambda=lambda),class="cvlglasso")
 return(output)
 }
 
@@ -777,17 +777,32 @@ return(output)
 #' @export
 #' @method plot cvlglasso
 
-plot.cvlglasso=function(x){
+plot.cvlglasso=function(x, xvar=c("lambda","step"),...){
+  xvar=match.arg(xvar)
+  if (!inherits(x, "cvlglasso")) {
+    stop("x must be an object of class 'cvlglasso'")
+  }
+
+  if (xvar == "lambda") {
+    xlab_label <- "Lambda"
+    x_data <- x$lambda # Assuming your cvlglasso object has a lambda component
+  } else if (xvar == "step") {
+    xlab_label <- "Steps"
+    x_data <- seq_along(x$lambda) # Assuming lambda can represent steps
+  }
+
+
+
   lambda=x$lambda
   err=apply(x$cv_error, 1, mean)
   if (is.vector(lambda)){
-    plot(lambda,err, type="l")
-  }
-  if (is.data.frame(lambda)){lambda=as.matrix(lambda)}
-  if (is.matrix(lambda)){
+    graphics::plot(x=x_data,y=err,xlab=xlab_label,ylab="CV Error", main = "cvlglasso Fit",
+                   type = "b", ...)
+  }else{
+lambda=as.matrix(lambda)
 a1=unique(lambda[,1])
 a2=unique(lambda[,2])
-err_matrix=matrix(0,nrow=length(a1),ncol=length(a2))
+err_matrix=matrix(0,nrow=length(a1),ncol=length(a2),dimnames = list(round(a1,3), round(a2,3)))
 for (i in 1:length(a1)) {
   for (j in 1:length(a2)) {
     index=which(apply(lambda,1,function(x) all(x==c(a1[i],a2[j]))))
@@ -796,30 +811,46 @@ for (i in 1:length(a1)) {
 }
 
 
-  heat_plot <- pheatmap(err_matrix,
-                        col = brewer.pal(8, 'OrRd'), # choose a colour scale for your data
-                        cluster_rows = F, cluster_cols = F, # set to FALSE if you want to remove the dendograms
-                        clustering_distance_cols = 'euclidean',
-                        clustering_distance_rows = 'euclidean',
-                        clustering_method = 'ward.D',
-                        #annotation_row = gene_functions_df, # row (gene) annotations
-                        #annotation_col = ann_df, # column (sample) annotations
-                        #annotation_colors = ann_colors, # colours for your annotations
-                        #annotation_names_row = F,
-                        #annotation_names_col = F,
-                        fontsize_row = 10,          # row label font size
-                        fontsize_col = 7,          # column label font size
-                        angle_col = 45, # sample names at an angle
-                        legend_breaks = c(-2, 0, 2), # legend customisation
-                        legend_labels = c("Low", "Medium", "High"), # legend customisation
-                        show_colnames = T, show_rownames = F, # displaying column and row names
-                        main = "CV error") # a title for our heatmap
+
+  # heat_plot <- pheatmap::pheatmap(err_matrix,
+  #                       col = brewer.pal(8, 'OrRd'), # choose a colour scale for your data
+  #                       cluster_rows = F, cluster_cols = F, # set to FALSE if you want to remove the dendograms
+  #                       clustering_distance_cols = 'euclidean',
+  #                       clustering_distance_rows = 'euclidean',
+  #                       clustering_method = 'ward.D',
+  #                       #annotation_row = gene_functions_df, # row (gene) annotations
+  #                       #annotation_col = ann_df, # column (sample) annotations
+  #                       #annotation_colors = ann_colors, # colours for your annotations
+  #                       #annotation_names_row = F,
+  #                       #annotation_names_col = F,
+  #                       fontsize_row = 10,          # row label font size
+  #                       fontsize_col = 7,          # column label font size
+  #                       angle_col = 45, # sample names at an angle
+  #                       legend_breaks = c(-2, 0, 2), # legend customisation
+  #                       legend_labels = c("Low", "Medium", "High"), # legend customisation
+  #                       show_colnames = T, show_rownames = F, # displaying column and row names
+  #                       main = "CV error") # a title for our heatmap
+
+heat_plot <- pheatmap::pheatmap(
+  err_matrix,
+  col = RColorBrewer::brewer.pal(8, 'OrRd'),
+  cluster_rows = FALSE, cluster_cols = FALSE,
+  main = "CV error",
+  # `angle_col` can be used to rotate column labels for readability
+  angle_col = 45,
+  # You can also customize label font sizes if needed
+  fontsize_row = 8,
+  fontsize_col = 8,
+  annotation_names_row = F,
+  annotation_names_col = F,
+  ...
+)
+
+return(invisible(heat_plot))
 
 }
 
 }
-
-
 
 
 
@@ -1287,7 +1318,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                }
 
   stopCluster(cluster)
-  output=structure(list(cv_error=CV, lambda=lambda),class="cvlglsso")
+  output=structure(list(cv_error=CV, lambda=lambda),class="cvlglasso")
   return(output)
 }
 
