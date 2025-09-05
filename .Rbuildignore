@@ -6,3 +6,6 @@
 ^scripts
 ^LICENSE\.md$
 ^\.github$
+^README.Rmd$
+^data-raw\.R
+^docs

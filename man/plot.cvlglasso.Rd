@@ -11,7 +11,7 @@
 
 \item{xvar}{character which specify the x axis of the plot}
 
-\item{...}{}
+\item{...}{other plot arguments}
 }
 \value{
 If \code{group} is NULL in \code{CVlglasso}, then a line plot will produced; otherwise, a heatmap will be produced.

@@ -21,7 +21,9 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE}
-library(lglasso)
+#library(lglasso)
+library(devtools)
+load_all()
 ```
 
 
@@ -89,7 +91,7 @@ group=rep(c(1,2),71)
 ### estimate general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1,,tol = 0.01, trace=TRUE)
+aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
 aa$wi
 ```
 

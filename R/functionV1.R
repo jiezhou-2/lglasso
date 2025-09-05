@@ -78,7 +78,7 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=30,
       obj=-(obj1+obj2)
     }
 
-    tau=optim(c(control$tau0[1]),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
+    tau=stats::optim(c(tau0[1]),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
     A=lapply(time_list,phifunction,tau=c(tau,expFix))
     return(list(corMatrixList=A,tau=tau))
   }
@@ -111,7 +111,7 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=30,
       obj=-(obj1+obj2)
     }
 
-    tau=optim(c(control$tau0),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
+    tau=stats::optim(c(tau0),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
     A=lapply(time_list,phifunction,tau=tau)
     return(list(corMatrixList=A,tau=tau))
   }
@@ -219,37 +219,52 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #' @param lambda   vector of length 1 or 2,  which
 #' is the tuning parameter for the identification of the networks. For details, see the explanations in the below.
 #' @param type a string specifying which model need to be fitted. There are three models available,
-#' which are refered as \code{general, expFixed} and \code{twoPara} respectively.
+#' which are refered as \code{general}, \code{expFixed} and \code{twoPara} respectively.
 #'  Please see the details in the below for the meaning of each.
 #' @param expFix  numeric number used in the model specification
 #' @param group  vector  of length \code{n} if supplied which specify which data
 #'  points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.
 #' @param maxit the maximum iterations for the estimation.
 #' @param tol the minimum value for  convergence criterion
-#' @param lower  vector of length 1 or 2 which specifies the lower bounds for (\alpha_1, \alpha_2) in the optimization algorithm
-#' @param upper  vector of length 1 or 2 which specifies the upper bounds for (\alpha_1, \alpha_2) in the optimization algorithm
+#' @param lower  vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
+#' @param upper  vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
+#' @param start how to start the initial values for lglasso algorithm
+#' @param w.init initial value for covariance matrix
+#' @param wi.init inital value for precision matrix
+#' @param trace whether or not show the progress of the computation
 #' @param ... other inputs
-#' @import glasso
-#' @import CVXR
+#' @import glasso CVXR
+#' @importFrom "utils" "fix"
 #' @export
-#' @return  \code{w} the general covariance matrix estimate
-#' @return  \code{wList} list representing the individual covariance matrix estimate
-#' @return \code{wi} the general precision matrix estimate
-#' @return  \code{wiList} list representing the individual precision matrix estimate
-#' @return \code{v} the correlation matrix between specified classes
-#' @return \code{vList} list representing the individual correlation matrix
-#' @return \code{tauhat} the correlation parameters for longitudinal data
-#' @details
-#' This function implements three statistical models for  network inference, according to how the
-#'  correlations is specified between time points (or tissues or contents in some clinical studies).
-#'  These three models are referred as
-#' \code{general, expFixed} and \code{twoPara}. Let's say we have two time points,\code{t_i,t_j},
-#' then in model \code{general}, the correlation is \tau_{ij}, while in model $expFixed$, we have
-#' \tau=exp(-\alpha_1*|t_1-t_2|^{-\alpha_2}) with \alpha_2 is pre-specified (default is \alpha_2=1).
-#' In model $twoPara$, both \alpha_1 and \alpha_2 is unknown and need to be inferred from the data.
-#' For longitudinal data, model $expFixed$ is recommended while for omic data from different tissues or contents,
-#' model \code{general} should be adopted.
-lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,diagonal=TRUE,maxit=30,
+#' @return list which include following components:
+#'
+#' \code{w} the general covariance matrix estimate;
+#'
+#' \code{wList} list representing the individual covariance matrix estimate;
+#'
+#' \code{wi} the general precision matrix estimate;
+#'
+#' \code{wiList} list representing the individual precision matrix estimate;
+#'
+#' \code{v} the correlation matrix between specified classes;
+#'
+#' \code{vList} list representing the individual correlation matrix;
+#'
+#' \code{tauhat} the correlation parameters for longitudinal data
+#'
+#' @details This function implements three statistical models for  network inference,
+#' according to how the correlations is specified between time points (or tissues or
+#' contents in some clinical studies). These three models are referred as
+#'  \code{general}, \code{expFixed}  and \code{twoPara}.Let's say we have
+#'  two time points,t_i,t_j, then in model \code{general}, the correlation is
+#'   tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
+#'   with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
+#'   both alpha_1 and alpha_2 is unknown and need to be inferred from the data.
+#'    For longitudinal data, model \code{expFixed} is recommended while for omics data
+#'    from different tissues or contents, model \code{general} should be adopted.
+#'
+#'
+lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,maxit=30,
                  tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
                  ...)
 
@@ -294,6 +309,7 @@ if (is.null(group))  {
     while(1){
       k=k+1
       A1=AA(data = data,B = B, type=type,...)$corMatrix
+      #browser()
       B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
 
       d1=round(max(abs(B-B1$preMatrix)),3)
@@ -347,12 +363,13 @@ if (is.null(group))  {
     }
     B=diag(p)
     k=0
-tau0=control$tau0
+tau0=tau0
     while(1){
       k=k+1
 
       #A1=AA(data = data,B = B, type=type,fix=expFix, init=tau0,lower = lower,upper = upper)
       A1=AA(data = data,B = B, type=type,expFix,...)
+      #browser()
       B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)
 
       d1=round(max(abs(B-B1$preMatrix)),4)
@@ -407,7 +424,7 @@ tau0=control$tau0
     }
     B=diag(p)
     k=0
-tau0=control$tau0
+tau0=tau0
     while(1){
       k=k+1
       A1=AA(data = data,B = B, type=type, fix=fix)
@@ -467,7 +484,7 @@ heternetwork=function(data,lambda,homo, group){
   aa=0
 for (i in 1:m3) {
   S[[i]]= Variable(p,p,PSD=TRUE)
-  Q[[i]]=cov(data_list[[i]][,-c(1,2)])
+  Q[[i]]=stats::cov(data_list[[i]][,-c(1,2)])
   obj=obj+log_det(S[[i]])-matrix_trace(S[[i]]%*%Q[[i]])
   aa=aa+ sum(abs(S[[i]]-homo))
 }
@@ -497,7 +514,7 @@ cvErrorji=function(data.train,data.valid,bi){
 
     index=which(bi==1)
     if (length(index)==0){
-      cv_error=var(data.valid[,i+2])
+      cv_error=stats::var(data.valid[,i+2])
 
     }else{
       if (length(index)>= nrow(data.train)){
@@ -508,7 +525,7 @@ cvErrorji=function(data.train,data.valid,bi){
       y=data.train[,i+2]
       x=as.matrix(data.train[,index+2])
       #browser()
-      coef.train=lm(y~x)$coef
+      coef.train=stats::lm(y~x)$coef
       yy=data.valid[,i+2, drop=FALSE]
       # if(nrow(data.valid)>1 && ncol(data.valid>1)){
       #   xx=cbind(1,X.valid[,index])
@@ -539,7 +556,7 @@ cvErrorj=function(data.train,data.valid,B){
 #'
 #' @param data.train trainng data
 #' @param data.valid testing data
-#' @param BB given network
+#' @param B given network (or network list)
 #' @param group.train group in training data
 #' @param group.valid group in testing data
 #'
@@ -617,7 +634,7 @@ cvlglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 
 
 
-  S = (nrow(X) - 1)/nrow(X) * cov(X)
+  S = (nrow(X) - 1)/nrow(X) * stats::cov(X)
   # crit.cv = match.arg(crit.cv)
   # start = match.arg(start)
 
@@ -649,7 +666,7 @@ cvlglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
 cv_error=matrix(0,nrow=nnlambda,ncol=K)
   if (trace) {
-    progress = txtProgressBar(max = K, style = 3)
+    progress = utils::txtProgressBar(max = K, style = 3)
   }
 
   for (k in 1:K) {
@@ -764,7 +781,7 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
   }
 cv_error[,k]=bb
 if (trace) {
-  setTxtProgressBar(progress,  k)
+  utils::setTxtProgressBar(progress,  k)
 }
   }
 
@@ -780,7 +797,7 @@ return(output)
 #'
 #' @param x CVlglasso object
 #' @param xvar character which specify the x axis of the plot
-#' @param ...
+#' @param ... other plot arguments
 #'
 #' @returns If \code{group} is NULL in \code{CVlglasso}, then a line plot will produced; otherwise, a heatmap will be produced.
 #' @export
@@ -881,7 +898,7 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
 
   if (m2==0){
           ## generate the precision matrices
-          theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+          theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
           theta = theta + t(theta)
           diag(theta)=1
           ### apply the required sparsity
@@ -919,7 +936,7 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
           #rownames(prior_stru)=paste0("metabolite",1:p)
           Structure[[i]][[j]]=prior_stru
           ## generate the precision matrices
-          theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+          theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
           #theta[lower.tri(theta, diag = TRUE)] = 0
           theta = theta + t(theta)
           diag(theta)=1
@@ -973,7 +990,7 @@ simulate_long=function(n,p,m1,tau){
 
   for (i in 1:n) {
     m3=sample(x=1:15,1,prob = rep(1,1,length=15))
-    t1=rexp(m3)
+    t1=stats::rexp(m3)
     timepoint[[i]]=cumsum(t1)
   }
   cc=lapply(timepoint,phifunction, tau=tau)
@@ -990,7 +1007,7 @@ simulate_long=function(n,p,m1,tau){
 
 
   mmlist=list()
-  theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
   theta[lower.tri(theta, diag = TRUE)] = 0
   theta = theta + t(theta) + diag(p)
   theta = theta * real_stru
@@ -1028,9 +1045,9 @@ simulate_heter=function(n,p,m1,alpha){
   cc=vector("list",)
   for (i in 1:n) {
     m3=sample(x=1:15,1,prob = rep(1,1,length=15))
-    t1=rexp(m3)
+    t1=stats::rexp(m3)
     timepoint[[i]]=cumsum(t1)
-    tau=c(tau,rexp(1,rate=alpha))
+    tau=c(tau,stats::rexp(1,rate=alpha))
   }
   for (j in 1:length(tau)) {
     cc[[j]]=phifunction(t=timepoint[[j]],tau=c(tau[j],1))
@@ -1049,7 +1066,7 @@ simulate_heter=function(n,p,m1,alpha){
 
 
   mmlist=list()
-  theta = matrix(rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
   theta = theta + t(theta)
   diag(theta)=1
   theta = theta * real_stru
@@ -1167,7 +1184,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
   X=data[,-c(1,2)]
 
 
-  S = (nrow(X) - 1)/nrow(X) * cov(X)
+  S = (nrow(X) - 1)/nrow(X) * stats::cov(X)
   # crit.cv = match.arg(crit.cv)
   # start = match.arg(start)
 
@@ -1204,7 +1221,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                .inorder = FALSE) %dopar% {
 
                  if (trace) {
-                   progress = txtProgressBar(max = K, style = 3)
+                   progress = utils::txtProgressBar(max = K, style = 3)
                  }
 
                  leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
@@ -1319,7 +1336,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                  cv_error=bb
 
                  if (trace) {
-                   setTxtProgressBar(progress,  k)
+                   utils::setTxtProgressBar(progress,  k)
                  }
 
                  return(cv_error=cv_error)

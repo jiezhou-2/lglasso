@@ -10,7 +10,6 @@ lglasso(
   type = c("general", "expFixed", "twoPara"),
   expFix = 1,
   group = NULL,
-  diagonal = TRUE,
   maxit = 30,
   tol = 10^(-3),
   lower = c(0.01, 0.1),
@@ -30,7 +29,7 @@ the time point for longitudinal data or tissue ID.}
 is the tuning parameter for the identification of the networks. For details, see the explanations in the below.}
 
 \item{type}{a string specifying which model need to be fitted. There are three models available,
-which are refered as \code{general, expFixed} and \code{twoPara} respectively.
+which are refered as \code{general}, \code{expFixed} and \code{twoPara} respectively.
  Please see the details in the below for the meaning of each.}
 
 \item{expFix}{numeric number used in the model specification}
@@ -42,24 +41,34 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 
 \item{tol}{the minimum value for  convergence criterion}
 
-\item{lower}{vector of length 1 or 2 which specifies the lower bounds for (\alpha_1, \alpha_2) in the optimization algorithm}
+\item{lower}{vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix}
 
-\item{upper}{vector of length 1 or 2 which specifies the upper bounds for (\alpha_1, \alpha_2) in the optimization algorithm}
+\item{upper}{vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix}
+
+\item{start}{how to start the initial values for lglasso algorithm}
+
+\item{w.init}{initial value for covariance matrix}
+
+\item{wi.init}{inital value for precision matrix}
+
+\item{trace}{whether or not show the progress of the computation}
 
 \item{...}{other inputs}
 }
 \value{
-\code{w} the general covariance matrix estimate
+list which include following components:
 
-\code{wList} list representing the individual covariance matrix estimate
+\code{w} the general covariance matrix estimate;
 
-\code{wi} the general precision matrix estimate
+\code{wList} list representing the individual covariance matrix estimate;
 
-\code{wiList} list representing the individual precision matrix estimate
+\code{wi} the general precision matrix estimate;
 
-\code{v} the correlation matrix between specified classes
+\code{wiList} list representing the individual precision matrix estimate;
 
-\code{vList} list representing the individual correlation matrix
+\code{v} the correlation matrix between specified classes;
+
+\code{vList} list representing the individual correlation matrix;
 
 \code{tauhat} the correlation parameters for longitudinal data
 }
@@ -70,13 +79,14 @@ This is the main function of the package, which identifies the underlying  netwo
  or more broadly, clustered data for given tuning parameters.
 }
 \details{
-This function implements three statistical models for  network inference, according to how the
- correlations is specified between time points (or tissues or contents in some clinical studies).
- These three models are referred as
-\code{general, expFixed} and \code{twoPara}. Let's say we have two time points,\code{t_i,t_j},
-then in model \code{general}, the correlation is \tau_{ij}, while in model $expFixed$, we have
-\tau=exp(-\alpha_1*|t_1-t_2|^{-\alpha_2}) with \alpha_2 is pre-specified (default is \alpha_2=1).
-In model $twoPara$, both \alpha_1 and \alpha_2 is unknown and need to be inferred from the data.
-For longitudinal data, model $expFixed$ is recommended while for omic data from different tissues or contents,
-model \code{general} should be adopted.
+This function implements three statistical models for  network inference,
+according to how the correlations is specified between time points (or tissues or
+contents in some clinical studies). These three models are referred as
+ \code{general}, \code{expFixed}  and \code{twoPara}.Let's say we have
+ two time points,t_i,t_j, then in model \code{general}, the correlation is
+  tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
+  with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
+  both alpha_1 and alpha_2 is unknown and need to be inferred from the data.
+   For longitudinal data, model \code{expFixed} is recommended while for omics data
+   from different tissues or contents, model \code{general} should be adopted.
 }

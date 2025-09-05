@@ -11,11 +11,11 @@ cvError(data.train, data.valid, B, group.train = NULL, group.valid = NULL)
 
 \item{data.valid}{testing data}
 
+\item{B}{given network (or network list)}
+
 \item{group.train}{group in training data}
 
 \item{group.valid}{group in testing data}
-
-\item{BB}{given network}
 }
 \value{
 a matrix
