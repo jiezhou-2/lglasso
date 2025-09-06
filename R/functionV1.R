@@ -1100,18 +1100,25 @@ simulate_heter=function(n,p,m1,alpha){
 #' This function generates three types of data based on the given network type. These data can then be used to test the
 #' efficiency of algorithms.
 #' @param type what type of dat should be generated. There are three types of data that can be simulated through the function, which are
-#' \code{general}, \code{longihomo} and \code{longiheter} respecitvely.
+#' \code{general}, \code{longihomo} and \code{longiheter} respectively.
 #' @param n number of subjects
 #' @param p number of nodes
 #' @param m1 number of edges
-#' @param m2 number of edges between general and individual network
+#' @param m2 number of edges between general and individual network (only for \code{longiheter})
 #' @param m3 number of correlated data within one subject
-#' @param cc correlation matrix between tissues
-#' @param tau parameters in correlation matrix
-#' @param alpha parameter in correlation matrix
+#' @param cc correlation matrix between tissues (only for \code{general})
+#' @param tau parameters in correlation matrix (only for \code{longihomo})
+#' @param alpha parameter in correlation matrix (only for \code{longiheter})
 #' @importFrom fake MakePositiveDefinite
 #' @importFrom MASS mvrnorm
-#' @returns data frame
+#' @details
+#' \code{Simulate} function generate three types of data that can be used to test
+#' the efficacy of  network identification algorithms.The first type \code{general} generates
+#' data of which the covariance between tissues has no parametric  structure; the second type \code{longihomo} generates data which has
+#' a same precision matrix that applies to  all subjects; the third type \code{longiheter} generates data in which subjects have
+#' different precision matrix.
+#'
+#' @returns list that include the relevant inputs and data generated.
 #' @export
 Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,cc=diag(m3),tau=c(2,1),alpha=2){
   type=match.arg(type)

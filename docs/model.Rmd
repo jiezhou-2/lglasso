@@ -1,0 +1,26 @@
+---
+title: " Identify networks from correlated data (1)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction_of_lglasso_package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+The *lglasso* package estimate networks from clustered data (typically, longitudinal data). This is accomplished through two steps. In step one, a general network $\Omega=(\theta_{ij})$ is estimated from longitudinal data. This step can be implemented through three different way, which are elaborated in the paper Jie Zhou et al (2024). We call $\Omega$ general network. Based on $\Omega$, in second step, we use an adapted fused graphical lasso algorithms to estimate $k$ individual networks. Specifically, we solve the following optimization problem,
+
+$$\min_{\Omega_1,\cdots, \Omega_k}\sum_{m=1}^k n_k(\log|\Omega_m|-Tr(S_m\Omega_m))+\lambda\sum_{i=1}^p\sum_{j=1}^p |\theta_{ij}-\theta_{mij}| $$
+where $\Omega_1=(\theta_{1ij}),\cdots, \Omega_{k}=(\theta_{kij})$ are the $k$ precision matrices coresponding to the $k$ individual networks, and $S_1,\cdots, S_m$ are the empirical covariance matrix computed based on the results in Jie Zhou et al (2024).  
+
+
+
+
+

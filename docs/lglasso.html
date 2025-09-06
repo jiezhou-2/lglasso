@@ -341,7 +341,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(lglasso)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(lglasso)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#library(devtools)</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#load_all()</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># number of nodes</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">10</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># number of edge in general network</span></span>
@@ -524,7 +526,7 @@ correlation</h2>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>group<span class="ot">=</span><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dv">71</span>)</span></code></pre></div>
 <div id="estimate-general-networks-1" class="section level3">
 <h3>estimate general networks</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="dv">1</span>,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="dv">1</span>,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 0.4368 /correlation tau difference: 0.4929&quot;</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 0.2394 /correlation tau difference: 0.1774&quot;</span></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0.095 /correlation tau difference: 0.0875&quot;</span></span>

@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE}
-#library(lglasso)
-library(devtools)
-load_all()
+library(lglasso)
+#library(devtools)
+#load_all()
 ```
 
 

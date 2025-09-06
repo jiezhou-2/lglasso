@@ -64,7 +64,7 @@ for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-lambda1=exp(seq(-5,-4,length=10))
+lambda1=exp(seq(-5,-4,length=3))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
 
@@ -88,7 +88,7 @@ for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-lambda1=exp(seq(-5,-4,length=10))
+lambda1=exp(seq(-5,-4,length=3))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
 ```
@@ -114,8 +114,8 @@ for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
 }
 group=ifelse(group==1,1,2)
-lambda1=exp(seq(-3,-2,length=10))
-lambda2=exp(seq(-3,-2,length=10))
+lambda1=exp(seq(-3,-2,length=3))
+lambda2=exp(seq(-3,-2,length=3))
 lambda=expand.grid(lambda1,lambda2)
 
 ```
