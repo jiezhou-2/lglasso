@@ -71,3 +71,8 @@ Estimation of Gaussian Graphical Models, Version: 1.11.
 
 \[3\] Matt Galloway (2025), CVglasso: Lasso Penalized Precision Matrix
 Estimation, version 1.0
+
+\[4\] Danaher P, Wang P, Witten DM. The joint graphical lasso for
+inverse covariance estimation across multiple classes. J R Stat Soc
+Series B Stat Methodol. 2014 Mar;76(2):373-397. doi: 10.1111/rssb.12033.
+PMID: 24817823; PMCID: PMC4012833.
