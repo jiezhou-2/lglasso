@@ -21,18 +21,18 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE}
-library(lglasso)
-#library(devtools)
-#load_all()
+#library(lglasso)
+library(devtools)
+load_all()
 ```
 
 
 
 ```{r, message=FALSE}
 # number of nodes
-p=10
+p=5
 # number of edge in general network
-m1=10
+m1=5
 # the difference between the number of edges in individual networks and general network
 m2=0
 #  number of tissues
@@ -58,79 +58,64 @@ ddata=dd$data
 ### estimate general networks
 
 ```{r}
-aa=lglasso(data=ddata,lambda = 0.1,type="general",tol = 0.01, trace=TRUE)
+aa=lglasso(data=ddata,lambda = 0.01,type="general",tol = 0.01, trace=TRUE)
 
 ## precision matrix
 aa$wi
 
 ## correlation between different tissues
-cov2cor(aa$v)
+cov2cor(aa$v[[1]])
 ```
 
 ### estimate individual networks
 ```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="general",group = ddata[,2], ,tol = 0.01, trace=TRUE)
-aa$wiList
+group=ifelse(ddata[,2]%in%c("tissue1","tissue2"),1,2)
+aa=lglasso(data=ddata,lambda = c(0.001,0.001),type="general",group = group, ,tol = 0.01, trace=TRUE)
+aa$wi
+cov2cor(aa$v[[1]])
 ```
 
 ## Model 2: longitudinal data with one-parameter structured correlation 
 
 
-```{r}
-
+```{r,eval=F}
+library(forcats)
 set.seed(5)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
 ddata=dd$data
-group=rep(c(1,2),71)
+subjects=fct_inorder(ddata$subject)
+nn=table(subjects)
+group=c()
+for (i in 1:length(nn)) {
+ if (nn[i]>2){
+   group=c(group,c(1,1,rep(2,nn[i]-2)))
+ }else{
+   group=c(group,rep(1,nn[i]))
+ } 
+}
 ```
 
 
 
 
 
-### estimate general networks
+### estimate general networks 
 
-```{r}
-aa=lglasso(data=ddata,lambda = 1,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
+```{r,eval=F}
+aa=lglasso(data=ddata,lambda = 0.1,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
 aa$wi
 ```
 
 
 ### estimate individual networks
 
-```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="expFixed",expFix=1,group = group, ,tol = 0.01, trace=TRUE)
+```{r,eval=FALSE}
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = 0.01, trace=TRUE)
 aa$wiList
 ```
 
 
-## Model 3: longitudinal data with two-parameter structured correlation 
 
-```{r}
-
-set.seed(5)
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2)
-ddata=dd$data
-group=rep(c(1,2),78)
-```
-
-
-
-
-
-### estimate general networks
-
-```{r}
-aa=lglasso(data=ddata,lambda = 1,type="twoPara", ,tol = 0.01, trace=TRUE)
-aa$wi
-```
-
-### estimate individual networks
-
-```{r}
-aa=lglasso(data=ddata,lambda = c(1,1),type="twoPara",group=group, ,tol = 0.01, trace=TRUE)
-aa$wiList
-```
 
 
 [1] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen AG. Identifying stationary microbial interaction networks based on irregularly spaced longitudinal 16S rRNA gene sequencing data. Front Microbiomes. 2024;3:1366948. doi: 10.3389/frmbi.2024.1366948. Epub 2024 Jun 2. PMID: 40687607; PMCID: PMC12276884.

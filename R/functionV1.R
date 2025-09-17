@@ -21,100 +21,120 @@ phifunction=function(t,tau){
 
 
 
-AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=30,
+AA=function(B,data,type=c("general","expFixed"),expFix,maxit=30,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5),...){
   ### clustered data
+if (!is.list(B)){
+  B=list(B)
+}
+
+if (!is.list(data)){
+  data=as.list(data)
+}
+
+  if (length(B)!= length(data)){
+    stop(" B should have same length as  data!")
+  }
+
   type=match.arg(type)
   if (type=="general"){
-    m3=length(unique(data[,2]))
-    p=ncol(data)-2
-    nn=length(unique(data[,1]))
-    subjects=unique(data[,1])
-    if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
+    corMatrix=vector("list",length(B))
+    for (i in 1:length(B)) {
+      dd=data[[i]]
+      bb=B[[i]]
+    m3=length(unique(dd[,2]))
+    p=ncol(dd)-2
+    nn=length(unique(dd[,1]))
+    #subjects=unique(dd[,1])
+    if (ncol(bb)!=p | nrow(bb)!=p){
+      stop("Inputs do not match with each other!")
+      }
     A=Variable(m3,m3,PSD=T) # tissue wise inverse correlation matrix
     obj1=(p*nn)/2*log_det(A)
-
-
-
-    data_sub=split(data[,-c(1,2)],data[,1])
-    #browser()
-    amatrix=Reduce("+",lapply(data_sub, function(B,xx){as.matrix(xx)%*%B%*%t(as.matrix(xx))}, B=B))
+    data_sub=split(dd[,-c(1,2)],dd[,1])
+    amatrix=Reduce("+",lapply(data_sub, function(B,xx){as.matrix(xx)%*%B%*%t(as.matrix(xx))}, B=bb))
     obj2=-0.5*matrix_trace(A%*%amatrix)
     obj=-(obj1+obj2)
     constr=list(CVXR::diag(A)==1)
     prob=Problem(Minimize(obj),constr)
     results=CVXR::solve(prob)
-    corMatrix=solve(results$getValue(A))
-    return(list(corMatrix=corMatrix))
+    corMatrix[[i]]=solve(results$getValue(A))
   }
-
-
+    return(list(corMatrix=corMatrix))
+}
   ### longitudinal data
 
   if (type == "expFixed"){
-    p=ncol(data)-2
-    nn=length(unique(data[,1]))
-    subjects=unique(data[,1])
-    if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
+    corMatrix=vector("list",length(B))
+    Tau=c()
+    for (i in 1:length(B)) {
+      dd=data[[i]]
+      bb=B[[i]]
+      p=ncol(dd)-2
+      nn=length(unique(dd[,1]))
+      #subjects=unique(dd[,1])
+      if (ncol(bb)!=p | nrow(bb)!=p){
+        stop("Inputs do not match with each other!")
+      }
+
     #YY=Variable(p,p,PSD=TRUE)
-    time_list=split(data[,2],data[,1])
-    subdata_list=split(data[,-c(1,2)],data[,1])
+    time_list=split(dd[,2],factor(dd[,1],unique(dd[,1])))
+    subdata_list=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
 
     likefun=function(tau){
       obj1=0
       obj2=0
       for (i in 1:nn) {
-
         datai=as.matrix(subdata_list[[i]])
         t=time_list[[i]]
         Aa=phifunction(t=t,tau = c(tau,expFix))
-        amatrix=datai%*%B%*%t(datai)
+        amatrix=datai%*%bb%*%t(datai)
         obji1=-0.5*p*log(det(Aa))
         obji2= -0.5*sum(diag(solve(Aa)%*%amatrix))
         obj1=obj1+obji1
         obj2=obj2+obji2
       }
-
       obj=-(obj1+obj2)
     }
 
     tau=stats::optim(c(tau0[1]),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
+    Tau=c(Tau,tau)
     A=lapply(time_list,phifunction,tau=c(tau,expFix))
-    return(list(corMatrixList=A,tau=tau))
+    corMatrix[[i]]=A
   }
-
-
+    return(list(corMatrix=corMatrix,tau=Tau))
+}
   ### longitudinal data
-  if (type == "twoPara"){
-    p=ncol(data)-2
-    nn=length(unique(data[,1]))
-    subjects=unique(data[,1])
-    if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
-    #YY=Variable(p,p,PSD=TRUE)
-    time_list=split(data[,2],data[,1])
-    subdata_list=split(data[,-c(1,2)],data[,1])
-
-    likefun=function(tau){
-      obj1=0
-      obj2=0
-      for (i in 1:nn) {
-        datai=as.matrix(subdata_list[[i]])
-        t=time_list[[i]]
-        Aa=phifunction(t=t,tau = c(tau,1))
-        amatrix=datai%*%B%*%t(datai)
-        obji1=-0.5*p*log(det(Aa))
-        obji2= -0.5*sum(diag(solve(Aa)%*%amatrix))
-        obj1=obj1+obji1
-        obj2=obj2+obji2
-      }
-
-      obj=-(obj1+obj2)
-    }
-
-    tau=stats::optim(c(tau0),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
-    A=lapply(time_list,phifunction,tau=tau)
-    return(list(corMatrixList=A,tau=tau))
-  }
+  # if (type == "twoPara"){
+  #   p=ncol(data)-2
+  #   nn=length(unique(data[,1]))
+  #   subjects=unique(data[,1])
+  #   if (ncol(B)!=p | nrow(B)!=p){stop("Inputs do not match with each other!")}
+  #   #YY=Variable(p,p,PSD=TRUE)
+  #   time_list=split(data[,2],data[,1])
+  #   subdata_list=split(data[,-c(1,2)],data[,1])
+  #
+  #   likefun=function(tau){
+  #     obj1=0
+  #     obj2=0
+  #     for (i in 1:nn) {
+  #       datai=as.matrix(subdata_list[[i]])
+  #       t=time_list[[i]]
+  #       Aa=phifunction(t=t,tau = c(tau,1))
+  #       amatrix=datai%*%B%*%t(datai)
+  #       obji1=-0.5*p*log(det(Aa))
+  #       obji2= -0.5*sum(diag(solve(Aa)%*%amatrix))
+  #       obj1=obj1+obji1
+  #       obj2=obj2+obji2
+  #     }
+  #
+  #     obj=-(obj1+obj2)
+  #   }
+  #
+  #   tau=stats::optim(c(tau0),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
+  #   A=lapply(time_list,phifunction,tau=tau)
+  #   return(list(corMatrixList=A,tau=tau))
+  # }
 
 }
 
@@ -125,83 +145,167 @@ AA=function(B,data,type=c("general","expFixed","twoPara"),expFix,maxit=30,
 
 
 
-BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,maxit=100,
+BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("warm","cold"),w.init=NULL,wi.init=NULL,...){
+
   type=match.arg(type)
   start=match.arg(start)
+
+
+
+  if (!is.list(data) | !is.list(A)){
+    stop("A and data must be a list!")
+  }
+
+  if (length(A)!= length(data)){
+    stop(" A should have same length as  data!")
+  }
+
+
+
+
+
+
   if (type=="general"){
-    m3=length(unique(data[,2]))
-    p=ncol(data)-2
-    nn=length(unique(data[,1]))
-    subjects=unique(data[,1])
-    if (ncol(A)!=m3 | nrow(A)!=m3){
-      stop("Inputs do not match with each other!")
+    for (i in 1:length(A)) {
+      Ai=A[[i]]
+      datai=data[[i]]
+      if (nrow(Ai)!=length(unique(datai[,2]))){
+        stop("The format of A does not match the format of data!")
+      }
     }
 
-    data_sub=split(data[,-c(1,2)],data[,1])
-    amatrix=Reduce("+",lapply(data_sub, function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=A))
 
-    if (start=="warm"){
-      #w.init=diag(diag(cov(data[,-c(1,2)])))
-      #wi.init=diag(1/diag(w.init))
-    bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
+    m= length(A)
+    B=vector("list",m)
+    obj=0
+    aa=0
+    bb=0
+     for (i in 1:m){
+      Ai=A[[i]]
+      dd=data[[i]]
+      p=ncol(dd)-2
+      data_sub=split(dd[,-c(1,2)],dd[,1])
+      nn=length(unique(dd[,1]))
+      amatrix=Reduce("+",lapply(data_sub,
+      function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=Ai))
+          B[[i]]=Variable(p,p,PSD=T) # tissue wise inverse correlation matrix
+          obj=(nn*nrow(Ai))/2*log_det(B[[i]])-0.5*matrix_trace(B[[i]]%*%amatrix)+obj
+          aa=aa+ sum(abs(B[[i]]))
+
+          if (m>1){
+          if (i>=2){
+            for (j in 1:i) {
+              bb=bb+sum(abs(B[[i]]-B[[j]]))
+            }
+          }
+          }
+     }
+    if (m==1){
+      contr=list(aa<=1/lambda[1])
     }else{
-      bb=glasso::glasso(s=amatrix/(m3*nn),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
-    }
-    return(list(preMatrix=bb$wi, corMatrix=bb$w))
+      contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
+}
+
+prob=Problem(Maximize(obj),contr)
+result=CVXR::solve(prob)
+S_est= lapply(B, function(x) result$getValue(x))
+return(wiList=S_est)
   }
+
+
+
   if (type == "expFixed"){
-    p=ncol(data)-2
-    nn=length(unique(data[,1]))
-    subjects=unique(data[,1])
-
-    data_sub=split(data[,-c(1,2)],data[,1])
-    if (length(A)!=length(data_sub)){stop("Data do not match!")}
-    bmate=0
     for (i in 1:length(A)) {
-      xx=as.matrix(data_sub[[i]])
-      yy=solve(as.matrix(A[[i]]))
-      bmate=t(xx)%*%yy%*%xx+bmate
+      Ai=A[[i]]
+      datai=data[[i]]
+      if (length(Ai)!=length(unique(datai[,1]))){
+        stop("The format of A does not match the format of data!")
+      }
+      subjects=unique(datai[,1])
+      for (j in 1:length(Ai)) {
+        Aij=Ai[[j]]
+        index=which(datai[,1]==subjects[j])
+        dataij=datai[index,]
+        if (nrow(Aij)!= nrow(dataij))
+        {stop("The format of A does not match the format of data!")}
+      }
+
     }
 
-    if (start=="warm"){
-      #w.init=cov(data[,-c(1,2)])
-      #wi.init=diag(ncol(w.init))
-      bb=glasso::glasso(s=bmat/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
+
+    m= length(A)
+    B=vector("list",m)
+    obj=0
+    aa=0
+    bb=0
+    for (i in 1:m){
+      Ai=A[[i]]
+      dd=data[[i]]
+      nn=length(unique(dd[,1]))
+      p=ncol(dd)-2
+      data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
+      B[[i]]=Variable(p,p,PSD=T) # tissue wise inverse correlation matrix
+      if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
+      for (j in 1:nn) {
+        xx=as.matrix(data_sub[[j]])
+        yy=solve(as.matrix(Ai[[j]]))
+        #browser()
+        amatrix=t(xx)%*%yy%*%xx
+        obj=nrow(Ai[[j]])*log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix)+obj
+      }
+
+      aa=aa+ sum(abs(B[[i]]))
+
+      if (m>1){
+        if (i>=2){
+          for (j in 1:i) {
+            bb=bb+sum(abs(B[[i]]-B[[j]]))
+          }
+        }
+      }
+    }
+
+
+    if (m==1){
+      contr=list(aa<=1/lambda[1])
     }else{
-      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
+      contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
     }
 
-    return(list(preMatrix=bb$wi,corMatrix=bb$w))
+    prob=Problem(Maximize(obj),contr)
+    result=CVXR::solve(prob)
+    S_est= lapply(B, function(x) result$getValue(x))
+    return(wiList=S_est)
 
   }
 
-  if (type == "twoPara"){
-    p=ncol(data)-2
-    nn=length(unique(data[,1]))
-    subjects=unique(data[,1])
-
-    data_sub=split(data[,-c(1,2)],data[,1])
-    if (length(A)!=length(data_sub)){stop("Data do not match!")}
-    bmate=0
-    for (i in 1:length(A)) {
-      xx=as.matrix(data_sub[[i]])
-      yy=solve(as.matrix(A[[i]]))
-      bmate=t(xx)%*%yy%*%xx+bmate
-    }
-
-    if (start=="warm"){
-     # w.init=cov(data[,-c(1,2)])
-    #  wi.init=diag(ncol(w.init))
-      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
-    }else{
-      bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
-    }
-
-
-    return(list(preMatrix=bb$wi,corMatrix=bb$w))
-
-  }
+  # if (type == "twoPara"){
+  #   p=ncol(data)-2
+  #   nn=length(unique(data[,1]))
+  #   subjects=unique(data[,1])
+  #
+  #   data_sub=split(data[,-c(1,2)],data[,1])
+  #   if (length(A)!=length(data_sub)){stop("Data do not match!")}
+  #   bmate=0
+  #   for (i in 1:length(A)) {
+  #     xx=as.matrix(data_sub[[i]])
+  #     yy=solve(as.matrix(A[[i]]))
+  #     bmate=t(xx)%*%yy%*%xx+bmate
+  #   }
+  #
+  #   if (start=="warm"){
+  #    # w.init=cov(data[,-c(1,2)])
+  #   #  wi.init=diag(ncol(w.init))
+  #     bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = start,w.init = w.init,wi.init = wi.init)
+  #   }else{
+  #     bb=glasso::glasso(s=bmate/nrow(data),rho=lambda[1], penalize.diagonal = diagonal, start = "cold")
+  #   }
+  #
+  #
+  #   return(list(preMatrix=bb$wi,corMatrix=bb$w))
+  #
+  # }
 
 }
 
@@ -264,7 +368,7 @@ BB=function(A,data,lambda,type=c("general","expFixed","twoPara"),diagonal=TRUE,m
 #'    from different tissues or contents, model \code{general} should be adopted.
 #'
 #'
-lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,group=NULL,maxit=30,
+lglasso=function(data,lambda, type=c("general","expFixed"),expFix=1,group=NULL,maxit=30,
                  tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
                  ...)
 
@@ -272,230 +376,203 @@ lglasso=function(data,lambda, type=c("general","expFixed","twoPara"),expFix=1,gr
 
 
 if (is.null(group))  {
+  data=list(data)
  if (length(lambda)!=1){
   stop("Arguments (group, lambda) do not match!")
  }
 }
 
   if (!is.null(group))  {
-    if (any(!is.matrix(lambda) | !ncol(lambda)!=2)){
+
+    if (length(group)!=nrow(data)){
+      stop("group should be the same length of the columns of data!")
+    }
+
+    X_bar = apply(data[,-c(1,2)], 2, mean)
+    data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
+    data=split(data,group)
+
+    if (!length(lambda)==2){
       stop("Arguments (group, lambda) do not match!")
     }
+
+
   }
+
+
 
   if (!all(lambda>0)){
     stop("lambda must be positive!")
   }
 
-
-
-
   type=match.arg(type)
   start=match.arg(start)
 
 
-  X_bar = apply(data[,-c(1,2)], 2, mean)
-  data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
-
-
-
   if (type=="general"){
-    m3=length(unique(data[,2]))
-    p=ncol(data)-2
-    A=diag(m3)
-    B=diag(p)
+    m3=sapply(data, function(x){length(unique(x[,2]))})
+    p=ncol(data[[1]])-2
+    A=vector("list",length(data))
+    B=vector("list",length((data)))
+
+    for (j in 1:length(A)) {
+      A[[j]]=diag(m3[j])
+      B[[j]]=diag(p)
+    }
+
     k=0
 
     while(1){
       k=k+1
+      #browser()
       A1=AA(data = data,B = B, type=type,...)$corMatrix
       #browser()
       B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
-
-      d1=round(max(abs(B-B1$preMatrix)),3)
-      d2=round(max(abs(A-A1)),3)
-
-
-      if (trace){
-      print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation difference: ",d2))
+      d1=c()
+      d2=c()
+      for (i in 1:length(B1)) {
+        d1=c(d1,round(max(abs(B[[i]]-B1[[i]])),3))
+        d2=c(d2,round(max(abs(A[[i]]-A1[[i]])),3))
       }
 
-      #browser()
-      if (d1<=tol && d2<= tol ){
-        if (is.null(group)){
-          output=structure(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1), class="lglasso")
-          }else{
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          output=structure(list(wi=B1$preMatrix,  wiList=individial,v=A1), class="lglasso")
-        }
+      if (trace){
+      print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation difference: ",max(d2)))
+      }
+
+      if (max(d1)<=tol && max(d2)<= tol ){
+          output=structure(list(wi=B1, v=A1), class="lglasso")
           break
       }else{
         A=A1
-        B=B1$preMatrix
+        B=B1
       }
 
 
       if (k>=maxit){
         warning("Algorithm did not converge!")
-
-        if (is.null(group)){
-          output=structure(list(w=B1$corMatrix,wi=B1$preMatrix, v=A1), class="lglasso")
-        }else{
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          output=structure(list(wi=B1$preMatrix,wiList=individial, v=A1), class="lglasso")
-        }
+          output=structure(list(wi=B1, v=A1), class="lglasso")
         break
       }
 
     }
-  }
 
 
+}
 
 
   if (type == "expFixed"){
-    if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){stop("Argument expFix is not correctly specified!")}
-    p=ncol(data)-2
-    fre=table(data[,1])
-    A=vector("list",length(fre))
+    if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){
+      stop("Argument expFix is not correctly specified!")
+    }
+    A=vector("list",length(data))
+    B=vector("list",length((data)))
+
     for (i in 1:length(A)) {
-      A[[i]]=diag(fre[i])
+      dd=data[[i]]
+      subjects=unique(dd[,1])
+      A[[i]]=vector("list",length(subjects))
+      for (j in 1:length(A[[i]])) {
+        index=which(dd[,1]==subjects[j])
+        A[[i]][[j]]=diag(length(index))
+      }
+      B[[i]]=diag(p)
     }
-    B=diag(p)
-    k=0
-tau0=tau0
-    while(1){
-      k=k+1
+k=0
+while(1){
+  k=k+1
+  #browser()
+A1=AA(data = data,B = B, type=type,expFix,...)
+B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)
+d1=c()
+d2=c()
+for (i in 1:length(B1)) {
+  d1=c(d1,round(max(abs(B[[i]]-B1[[i]])),3))
+  d2=c(d2,round(max(abs(tau0-A1$tau)),3))
+}
+if (trace){
+  print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation tau difference: ",max(d2)))
+}
 
-      #A1=AA(data = data,B = B, type=type,fix=expFix, init=tau0,lower = lower,upper = upper)
-      A1=AA(data = data,B = B, type=type,expFix,...)
-      #browser()
-      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)
-
-      d1=round(max(abs(B-B1$preMatrix)),4)
-      d2=round(max(abs(tau0-A1$tau)),4)
-      if (trace){
-      print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
-      }
-      if (d1<=tol & d2<= tol ){
-
-        if (is.null(group)){
-          output=structure(list(wi=B1$preMatrix, wiList=NULL, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-        }else{
-
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-        }
-
-        break
-
-      }else{
-        A=A1$corMatrixList
-        B=B1$preMatrix
-        tau0=A1$tau
-      }
-      if (k>=maxit){
-        warning("Algorithm did not converge!")
-        if (is.null(group)){
-
-          output=structure(list(wi=B1$preMatrix, wiList=NULL, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-
-        }else{
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-        }
-        break
-           }
-
-    }
-  }
-
-
-
-
-
-
-  if (type == "twoPara"){
-    p=ncol(data)-2
-    fre=table(data[,1])
-    A=vector("list",length(fre))
-    for (i in 1:length(A)) {
-      A[[i]]=diag(fre[i])
-    }
-    B=diag(p)
-    k=0
-tau0=tau0
-    while(1){
-      k=k+1
-      A1=AA(data = data,B = B, type=type, fix=fix)
-      B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init,...)
-
-      d1=round(max(abs(B-B1$preMatrix)),4)
-      d2=round(max(abs(tau0-A1$tau)),4)
-      if (trace){
-      print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
-      }
-      if (d1<= tol & d2<= tol ){
-
-        if (is.null(group)){
-          output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-        }else{
-
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-        }
-        break
-      }else{
-        A=A1$corMatrixList
-        B=B1$preMatrix
-        tau0=A1$tau
-      }
-      if (k>= maxit){
-        warning("Algorithm did not converge!")
-
-        if (is.null(group)){
-          output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-
-        }else{
-          #browser()
-          individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-          output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-      }
-        break
-          }
-
-    }
-
-  }
-  return(output)
+if (max(d1)<=tol && max(d2)<= tol ){
+    output=structure(list(wi=B1, v=A1$corMatrix, tau=A1$tau), class="lglasso")
+  break
+}else{
+  A=A1$corMatrix
+  B=B1
+  tau0=A1$tau
 }
 
 
-heternetwork=function(data,lambda,homo, group){
-  if (length(group)!=nrow(data)){
-    stop("Argument group doens not match data!")
-    }
-  m3=length(unique(group))
-  data_list=split(data,group)
-  p=ncol(data)-2
- S=vector("list",m3)
- Q=vector("list",m3)
-  obj=0
-  aa=0
-for (i in 1:m3) {
-  S[[i]]= Variable(p,p,PSD=TRUE)
-  Q[[i]]=stats::cov(data_list[[i]][,-c(1,2)])
-  obj=obj+log_det(S[[i]])-matrix_trace(S[[i]]%*%Q[[i]])
-  aa=aa+ sum(abs(S[[i]]-homo))
+if (k>=maxit){
+  warning("Algorithm did not converge!")
+  output=structure(list(wi=B1, v=A1$corMatrix, tau=tau0), class="lglasso")
+  break
 }
-constr=list(aa<=1/lambda)
 
-prob=Problem(Maximize(obj),constr)
-result=CVXR::solve(prob,solver="SCS")
-S_est= lapply(S, function(x) result$getValue(x))
-names(S_est)=names(data_list)
-return(individual=S_est)
 }
+
+    }
+return(output)
+}
+
+
+
+
+#   if (type == "twoPara"){
+#     p=ncol(data)-2
+#     fre=table(data[,1])
+#     A=vector("list",length(fre))
+#     for (i in 1:length(A)) {
+#       A[[i]]=diag(fre[i])
+#     }
+#     B=diag(p)
+#     k=0
+# tau0=tau0
+#     while(1){
+#       k=k+1
+#       A1=AA(data = data,B = B, type=type, fix=fix)
+#       B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init,...)
+#
+#       d1=round(max(abs(B-B1$preMatrix)),4)
+#       d2=round(max(abs(tau0-A1$tau)),4)
+#       if (trace){
+#       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
+#       }
+#       if (d1<= tol & d2<= tol ){
+#
+#         if (is.null(group)){
+#           output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
+#         }else{
+#
+#           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
+#           output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
+#         }
+#         break
+#       }else{
+#         A=A1$corMatrixList
+#         B=B1$preMatrix
+#         tau0=A1$tau
+#       }
+#       if (k>= maxit){
+#         warning("Algorithm did not converge!")
+#
+#         if (is.null(group)){
+#           output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
+#
+#         }else{
+#           #browser()
+#           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
+#           output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
+#       }
+#         break
+#           }
+#
+#     }
+#
+#   }
+
+
+
 
 
 
