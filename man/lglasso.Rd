@@ -7,7 +7,7 @@
 lglasso(
   data,
   lambda,
-  type = c("general", "expFixed", "twoPara"),
+  type = c("general", "expFixed"),
   expFix = 1,
   group = NULL,
   maxit = 30,

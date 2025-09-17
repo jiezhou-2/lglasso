@@ -46,6 +46,7 @@ if (!is.list(data)){
     p=ncol(dd)-2
     nn=length(unique(dd[,1]))
     #subjects=unique(dd[,1])
+    #browser()
     if (ncol(bb)!=p | nrow(bb)!=p){
       stop("Inputs do not match with each other!")
       }
@@ -73,6 +74,7 @@ if (!is.list(data)){
       p=ncol(dd)-2
       nn=length(unique(dd[,1]))
       #subjects=unique(dd[,1])
+      #browser()
       if (ncol(bb)!=p | nrow(bb)!=p){
         stop("Inputs do not match with each other!")
       }
@@ -191,23 +193,26 @@ BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
       function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=Ai))
           B[[i]]=Variable(p,p,PSD=T) # tissue wise inverse correlation matrix
           obj=(nn*nrow(Ai))/2*log_det(B[[i]])-0.5*matrix_trace(B[[i]]%*%amatrix)+obj
-          aa=aa+ sum(abs(B[[i]]))
+          # Create a mask matrix
+          mask <- matrix(1, p, p)
+          diag(mask) <- 0
+          aa=aa+ sum(abs(B[[i]]*mask))
 
           if (m>1){
           if (i>=2){
             for (j in 1:i) {
-              bb=bb+sum(abs(B[[i]]-B[[j]]))
+              bb=bb+sum(abs(B[[i]]-B[[j]])*mask)
             }
           }
           }
      }
-    if (m==1){
-      contr=list(aa<=1/lambda[1])
-    }else{
-      contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
-}
-
-prob=Problem(Maximize(obj),contr)
+#     if (m==1){
+#       contr=list(aa<=1/lambda[1])
+#     }else{
+#       contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
+# }
+obj=-obj+aa+bb
+prob=Problem(Minimize(obj))
 result=CVXR::solve(prob)
 S_est= lapply(B, function(x) result$getValue(x))
 return(wiList=S_est)
@@ -216,6 +221,7 @@ return(wiList=S_est)
 
 
   if (type == "expFixed"){
+    m= length(A)
     for (i in 1:length(A)) {
       Ai=A[[i]]
       datai=data[[i]]
@@ -234,7 +240,7 @@ return(wiList=S_est)
     }
 
 
-    m= length(A)
+
     B=vector("list",m)
     obj=0
     aa=0
@@ -247,33 +253,38 @@ return(wiList=S_est)
       data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
       B[[i]]=Variable(p,p,PSD=T) # tissue wise inverse correlation matrix
       if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
+      amatrix=0
+      # Create a mask matrix
+      mask <- matrix(1, p, p)
+      diag(mask) <- 0
       for (j in 1:nn) {
         xx=as.matrix(data_sub[[j]])
         yy=solve(as.matrix(Ai[[j]]))
         #browser()
-        amatrix=t(xx)%*%yy%*%xx
-        obj=nrow(Ai[[j]])*log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix)+obj
+        amatrix=t(xx)%*%yy%*%xx+amatrix
       }
-
-      aa=aa+ sum(abs(B[[i]]))
+      obj=log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix)/nrow(dd)+obj
+      aa=aa+ sum(abs(B[[i]])*mask)
 
       if (m>1){
         if (i>=2){
-          for (j in 1:i) {
-            bb=bb+sum(abs(B[[i]]-B[[j]]))
+          for (j in 1:(i-1)) {
+            bb=bb+sum(abs(B[[i]]-B[[j]])*mask)
           }
         }
       }
     }
 
 
-    if (m==1){
-      contr=list(aa<=1/lambda[1])
-    }else{
-      contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
-    }
+    # if (m==1){
+    #   contr=list(aa<=1/lambda[1])
+    # }else{
+    #   contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
+    # }
+obj=-obj+aa+bb
 
-    prob=Problem(Maximize(obj),contr)
+#prob=Problem(Maximize(obj),contr)
+    prob=Problem(Minimize(obj))
     result=CVXR::solve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
     return(wiList=S_est)
@@ -373,7 +384,7 @@ lglasso=function(data,lambda, type=c("general","expFixed"),expFix=1,group=NULL,m
                  ...)
 
   {
-
+p=ncol(data)-2
 
 if (is.null(group))  {
   data=list(data)
@@ -389,7 +400,7 @@ if (is.null(group))  {
     }
 
     X_bar = apply(data[,-c(1,2)], 2, mean)
-    data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
+    data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = TRUE)
     data=split(data,group)
 
     if (!length(lambda)==2){
@@ -407,7 +418,9 @@ if (is.null(group))  {
 
   type=match.arg(type)
   start=match.arg(start)
-
+  # Create a mask matrix
+  mask <- matrix(1, p, p)
+  diag(mask) <- 0
 
   if (type=="general"){
     m3=sapply(data, function(x){length(unique(x[,2]))})
@@ -431,7 +444,7 @@ if (is.null(group))  {
       d1=c()
       d2=c()
       for (i in 1:length(B1)) {
-        d1=c(d1,round(max(abs(B[[i]]-B1[[i]])),3))
+        d1=c(d1,round(max(abs(B[[i]]-B1[[i]])*mask),3))
         d2=c(d2,round(max(abs(A[[i]]-A1[[i]])),3))
       }
 
@@ -486,7 +499,7 @@ B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.
 d1=c()
 d2=c()
 for (i in 1:length(B1)) {
-  d1=c(d1,round(max(abs(B[[i]]-B1[[i]])),3))
+  d1=c(d1,round(max(abs(B[[i]]-B1[[i]])*mask),3))
   d2=c(d2,round(max(abs(tau0-A1$tau)),3))
 }
 if (trace){

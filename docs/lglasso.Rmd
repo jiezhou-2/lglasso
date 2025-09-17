@@ -21,18 +21,18 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE}
-#library(lglasso)
-library(devtools)
-load_all()
+library(lglasso)
+# library(devtools)
+# load_all()
 ```
 
 
 
 ```{r, message=FALSE}
 # number of nodes
-p=5
+p=10
 # number of edge in general network
-m1=5
+m1=10
 # the difference between the number of edges in individual networks and general network
 m2=0
 #  number of tissues
@@ -45,7 +45,7 @@ rho=0.8
 ```
 
 ## Model 1: clustered data with no correlation structure
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 set.seed(5)
 cc=matrix(rho,ncol = m3,nrow = m3)
 diag(cc)=1
@@ -55,30 +55,38 @@ ddata=dd$data
 
 
 
-### estimate general networks
+### estimate one network
 
-```{r}
-aa=lglasso(data=ddata,lambda = 0.01,type="general",tol = 0.01, trace=TRUE)
+```{r, warning=FALSE}
+aa=lglasso(data=ddata,lambda = 0.1,type="general",tol = 0.01, trace=TRUE)
 
 ## precision matrix
 aa$wi
 
-## correlation between different tissues
+## correlation matrix between different tissues
+
 cov2cor(aa$v[[1]])
 ```
 
-### estimate individual networks
-```{r}
+### estimate two networks based on a grouping variable
+```{r,warning=FALSE}
 group=ifelse(ddata[,2]%in%c("tissue1","tissue2"),1,2)
-aa=lglasso(data=ddata,lambda = c(0.001,0.001),type="general",group = group, ,tol = 0.01, trace=TRUE)
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="general",group = group, ,tol = 0.01, trace=TRUE)
+
+## precision matrices
 aa$wi
+
+## correlation matrices between tissue 1 and tissue 2
 cov2cor(aa$v[[1]])
+
+## correlation matrices between tissue 3 and tissue 4
+cov2cor(aa$v[[2]])
 ```
 
-## Model 2: longitudinal data with one-parameter structured correlation 
+## Model 2: longitudinal data with exponential correlation structure 
 
 
-```{r,eval=F}
+```{r,warning=FALSE}
 library(forcats)
 set.seed(5)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
@@ -99,19 +107,29 @@ for (i in 1:length(nn)) {
 
 
 
-### estimate general networks 
+### estimate one networks 
 
-```{r,eval=F}
+```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = 0.1,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
+
+## precision matrix 
 aa$wi
+
+## correlation parameter
+aa$tau
 ```
 
 
-### estimate individual networks
+### estimate two networks based on a grouping variable
 
-```{r,eval=FALSE}
+```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = 0.01, trace=TRUE)
-aa$wiList
+
+## precision matrices
+aa$wi
+
+## correlation parameters
+aa$tau
 ```
 
 
