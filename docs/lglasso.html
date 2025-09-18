@@ -343,7 +343,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(lglasso)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># library(devtools)</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># load_all()</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a> <span class="co">#load_all()</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># number of nodes</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>p<span class="ot">=</span><span class="dv">10</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># number of edge in general network</span></span>
@@ -365,138 +365,141 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>ddata<span class="ot">=</span>dd<span class="sc">$</span>data</span></code></pre></div>
 <div id="estimate-one-network" class="section level3">
 <h3>estimate one network</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,<span class="at">type=</span><span class="st">&quot;general&quot;</span>,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 6.456 /correlation difference: 0.337&quot;</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 1.348 /correlation difference: 0.358&quot;</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0.829 /correlation difference: 0.494&quot;</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.593 /correlation difference: 0.427&quot;</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.358 /correlation difference: 0.521&quot;</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.447 /correlation difference: 0.344&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.318 /correlation difference: 0.322&quot;</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.246 /correlation difference: 0.178&quot;</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.157 /correlation difference: 0.149&quot;</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.137 /correlation difference: 0.074&quot;</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.06 /correlation difference: 0.058&quot;</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.047 /correlation difference: 0.028&quot;</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.022 /correlation difference: 0.022&quot;</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.017 /correlation difference: 0.01&quot;</span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 15 precision difference: 0.008 /correlation difference: 0.008&quot;</span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="do">## precision matrix</span></span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;  [1,]  2.044209e+01  6.668722e-07  6.143114e+00 -1.072850e-06  4.411147e-01</span></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;  [2,]  6.668722e-07  9.557196e+00 -2.436491e-06  6.319461e-01  8.895982e-07</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;  [3,]  6.143114e+00 -2.436491e-06  1.481621e+01  3.116047e-06 -2.005443e-06</span></span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.072850e-06  6.319461e-01  3.116047e-06  1.108412e+01  3.766742e-06</span></span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;  [5,]  4.411147e-01  8.895982e-07 -2.005443e-06  3.766742e-06  1.863092e+01</span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;  [6,] -5.881328e-06 -7.548160e-08  3.868800e-06 -2.135228e-06  6.291483e+00</span></span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;  [7,] -1.605349e-06  5.509109e-06  1.441979e-06 -3.446258e+00  2.860430e-01</span></span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.280908e-06  1.442003e-06  2.148249e-06 -2.402554e-06  8.968086e-07</span></span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt;  [9,] -9.460583e-07  3.840229e+00  9.276878e-07  3.959289e-06 -2.185528e-06</span></span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; [10,]  3.758158e-06  3.686612e-07 -2.412408e-06  1.149578e-06 -2.565987e+00</span></span>
-<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
-<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="co">#&gt;  [1,] -5.881328e-06 -1.605349e-06 -1.280908e-06 -9.460583e-07  3.758158e-06</span></span>
-<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt;  [2,] -7.548160e-08  5.509109e-06  1.442003e-06  3.840229e+00  3.686612e-07</span></span>
-<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.868800e-06  1.441979e-06  2.148249e-06  9.276878e-07 -2.412408e-06</span></span>
-<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="co">#&gt;  [4,] -2.135228e-06 -3.446258e+00 -2.402554e-06  3.959289e-06  1.149578e-06</span></span>
-<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt;  [5,]  6.291483e+00  2.860430e-01  8.968086e-07 -2.185528e-06 -2.565987e+00</span></span>
-<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="co">#&gt;  [6,]  2.447238e+01 -3.177080e-06 -1.171569e-06 -2.908388e-07  1.151719e-05</span></span>
-<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="co">#&gt;  [7,] -3.177080e-06  1.514337e+01  3.465166e-06 -1.891808e-06  2.841383e-06</span></span>
-<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.171569e-06  3.465166e-06  4.831078e+00  4.462532e-07 -6.350096e-07</span></span>
-<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a><span class="co">#&gt;  [9,] -2.908388e-07 -1.891808e-06  4.462532e-07  1.266681e+01 -1.469007e-06</span></span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a><span class="co">#&gt; [10,]  1.151719e-05  2.841383e-06 -6.350096e-07 -1.469007e-06  1.374727e+01</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.01</span>,<span class="at">type=</span><span class="st">&quot;general&quot;</span>,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 7.453 /correlation difference: 0.337&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 1.609 /correlation difference: 0.345&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0.64 /correlation difference: 0.48&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.889 /correlation difference: 0.352&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.464 /correlation difference: 0.394&quot;</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.376 /correlation difference: 0.224&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.173 /correlation difference: 0.206&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.139 /correlation difference: 0.099&quot;</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.061 /correlation difference: 0.082&quot;</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.048 /correlation difference: 0.037&quot;</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.021 /correlation difference: 0.03&quot;</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.017 /correlation difference: 0.013&quot;</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.007 /correlation difference: 0.01&quot;</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="do">## precision matrix</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;             [,1]       [,2]       [,3]        [,4]        [,5]      [,6]</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;  [1,] 20.4297761  0.0000000  8.9774212  0.00000000  2.39565408 -1.369210</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;  [2,]  0.0000000  9.4827157 -0.2649992  1.48750398  0.00000000  0.000000</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;  [3,]  8.9774096 -0.2651869 14.9940837  0.92297437 -0.23819175  1.173820</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;  [4,]  0.0000000  1.4875077  0.9229966 10.80310751  0.03731513  0.000000</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;  [5,]  2.3956805  0.0000000 -0.2380988  0.03737814 20.63522644  9.502098</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;  [6,] -1.3690534  0.0000000  1.1738766  0.00000000  9.50204665 24.188397</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;  [7,]  0.0000000  0.3357006  0.0000000 -4.92824535  2.58375865  0.000000</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;  [8,]  0.0000000  0.0000000  0.1372599 -0.63194283  0.02472927  0.000000</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;  [9,]  0.0000000  4.8514142  0.0000000  0.00000000 -1.03453235  0.000000</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; [10,]  0.4518289  0.0000000  0.0000000  0.00000000 -4.01370570  1.784782</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt;             [,7]        [,8]        [,9]       [,10]</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt;  [1,]  0.0000000  0.00000000  0.00000000  0.45176074</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt;  [2,]  0.3355614  0.00000000  4.85140318  0.00000000</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="co">#&gt;  [3,]  0.0000000  0.13725899  0.00000000  0.00000000</span></span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt;  [4,] -4.9282613 -0.63194324  0.00000000  0.00000000</span></span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt;  [5,]  2.5837150  0.02472283 -1.03452705 -4.01371799</span></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="co">#&gt;  [6,]  0.0000000  0.00000000  0.00000000  1.78478837</span></span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt;  [7,] 15.0649525  0.94081668  0.00000000  1.20818510</span></span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="co">#&gt;  [8,]  0.9408170  4.49357809  0.00000000  0.00000000</span></span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="co">#&gt;  [9,]  0.0000000  0.00000000 11.80501985 -0.04598817</span></span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a><span class="co">#&gt; [10,]  1.2081385  0.00000000 -0.04600145 13.28087468</span></span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a><span class="do">## correlation matrix between different tissues</span></span>
 <span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a></span>
-<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="do">## correlation matrix between different tissues</span></span>
-<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a></span>
-<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>v[[<span class="dv">1</span>]])</span>
-<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]</span></span>
-<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.8022430 0.8163628 0.8118753</span></span>
-<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt; [2,] 0.8022430 1.0000000 0.7994267 0.8041030</span></span>
-<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a><span class="co">#&gt; [3,] 0.8163628 0.7994267 1.0000000 0.7991343</span></span>
-<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a><span class="co">#&gt; [4,] 0.8118753 0.8041030 0.7991343 1.0000000</span></span></code></pre></div>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>v[[<span class="dv">1</span>]])</span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]</span></span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.7559950 0.7728643 0.7760703</span></span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt; [2,] 0.7559950 1.0000000 0.7533156 0.7586702</span></span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; [3,] 0.7728643 0.7533156 1.0000000 0.7566526</span></span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt; [4,] 0.7760703 0.7586702 0.7566526 1.0000000</span></span></code></pre></div>
 </div>
 <div id="estimate-two-networks-based-on-a-grouping-variable" class="section level3">
 <h3>estimate two networks based on a grouping variable</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>group<span class="ot">=</span><span class="fu">ifelse</span>(ddata[,<span class="dv">2</span>]<span class="sc">%in%</span><span class="fu">c</span>(<span class="st">&quot;tissue1&quot;</span>,<span class="st">&quot;tissue2&quot;</span>),<span class="dv">1</span>,<span class="dv">2</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.1</span>),<span class="at">type=</span><span class="st">&quot;general&quot;</span>,<span class="at">group =</span> group, ,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 2.994 /correlation difference: 0.817&quot;</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 0.591 /correlation difference: 0.18&quot;</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0.076 /correlation difference: 0.518&quot;</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.198 /correlation difference: 0.119&quot;</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.037 /correlation difference: 0.334&quot;</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.098 /correlation difference: 0.074&quot;</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.019 /correlation difference: 0.203&quot;</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.05 /correlation difference: 0.043&quot;</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.01 /correlation difference: 0.118&quot;</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.028 /correlation difference: 0.025&quot;</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.006 /correlation difference: 0.067&quot;</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.015 /correlation difference: 0.014&quot;</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.003 /correlation difference: 0.037&quot;</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.008 /correlation difference: 0.008&quot;</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="do">## precision matrices</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt;  [1,]  6.215123e+00 -4.231140e-07  3.683632e+00 -9.814706e-06  5.227108e-02</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt;  [2,] -4.231140e-07  3.754643e+00  9.953989e-07  3.156661e-01  2.658590e-06</span></span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.683632e+00  9.953989e-07  5.383759e+00  1.570883e-01 -1.187996e-05</span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt;  [4,] -9.814706e-06  3.156661e-01  1.570883e-01  3.628045e+00  2.295355e-01</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt;  [5,]  5.227108e-02  2.658590e-06 -1.187996e-05  2.295355e-01  4.862654e+00</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt;  [6,] -5.371749e-01 -4.603622e-06  8.398818e-06 -1.869282e-05  2.317571e+00</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt;  [7,] -1.398963e-01  1.616371e-01  1.234167e-05 -1.193914e+00  7.337117e-01</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt;  [8,]  1.170487e-05 -4.574377e-06 -1.261031e-05 -2.228936e-01  1.215655e-01</span></span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt;  [9,]  2.142754e-06  1.659684e+00 -2.233758e-06 -9.907791e-07 -3.078225e-01</span></span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; [10,]  3.023541e-01  1.984915e-06 -2.658374e-02 -2.233598e-06 -1.456894e+00</span></span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt;  [1,] -5.371749e-01 -1.398963e-01  1.170487e-05  2.142754e-06  3.023541e-01</span></span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt;  [2,] -4.603622e-06  1.616371e-01 -4.574377e-06  1.659684e+00  1.984915e-06</span></span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co">#&gt;  [3,]  8.398818e-06  1.234167e-05 -1.261031e-05 -2.233758e-06 -2.658374e-02</span></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.869282e-05 -1.193914e+00 -2.228936e-01 -9.907791e-07 -2.233598e-06</span></span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt;  [5,]  2.317571e+00  7.337117e-01  1.215655e-01 -3.078225e-01 -1.456894e+00</span></span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co">#&gt;  [6,]  3.372063e+00 -9.478390e-02 -1.719433e-01 -6.173983e-02  8.257312e-02</span></span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a><span class="co">#&gt;  [7,] -9.478390e-02  3.131541e+00  1.489907e-01  2.376999e-06  3.608427e-06</span></span>
-<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.719433e-01  1.489907e-01  1.912947e+00  5.099040e-06  1.329454e-05</span></span>
-<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co">#&gt;  [9,] -6.173983e-02  2.376999e-06  5.099040e-06  3.967890e+00 -3.686931e-01</span></span>
-<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="co">#&gt; [10,]  8.257312e-02  3.608427e-06  1.329454e-05 -3.686931e-01  3.584615e+00</span></span>
-<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a><span class="co">#&gt; [[2]]</span></span>
-<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
-<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co">#&gt;  [1,]  5.740338e+00  4.531535e-06  3.683631e+00  1.093432e-05  5.223380e-02</span></span>
-<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="co">#&gt;  [2,]  4.531535e-06  3.178607e+00 -3.737875e-06  3.156740e-01 -9.286923e-07</span></span>
-<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.683631e+00 -3.737875e-06  4.955320e+00  1.570551e-01  1.416878e-05</span></span>
-<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co">#&gt;  [4,]  1.093432e-05  3.156740e-01  1.570551e-01  3.187790e+00  2.294874e-01</span></span>
-<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="co">#&gt;  [5,]  5.223380e-02 -9.286923e-07  1.416878e-05  2.294874e-01  5.262589e+00</span></span>
-<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co">#&gt;  [6,] -5.371435e-01  8.227424e-07 -1.317385e-05  1.945515e-05  2.317550e+00</span></span>
-<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co">#&gt;  [7,] -1.398368e-01  1.616465e-01 -2.465038e-05 -1.193886e+00  7.336425e-01</span></span>
-<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="co">#&gt;  [8,]  1.619832e-05 -9.898537e-07 -1.724880e-05 -2.228894e-01  1.215632e-01</span></span>
-<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="co">#&gt;  [9,] -1.179697e-05  1.659685e+00  1.214236e-05 -1.502791e-05 -3.078035e-01</span></span>
-<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a><span class="co">#&gt; [10,]  3.023018e-01 -1.684573e-06 -2.652711e-02 -2.797649e-05 -1.147146e+00</span></span>
-<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
-<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a><span class="co">#&gt;  [1,] -5.371435e-01 -1.398368e-01  1.619832e-05 -1.179697e-05  3.023018e-01</span></span>
-<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co">#&gt;  [2,]  8.227424e-07  1.616465e-01 -9.898537e-07  1.659685e+00 -1.684573e-06</span></span>
-<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a><span class="co">#&gt;  [3,] -1.317385e-05 -2.465038e-05 -1.724880e-05  1.214236e-05 -2.652711e-02</span></span>
-<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a><span class="co">#&gt;  [4,]  1.945515e-05 -1.193886e+00 -2.228894e-01 -1.502791e-05 -2.797649e-05</span></span>
-<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="co">#&gt;  [5,]  2.317550e+00  7.336425e-01  1.215632e-01 -3.078035e-01 -1.147146e+00</span></span>
-<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a><span class="co">#&gt;  [6,]  3.686738e+00 -9.467984e-02 -1.305530e-01 -6.176980e-02  8.251585e-02</span></span>
-<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co">#&gt;  [7,] -9.467984e-02  2.665764e+00  1.489965e-01 -1.685145e-05 -1.766824e-05</span></span>
-<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.305530e-01  1.489965e-01  1.982237e+00 -5.557852e-07 -2.276682e-06</span></span>
-<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a><span class="co">#&gt;  [9,] -6.176980e-02 -1.685145e-05 -5.557852e-07  3.785927e+00 -3.686829e-01</span></span>
-<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a><span class="co">#&gt; [10,]  8.251585e-02 -1.766824e-05 -2.276682e-06 -3.686829e-01  2.505037e+00</span></span>
-<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a></span>
-<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a><span class="do">## correlation matrices between tissue 1 and tissue 2</span></span>
-<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>v[[<span class="dv">1</span>]])</span>
-<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
-<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.7397453</span></span>
-<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a><span class="co">#&gt; [2,] 0.7397453 1.0000000</span></span>
-<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a></span>
-<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a><span class="do">## correlation matrices between tissue 3 and tissue 4</span></span>
-<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>v[[<span class="dv">2</span>]])</span>
-<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a><span class="co">#&gt;          [,1]     [,2]</span></span>
-<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a><span class="co">#&gt; [1,] 1.000000 0.704656</span></span>
-<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a><span class="co">#&gt; [2,] 0.704656 1.000000</span></span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 5.099 /correlation difference: 0.817&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 1.426 /correlation difference: 0.153&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0.261 /correlation difference: 0.578&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.983 /correlation difference: 0.111&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.185 /correlation difference: 0.4&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.639 /correlation difference: 0.072&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.107 /correlation difference: 0.25&quot;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.357 /correlation difference: 0.043&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.059 /correlation difference: 0.144&quot;</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.204 /correlation difference: 0.024&quot;</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.034 /correlation difference: 0.08&quot;</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.118 /correlation difference: 0.013&quot;</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.018 /correlation difference: 0.042&quot;</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.058 /correlation difference: 0.007&quot;</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 15 precision difference: 0.009 /correlation difference: 0.022&quot;</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 16 precision difference: 0.031 /correlation difference: 0.004&quot;</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 17 precision difference: 0.005 /correlation difference: 0.012&quot;</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 18 precision difference: 0.016 /correlation difference: 0.002&quot;</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 19 precision difference: 0.003 /correlation difference: 0.006&quot;</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="do">## precision matrices</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt;  [1,]  1.127936e+01  2.887555e-06  7.419156e+00 -1.091015e-05 -2.688529e-06</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt;  [2,]  2.887555e-06  5.448906e+00 -3.205898e-01  1.019887e+00 -2.480064e-06</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt;  [3,]  7.419156e+00 -3.205898e-01  9.068446e+00  1.647906e-01  1.898544e-05</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.091015e-05  1.019887e+00  1.647906e-01  5.158476e+00  1.053853e+00</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt;  [5,] -2.688529e-06 -2.480064e-06  1.898544e-05  1.053853e+00  9.112636e+00</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt;  [6,] -6.649711e-01 -2.988124e-01 -1.772245e-01  7.167252e-01  3.765792e+00</span></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt;  [7,] -7.168185e-01  8.119203e-02 -5.303356e-05 -2.287869e+00  1.429232e+00</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt;  [8,] -3.474007e-01  1.362682e-02  1.040315e-01 -8.568378e-01  7.885329e-01</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a><span class="co">#&gt;  [9,]  2.753936e-06  3.510515e+00  7.326188e-01  6.345537e-01 -1.622790e+00</span></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a><span class="co">#&gt; [10,]  1.326849e+00 -4.509205e-01 -2.393768e-01 -4.672792e-01 -3.691249e+00</span></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="co">#&gt;              [,6]          [,7]        [,8]          [,9]         [,10]</span></span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co">#&gt;  [1,] -0.66497105 -7.168185e-01 -0.34740066  2.753936e-06  1.326849e+00</span></span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a><span class="co">#&gt;  [2,] -0.29881236  8.119203e-02  0.01362682  3.510515e+00 -4.509205e-01</span></span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a><span class="co">#&gt;  [3,] -0.17722451 -5.303356e-05  0.10403152  7.326188e-01 -2.393768e-01</span></span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a><span class="co">#&gt;  [4,]  0.71672524 -2.287869e+00 -0.85683783  6.345537e-01 -4.672792e-01</span></span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a><span class="co">#&gt;  [5,]  3.76579216  1.429232e+00  0.78853288 -1.622790e+00 -3.691249e+00</span></span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a><span class="co">#&gt;  [6,]  4.75341226 -9.248132e-02 -0.70865439 -1.779111e+00  4.088964e-01</span></span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a><span class="co">#&gt;  [7,] -0.09248132  4.689863e+00  1.15095522 -3.608420e-01  3.680286e-05</span></span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a><span class="co">#&gt;  [8,] -0.70865439  1.150955e+00  2.60294138  1.856966e-01 -1.082930e+00</span></span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co">#&gt;  [9,] -1.77911079 -3.608420e-01  0.18569655  7.144066e+00 -2.112404e+00</span></span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="co">#&gt; [10,]  0.40889642  3.680286e-05 -1.08292952 -2.112404e+00  7.207936e+00</span></span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co">#&gt; [[2]]</span></span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a><span class="co">#&gt;  [1,]  1.003675e+01  9.562811e-07  7.414907e+00  1.271819e+00 -7.513987e-06</span></span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co">#&gt;  [2,]  9.562811e-07  4.778928e+00 -3.205918e-01  1.215289e+00 -1.950698e-05</span></span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="co">#&gt;  [3,]  7.414907e+00 -3.205918e-01  8.696642e+00  1.561959e+00  1.060096e-05</span></span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="co">#&gt;  [4,]  1.271819e+00  1.215289e+00  1.561959e+00  4.995819e+00  5.013236e-01</span></span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a><span class="co">#&gt;  [5,] -7.513987e-06 -1.950698e-05  1.060096e-05  5.013236e-01  1.019689e+01</span></span>
+<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="co">#&gt;  [6,] -1.193383e+00 -7.410822e-01 -1.510481e-01  1.549878e-05  6.182269e+00</span></span>
+<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a><span class="co">#&gt;  [7,] -7.167996e-01  5.818233e-01 -7.530398e-01 -2.058931e+00  1.320319e+00</span></span>
+<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co">#&gt;  [8,] -3.474131e-01 -1.289346e-02 -7.136182e-02 -9.184598e-01  3.900984e-01</span></span>
+<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a><span class="co">#&gt;  [9,]  1.875092e-06  3.082496e+00 -3.353042e-01  6.345387e-01 -2.405969e+00</span></span>
+<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a><span class="co">#&gt; [10,]  1.144703e-02 -3.127550e-01 -2.394451e-01 -3.803616e-01 -9.164841e-01</span></span>
+<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
+<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a><span class="co">#&gt;  [1,] -1.193383e+00 -7.167996e-01 -0.3474131140  1.875092e-06  1.144703e-02</span></span>
+<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a><span class="co">#&gt;  [2,] -7.410822e-01  5.818233e-01 -0.0128934584  3.082496e+00 -3.127550e-01</span></span>
+<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a><span class="co">#&gt;  [3,] -1.510481e-01 -7.530398e-01 -0.0713618192 -3.353042e-01 -2.394451e-01</span></span>
+<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a><span class="co">#&gt;  [4,]  1.549878e-05 -2.058931e+00 -0.9184598352  6.345387e-01 -3.803616e-01</span></span>
+<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a><span class="co">#&gt;  [5,]  6.182269e+00  1.320319e+00  0.3900984490 -2.405969e+00 -9.164841e-01</span></span>
+<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a><span class="co">#&gt;  [6,]  7.274263e+00 -9.233668e-02  0.1604205498 -2.295538e+00  4.088272e-01</span></span>
+<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a><span class="co">#&gt;  [7,] -9.233668e-02  3.702740e+00  0.7863000185  5.369078e-02  1.692242e-05</span></span>
+<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a><span class="co">#&gt;  [8,]  1.604205e-01  7.863000e-01  2.3695737727 -2.089520e-05  2.810736e-01</span></span>
+<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a><span class="co">#&gt;  [9,] -2.295538e+00  5.369078e-02 -0.0000208952  5.926008e+00 -5.391263e-01</span></span>
+<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a><span class="co">#&gt; [10,]  4.088272e-01  1.692242e-05  0.2810735975 -5.391263e-01  2.638650e+00</span></span>
+<span id="cb5-72"><a href="#cb5-72" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" tabindex="-1"></a><span class="do">## correlation matrices between tissue 1 and tissue 2</span></span>
+<span id="cb5-74"><a href="#cb5-74" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>v[[<span class="dv">1</span>]])</span>
+<span id="cb5-75"><a href="#cb5-75" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
+<span id="cb5-76"><a href="#cb5-76" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.7732285</span></span>
+<span id="cb5-77"><a href="#cb5-77" tabindex="-1"></a><span class="co">#&gt; [2,] 0.7732285 1.0000000</span></span>
+<span id="cb5-78"><a href="#cb5-78" tabindex="-1"></a></span>
+<span id="cb5-79"><a href="#cb5-79" tabindex="-1"></a><span class="do">## correlation matrices between tissue 3 and tissue 4</span></span>
+<span id="cb5-80"><a href="#cb5-80" tabindex="-1"></a><span class="fu">cov2cor</span>(aa<span class="sc">$</span>v[[<span class="dv">2</span>]])</span>
+<span id="cb5-81"><a href="#cb5-81" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
+<span id="cb5-82"><a href="#cb5-82" tabindex="-1"></a><span class="co">#&gt; [1,] 1.0000000 0.7572634</span></span>
+<span id="cb5-83"><a href="#cb5-83" tabindex="-1"></a><span class="co">#&gt; [2,] 0.7572634 1.0000000</span></span></code></pre></div>
 </div>
 </div>
 <div id="model-2-longitudinal-data-with-exponential-correlation-structure" class="section level2">
@@ -518,112 +521,115 @@ structure</h2>
 <span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>}</span></code></pre></div>
 <div id="estimate-one-networks" class="section level3">
 <h3>estimate one networks</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.1</span>,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 0 /correlation tau difference: 0.494&quot;</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 0 /correlation tau difference: 1.649&quot;</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0 /correlation tau difference: 1.258&quot;</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0 /correlation tau difference: 1.242&quot;</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0 /correlation tau difference: 0.637&quot;</span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0 /correlation tau difference: 0.634&quot;</span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0 /correlation tau difference: 0.192&quot;</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0 /correlation tau difference: 0.191&quot;</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0 /correlation tau difference: 0.042&quot;</span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0 /correlation tau difference: 0.042&quot;</span></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0 /correlation tau difference: 0.008&quot;</span></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="do">## precision matrix </span></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt;  [1,]  4.416107e+00 -1.837562e-07  2.372341e-07 -1.377261e-07  1.326334e-08</span></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt;  [2,] -1.837562e-07  6.559738e+00 -7.433879e-08  1.216226e-07 -4.005598e-08</span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;  [3,]  2.372341e-07 -7.433879e-08  5.643845e+00 -1.770986e-08  5.923240e-08</span></span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.377261e-07  1.216226e-07 -1.770986e-08  1.547897e+00  3.293770e-08</span></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;  [5,]  1.326334e-08 -4.005598e-08  5.923240e-08  3.293770e-08  3.535152e+00</span></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;  [6,] -7.103898e-08  1.287738e-08 -1.097331e-07 -8.897003e-08 -1.965309e-07</span></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;  [7,]  1.113014e-07 -5.022030e-11  1.210348e-07 -4.188970e-07  1.680174e-08</span></span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.814220e-08  9.238639e-08 -3.842163e-09  2.637756e-07  6.826076e-08</span></span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;  [9,] -1.240114e-07  1.599071e-07 -9.383656e-08  2.734495e-07 -4.393210e-08</span></span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; [10,] -1.370668e-07  5.298510e-08 -1.090318e-07 -6.154526e-06  5.615349e-08</span></span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt;  [1,] -7.103898e-08  1.113014e-07 -1.814220e-08 -1.240114e-07 -1.370668e-07</span></span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt;  [2,]  1.287738e-08 -5.022030e-11  9.238639e-08  1.599071e-07  5.298510e-08</span></span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt;  [3,] -1.097331e-07  1.210348e-07 -3.842163e-09 -9.383656e-08 -1.090318e-07</span></span>
-<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co">#&gt;  [4,] -8.897003e-08 -4.188970e-07  2.637756e-07  2.734495e-07 -6.154526e-06</span></span>
-<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt;  [5,] -1.965309e-07  1.680174e-08  6.826076e-08 -4.393210e-08  5.615349e-08</span></span>
-<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt;  [6,]  5.368035e+00 -8.252598e-08 -1.698259e-07 -2.620023e-08  7.497420e-08</span></span>
-<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt;  [7,] -8.252598e-08  2.395608e+00  1.130900e-08  2.007172e-08 -9.697135e-09</span></span>
-<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.698259e-07  1.130900e-08  3.859826e+00  2.446972e-07  1.921400e-07</span></span>
-<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt;  [9,] -2.620023e-08  2.007172e-08  2.446972e-07  4.841991e+00  7.330156e-08</span></span>
-<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt; [10,]  7.497420e-08 -9.697135e-09  1.921400e-07  7.330156e-08  1.479590e+00</span></span>
-<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="do">## correlation parameter</span></span>
-<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a>aa<span class="sc">$</span>tau</span>
-<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; [1] 2.12781</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fl">0.01</span>,<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,<span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 3.873 /correlation tau difference: 0.494&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 2.351 /correlation tau difference: 1.566&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 1.639 /correlation tau difference: 1.252&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 1.061 /correlation tau difference: 1.148&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 1.016 /correlation tau difference: 0.691&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.46 /correlation tau difference: 0.666&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 7 precision difference: 0.448 /correlation tau difference: 0.278&quot;</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 8 precision difference: 0.148 /correlation tau difference: 0.271&quot;</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 9 precision difference: 0.145 /correlation tau difference: 0.087&quot;</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 10 precision difference: 0.042 /correlation tau difference: 0.085&quot;</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 11 precision difference: 0.041 /correlation tau difference: 0.025&quot;</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 12 precision difference: 0.012 /correlation tau difference: 0.024&quot;</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 13 precision difference: 0.011 /correlation tau difference: 0.007&quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 14 precision difference: 0.003 /correlation tau difference: 0.007&quot;</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="do">## precision matrix </span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;              [,1]        [,2]        [,3]        [,4]        [,5]        [,6]</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;  [1,]  6.54842677  2.70137564 -3.09756636  0.03291847  0.00000000  0.00000000</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;  [2,]  2.70142777  8.76207921  0.00000000 -0.01393295  0.08598649  0.00000000</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;  [3,] -3.09760040  0.00000000  7.60283914  0.00000000  0.00000000  1.52529471</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;  [4,]  0.03292506 -0.01393356  0.00000000  1.53651930  0.00000000  0.01308807</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;  [5,]  0.00000000  0.08598297  0.00000000  0.00000000  3.67493211  1.35064678</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;  [6,]  0.00000000  0.00000000  1.52529599  0.01308789  1.35064653  6.34639561</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt;  [7,] -0.07764525  0.00000000 -0.31933184 -0.14384090  0.00000000  0.09072906</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;  [8,]  0.00000000 -0.19108184  0.00000000 -0.09960491  0.00000000  1.47626911</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt;  [9,]  0.00000000 -2.48551094  0.68363947 -0.27252322  0.17335390  0.00000000</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; [10,]  0.03831921  0.00000000  0.07396617 -0.05951876 -0.02794538 -0.08993859</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt;              [,7]        [,8]       [,9]       [,10]</span></span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co">#&gt;  [1,] -0.07764712  0.00000000  0.0000000  0.03831673</span></span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt;  [2,]  0.00000000 -0.19108098 -2.4855083  0.00000000</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt;  [3,] -0.31933061  0.00000000  0.6836509  0.07396725</span></span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt;  [4,] -0.14384085 -0.09960457 -0.2725231 -0.05951877</span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt;  [5,]  0.00000000  0.00000000  0.1733543 -0.02794544</span></span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt;  [6,]  0.09072895  1.47626925  0.0000000 -0.08993901</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt;  [7,]  2.30346517  0.00000000  0.0000000  0.00000000</span></span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt;  [8,]  0.00000000  4.65607475 -1.7932267 -0.14637455</span></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt;  [9,]  0.00000000 -1.79322724  6.3309743  0.00000000</span></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt; [10,]  0.00000000 -0.14637454  0.0000000  1.45340420</span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="do">## correlation parameter</span></span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a>aa<span class="sc">$</span>tau</span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a><span class="co">#&gt; [1] 1.934393</span></span></code></pre></div>
 </div>
 <div id="estimate-two-networks-based-on-a-grouping-variable-1" class="section level3">
 <h3>estimate two networks based on a grouping variable</h3>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>aa<span class="ot">=</span><span class="fu">lglasso</span>(<span class="at">data=</span>ddata,<span class="at">lambda =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.1</span>),<span class="at">type=</span><span class="st">&quot;expFixed&quot;</span>,<span class="at">expFix=</span><span class="dv">1</span>,<span class="at">group =</span> group, <span class="at">tol =</span> <span class="fl">0.01</span>, <span class="at">trace=</span><span class="cn">TRUE</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 0 /correlation tau difference: 1.441&quot;</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 0 /correlation tau difference: 0.3&quot;</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0 /correlation tau difference: 0.199&quot;</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0 /correlation tau difference: 0.044&quot;</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0 /correlation tau difference: 0.028&quot;</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0 /correlation tau difference: 0.007&quot;</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 1 precision difference: 0.719 /correlation tau difference: 1.441&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 2 precision difference: 0.09 /correlation tau difference: 0.072&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 3 precision difference: 0.004 /correlation tau difference: 0.218&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 4 precision difference: 0.004 /correlation tau difference: 0.014&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 5 precision difference: 0.001 /correlation tau difference: 0.042&quot;</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;iteration 6 precision difference: 0.001 /correlation tau difference: 0.003&quot;</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## precision matrices</span></span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>aa<span class="sc">$</span>wi</span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt;  [1,]  1.313086e+00 -5.891518e-07  9.815374e-07 -1.083690e-08 -2.684323e-07</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt;  [2,] -5.891518e-07  1.133720e+00  3.816124e-07 -3.373304e-07  9.727687e-08</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;  [3,]  9.815374e-07  3.816124e-07  1.091679e+00  6.904581e-08 -7.960213e-08</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.083690e-08 -3.373304e-07  6.904581e-08  9.459764e-01 -2.576641e-08</span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;  [5,] -2.684323e-07  9.727687e-08 -7.960213e-08 -2.576641e-08  1.041988e+00</span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;  [6,] -3.743395e-07 -7.346077e-08  3.262902e-07  7.018458e-07  9.650377e-07</span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;  [7,] -1.720817e-07  2.559723e-07 -1.675681e-06 -3.599218e-06 -5.290948e-07</span></span>
-<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt;  [8,]  1.843534e-07 -7.054392e-07  3.763933e-08 -5.388925e-07 -2.168486e-07</span></span>
-<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt;  [9,]  5.305816e-07 -2.057454e-06  8.356336e-07 -1.037774e-06  1.669021e-07</span></span>
-<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; [10,] -9.017012e-08  8.442348e-08 -3.197168e-08 -8.789473e-08 -1.235441e-07</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt;  [1,]  1.801685e+00  5.273002e-01 -6.630001e-01  3.376162e-06  5.865538e-07</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt;  [2,]  5.273002e-01  1.497532e+00  7.465132e-06 -4.110646e-06  4.560354e-08</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;  [3,] -6.630001e-01  7.465132e-06  1.502536e+00  3.663091e-06  3.599241e-06</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  [4,]  3.376162e-06 -4.110646e-06  3.663091e-06  9.652178e-01  2.038952e-06</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;  [5,]  5.865538e-07  4.560354e-08  3.599241e-06  2.038952e-06  1.104631e+00</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;  [6,] -3.892616e-06  2.187922e-06  3.310905e-01 -2.122161e-06  2.597444e-01</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;  [7,]  9.466810e-06 -7.149834e-06 -2.143376e-01 -1.396152e-01  4.618678e-06</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt;  [8,]  7.661945e-07 -2.231454e-05  3.122991e-06 -3.136640e-02  3.064452e-06</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt;  [9,]  3.234726e-06 -4.944622e-01  9.292785e-02 -4.619151e-02  5.634645e-06</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; [10,]  5.382046e-06 -6.629837e-06  4.309150e-06 -1.951413e-06 -4.924168e-07</span></span>
 <span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
-<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt;  [1,] -3.743395e-07 -1.720817e-07  1.843534e-07  5.305816e-07 -9.017012e-08</span></span>
-<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt;  [2,] -7.346077e-08  2.559723e-07 -7.054392e-07 -2.057454e-06  8.442348e-08</span></span>
-<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.262902e-07 -1.675681e-06  3.763933e-08  8.356336e-07 -3.197168e-08</span></span>
-<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt;  [4,]  7.018458e-07 -3.599218e-06 -5.388925e-07 -1.037774e-06 -8.789473e-08</span></span>
-<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt;  [5,]  9.650377e-07 -5.290948e-07 -2.168486e-07  1.669021e-07 -1.235441e-07</span></span>
-<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt;  [6,]  9.540520e-01  3.540008e-06  6.004535e-07  2.627312e-07 -2.890465e-09</span></span>
-<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt;  [7,]  3.540008e-06  8.842846e-01 -1.543591e-06 -8.959642e-07 -3.243175e-07</span></span>
-<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt;  [8,]  6.004535e-07 -1.543591e-06  1.155190e+00 -4.514371e-06 -7.235024e-08</span></span>
-<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt;  [9,]  2.627312e-07 -8.959642e-07 -4.514371e-06  1.097551e+00  1.119813e-07</span></span>
-<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; [10,] -2.890465e-09 -3.243175e-07 -7.235024e-08  1.119813e-07  1.101881e+00</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt;  [1,] -3.892616e-06  9.466810e-06  7.661945e-07  3.234726e-06  5.382046e-06</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt;  [2,]  2.187922e-06 -7.149834e-06 -2.231454e-05 -4.944622e-01 -6.629837e-06</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.310905e-01 -2.143376e-01  3.122991e-06  9.292785e-02  4.309150e-06</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt;  [4,] -2.122161e-06 -1.396152e-01 -3.136640e-02 -4.619151e-02 -1.951413e-06</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt;  [5,]  2.597444e-01  4.618678e-06  3.064452e-06  5.634645e-06 -4.924168e-07</span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt;  [6,]  1.188607e+00  4.251197e-03  3.297558e-01 -7.274383e-06  1.775263e-07</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt;  [7,]  4.251197e-03  9.259153e-01 -1.295692e-01  5.637979e-06  1.659172e-06</span></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt;  [8,]  3.297558e-01 -1.295692e-01  1.414233e+00 -4.149286e-01 -3.924689e-06</span></span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt;  [9,] -7.274383e-06  5.637979e-06 -4.149286e-01  1.410219e+00 -2.505048e-05</span></span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; [10,]  1.775263e-07  1.659172e-06 -3.924689e-06 -2.505048e-05  1.105320e+00</span></span>
 <span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt; [[2]]</span></span>
 <span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt;                [,1]          [,2]          [,3]          [,4]          [,5]</span></span>
-<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt;  [1,]  1.007844e+00  6.393914e-07 -6.831293e-08 -4.518274e-08 -2.229812e-07</span></span>
-<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt;  [2,]  6.393914e-07  9.774241e-01  1.123150e-06 -1.905967e-07  2.625535e-07</span></span>
-<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt;  [3,] -6.831293e-08  1.123150e-06  1.017051e+00 -8.456301e-08 -3.360219e-07</span></span>
-<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="co">#&gt;  [4,] -4.518274e-08 -1.905967e-07 -8.456301e-08  1.085215e+00 -1.162269e-08</span></span>
-<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a><span class="co">#&gt;  [5,] -2.229812e-07  2.625535e-07 -3.360219e-07 -1.162269e-08  1.023204e+00</span></span>
-<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a><span class="co">#&gt;  [6,] -3.472730e-08 -2.574496e-07  3.526984e-07  2.745331e-07  3.782467e-07</span></span>
-<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a><span class="co">#&gt;  [7,] -1.010933e-06  3.553499e-07 -2.346937e-06 -2.548150e-06 -3.974747e-07</span></span>
-<span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a><span class="co">#&gt;  [8,]  3.770875e-07 -2.246467e-06 -1.900558e-07 -8.349163e-07 -7.717666e-07</span></span>
-<span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a><span class="co">#&gt;  [9,]  2.432200e-06 -5.739866e-06  2.078935e-06 -1.150999e-06  2.933074e-07</span></span>
-<span id="cb8-46"><a href="#cb8-46" tabindex="-1"></a><span class="co">#&gt; [10,] -1.445731e-07  6.871090e-08 -1.070074e-07  1.910630e-07  1.681950e-08</span></span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt;  [1,]  1.569097e+00  5.272850e-01 -6.629955e-01 -1.831165e-06 -4.397312e-06</span></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt;  [2,]  5.272850e-01  1.432002e+00 -5.713488e-06  1.359241e-06  4.654291e-06</span></span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt;  [3,] -6.629955e-01 -5.713488e-06  1.451693e+00 -5.960519e-07 -1.985130e-06</span></span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.831165e-06  1.359241e-06 -5.960519e-07  1.082901e+00  1.864661e-06</span></span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a><span class="co">#&gt;  [5,] -4.397312e-06  4.654291e-06 -1.985130e-06  1.864661e-06  1.069978e+00</span></span>
+<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a><span class="co">#&gt;  [6,]  7.273750e-06 -4.486771e-06  3.311072e-01 -1.995285e-06  2.597454e-01</span></span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a><span class="co">#&gt;  [7,]  9.556521e-06 -1.139737e-05 -8.215750e-02 -3.479353e-02  2.482223e-06</span></span>
+<span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a><span class="co">#&gt;  [8,] -1.904288e-05  2.841497e-06 -1.249635e-05 -3.136286e-02  6.464061e-06</span></span>
+<span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a><span class="co">#&gt;  [9,] -3.284564e-05 -4.944221e-01  9.287611e-02 -4.618618e-02  8.841286e-06</span></span>
+<span id="cb8-46"><a href="#cb8-46" tabindex="-1"></a><span class="co">#&gt; [10,]  6.511341e-06 -8.088453e-06  5.003409e-06 -8.592245e-07 -1.105778e-07</span></span>
 <span id="cb8-47"><a href="#cb8-47" tabindex="-1"></a><span class="co">#&gt;                [,6]          [,7]          [,8]          [,9]         [,10]</span></span>
-<span id="cb8-48"><a href="#cb8-48" tabindex="-1"></a><span class="co">#&gt;  [1,] -3.472730e-08 -1.010933e-06  3.770875e-07  2.432200e-06 -1.445731e-07</span></span>
-<span id="cb8-49"><a href="#cb8-49" tabindex="-1"></a><span class="co">#&gt;  [2,] -2.574496e-07  3.553499e-07 -2.246467e-06 -5.739866e-06  6.871090e-08</span></span>
-<span id="cb8-50"><a href="#cb8-50" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.526984e-07 -2.346937e-06 -1.900558e-07  2.078935e-06 -1.070074e-07</span></span>
-<span id="cb8-51"><a href="#cb8-51" tabindex="-1"></a><span class="co">#&gt;  [4,]  2.745331e-07 -2.548150e-06 -8.349163e-07 -1.150999e-06  1.910630e-07</span></span>
-<span id="cb8-52"><a href="#cb8-52" tabindex="-1"></a><span class="co">#&gt;  [5,]  3.782467e-07 -3.974747e-07 -7.717666e-07  2.933074e-07  1.681950e-08</span></span>
-<span id="cb8-53"><a href="#cb8-53" tabindex="-1"></a><span class="co">#&gt;  [6,]  1.096352e+00  2.515554e-06  1.140517e-06  2.940245e-07  2.550165e-08</span></span>
-<span id="cb8-54"><a href="#cb8-54" tabindex="-1"></a><span class="co">#&gt;  [7,]  2.515554e-06  8.949251e-01 -2.508371e-06 -1.269016e-06 -3.768811e-07</span></span>
-<span id="cb8-55"><a href="#cb8-55" tabindex="-1"></a><span class="co">#&gt;  [8,]  1.140517e-06 -2.508371e-06  8.908261e-01 -1.056921e-05  1.499847e-08</span></span>
-<span id="cb8-56"><a href="#cb8-56" tabindex="-1"></a><span class="co">#&gt;  [9,]  2.940245e-07 -1.269016e-06 -1.056921e-05  8.652142e-01 -2.606840e-07</span></span>
-<span id="cb8-57"><a href="#cb8-57" tabindex="-1"></a><span class="co">#&gt; [10,]  2.550165e-08 -3.768811e-07  1.499847e-08 -2.606840e-07  1.234622e+00</span></span>
+<span id="cb8-48"><a href="#cb8-48" tabindex="-1"></a><span class="co">#&gt;  [1,]  7.273750e-06  9.556521e-06 -1.904288e-05 -3.284564e-05  6.511341e-06</span></span>
+<span id="cb8-49"><a href="#cb8-49" tabindex="-1"></a><span class="co">#&gt;  [2,] -4.486771e-06 -1.139737e-05  2.841497e-06 -4.944221e-01 -8.088453e-06</span></span>
+<span id="cb8-50"><a href="#cb8-50" tabindex="-1"></a><span class="co">#&gt;  [3,]  3.311072e-01 -8.215750e-02 -1.249635e-05  9.287611e-02  5.003409e-06</span></span>
+<span id="cb8-51"><a href="#cb8-51" tabindex="-1"></a><span class="co">#&gt;  [4,] -1.995285e-06 -3.479353e-02 -3.136286e-02 -4.618618e-02 -8.592245e-07</span></span>
+<span id="cb8-52"><a href="#cb8-52" tabindex="-1"></a><span class="co">#&gt;  [5,]  2.597454e-01  2.482223e-06  6.464061e-06  8.841286e-06 -1.105778e-07</span></span>
+<span id="cb8-53"><a href="#cb8-53" tabindex="-1"></a><span class="co">#&gt;  [6,]  1.341390e+00  4.258204e-03  3.297542e-01 -4.426480e-06  2.928617e-07</span></span>
+<span id="cb8-54"><a href="#cb8-54" tabindex="-1"></a><span class="co">#&gt;  [7,]  4.258204e-03  8.892190e-01 -1.269485e-05 -7.122660e-06  9.532044e-07</span></span>
+<span id="cb8-55"><a href="#cb8-55" tabindex="-1"></a><span class="co">#&gt;  [8,]  3.297542e-01 -1.269485e-05  1.132254e+00 -4.149156e-01 -4.696428e-06</span></span>
+<span id="cb8-56"><a href="#cb8-56" tabindex="-1"></a><span class="co">#&gt;  [9,] -4.426480e-06 -7.122660e-06 -4.149156e-01  1.231563e+00 -1.761742e-05</span></span>
+<span id="cb8-57"><a href="#cb8-57" tabindex="-1"></a><span class="co">#&gt; [10,]  2.928617e-07  9.532044e-07 -4.696428e-06 -1.761742e-05  1.227657e+00</span></span>
 <span id="cb8-58"><a href="#cb8-58" tabindex="-1"></a></span>
 <span id="cb8-59"><a href="#cb8-59" tabindex="-1"></a><span class="do">## correlation parameters</span></span>
 <span id="cb8-60"><a href="#cb8-60" tabindex="-1"></a>aa<span class="sc">$</span>tau</span>
-<span id="cb8-61"><a href="#cb8-61" tabindex="-1"></a><span class="co">#&gt; [1] 2.365005 2.091702</span></span></code></pre></div>
+<span id="cb8-61"><a href="#cb8-61" tabindex="-1"></a><span class="co">#&gt; [1] 2.022462 1.985435</span></span></code></pre></div>
 <p>[1] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen
 AG. Identifying stationary microbial interaction networks based on
 irregularly spaced longitudinal 16S rRNA gene sequencing data. Front

@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 ```{r setup, message=FALSE,warning=FALSE}
 library(lglasso)
 # library(devtools)
-# load_all()
+ #load_all()
 ```
 
 
@@ -58,7 +58,7 @@ ddata=dd$data
 ### estimate one network
 
 ```{r, warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.1,type="general",tol = 0.01, trace=TRUE)
+aa=lglasso(data=ddata,lambda = 0.01,type="general",tol = 0.01, trace=TRUE)
 
 ## precision matrix
 aa$wi
@@ -110,7 +110,7 @@ for (i in 1:length(nn)) {
 ### estimate one networks 
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.1,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
+aa=lglasso(data=ddata,lambda = 0.01,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
 
 ## precision matrix 
 aa$wi

@@ -29,7 +29,7 @@ the time point for longitudinal data or tissue ID.}
 is the tuning parameter for the identification of the networks. For details, see the explanations in the below.}
 
 \item{type}{a string specifying which model need to be fitted. There are three models available,
-which are refered as \code{general}, \code{expFixed} and \code{twoPara} respectively.
+which are referred as \code{general}, \code{expFixed} respectively.
  Please see the details in the below for the meaning of each.}
 
 \item{expFix}{numeric number used in the model specification}
@@ -82,7 +82,7 @@ This is the main function of the package, which identifies the underlying  netwo
 This function implements three statistical models for  network inference,
 according to how the correlations is specified between time points (or tissues or
 contents in some clinical studies). These three models are referred as
- \code{general}, \code{expFixed}  and \code{twoPara}.Let's say we have
+ \code{general}, \code{expFixed}.Let's say we have
  two time points,t_i,t_j, then in model \code{general}, the correlation is
   tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
   with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},

@@ -211,10 +211,16 @@ BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
 #     }else{
 #       contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
 # }
-obj=-obj+aa+bb
+
+    if (m==1){
+      S_est=list(glasso::glasso(s=amatrix/(nn*nrow(Ai)), rho = lambda[1])$wi)
+    }else{
+obj=-obj+lambda[1]*aa+lambda[2]*bb
+#obj=-obj+aa+bb
 prob=Problem(Minimize(obj))
 result=CVXR::solve(prob)
 S_est= lapply(B, function(x) result$getValue(x))
+}
 return(wiList=S_est)
   }
 
@@ -255,8 +261,10 @@ return(wiList=S_est)
       if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
       amatrix=0
       # Create a mask matrix
-      mask <- matrix(1, p, p)
-      diag(mask) <- 0
+      mask1 <- matrix(lambda[1], p, p)
+      diag(mask1) <- 0
+      mask2 <- matrix(lambda[2], p, p)
+      diag(mask2) <- 0
       for (j in 1:nn) {
         xx=as.matrix(data_sub[[j]])
         yy=solve(as.matrix(Ai[[j]]))
@@ -264,12 +272,12 @@ return(wiList=S_est)
         amatrix=t(xx)%*%yy%*%xx+amatrix
       }
       obj=log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix)/nrow(dd)+obj
-      aa=aa+ sum(abs(B[[i]])*mask)
+      aa=aa+ sum(abs(B[[i]])*mask1)
 
       if (m>1){
         if (i>=2){
           for (j in 1:(i-1)) {
-            bb=bb+sum(abs(B[[i]]-B[[j]])*mask)
+            bb=bb+sum(abs((B[[i]]-B[[j]]))*mask2)
           }
         }
       }
@@ -281,16 +289,18 @@ return(wiList=S_est)
     # }else{
     #   contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
     # }
-obj=-obj+aa+bb
-
-#prob=Problem(Maximize(obj),contr)
+#obj=-obj+lambda[1]*aa+lambda[2]*bb
+    obj=-obj+aa+bb
+if (m==1){
+  S_est=list(glasso::glasso(s=amatrix/(nrow(dd)),rho=lambda[1])$wi)
+}else{
     prob=Problem(Minimize(obj))
     result=CVXR::solve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
     return(wiList=S_est)
-
   }
-
+  }
+}
   # if (type == "twoPara"){
   #   p=ncol(data)-2
   #   nn=length(unique(data[,1]))
@@ -318,7 +328,7 @@ obj=-obj+aa+bb
   #
   # }
 
-}
+
 
 
 #' @title Longitudinal graphical lasso
@@ -334,7 +344,7 @@ obj=-obj+aa+bb
 #' @param lambda   vector of length 1 or 2,  which
 #' is the tuning parameter for the identification of the networks. For details, see the explanations in the below.
 #' @param type a string specifying which model need to be fitted. There are three models available,
-#' which are refered as \code{general}, \code{expFixed} and \code{twoPara} respectively.
+#' which are referred as \code{general}, \code{expFixed} respectively.
 #'  Please see the details in the below for the meaning of each.
 #' @param expFix  numeric number used in the model specification
 #' @param group  vector  of length \code{n} if supplied which specify which data
@@ -370,7 +380,7 @@ obj=-obj+aa+bb
 #' @details This function implements three statistical models for  network inference,
 #' according to how the correlations is specified between time points (or tissues or
 #' contents in some clinical studies). These three models are referred as
-#'  \code{general}, \code{expFixed}  and \code{twoPara}.Let's say we have
+#'  \code{general}, \code{expFixed}.Let's say we have
 #'  two time points,t_i,t_j, then in model \code{general}, the correlation is
 #'   tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
 #'   with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
@@ -495,7 +505,7 @@ while(1){
   k=k+1
   #browser()
 A1=AA(data = data,B = B, type=type,expFix,...)
-B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init, ...)
+B1=BB(data=data,A=A,lambda = lambda, type=type,start=start, w.init=w.init,wi.init=wi.init, ...)
 d1=c()
 d2=c()
 for (i in 1:length(B1)) {
