@@ -9,7 +9,7 @@ phifunction=function(t,tau){
     M=matrix(nrow = n, ncol = n)
     for (i in 1:n) {
       for (j in i:n){
-        M[i,j]=exp(-tau[1]*(abs(t[i]-t[j])))^tau[2]
+        M[i,j]=exp(-tau[1]*(abs(t[i]-t[j])))
         M[j,i]=M[i,j]
       }
     }
@@ -50,7 +50,7 @@ if (!is.list(data)){
     if (ncol(bb)!=p | nrow(bb)!=p){
       stop("Inputs do not match with each other!")
       }
-    A=Variable(m3,m3,PSD=T) # tissue wise inverse correlation matrix
+    A=Variable(m3,m3,PSD=TRUE) # tissue wise inverse correlation matrix
     obj1=(p*nn)/2*log_det(A)
     data_sub=split(dd[,-c(1,2)],dd[,1])
     amatrix=Reduce("+",lapply(data_sub, function(B,xx){as.matrix(xx)%*%B%*%t(as.matrix(xx))}, B=bb))
@@ -147,6 +147,7 @@ if (!is.list(data)){
 
 
 
+
 BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("warm","cold"),w.init=NULL,wi.init=NULL,...){
 
@@ -191,7 +192,7 @@ BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
       nn=length(unique(dd[,1]))
       amatrix=Reduce("+",lapply(data_sub,
       function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=Ai))
-          B[[i]]=Variable(p,p,PSD=T) # tissue wise inverse correlation matrix
+          B[[i]]=Variable(p,p,PSD=TRUE) # tissue wise inverse correlation matrix
           obj=(nn*nrow(Ai))/2*log_det(B[[i]])-0.5*matrix_trace(B[[i]]%*%amatrix)+obj
           # Create a mask matrix
           mask <- matrix(1, p, p)
@@ -257,7 +258,7 @@ return(wiList=S_est)
       nn=length(unique(dd[,1]))
       p=ncol(dd)-2
       data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
-      B[[i]]=Variable(p,p,PSD=T) # tissue wise inverse correlation matrix
+      B[[i]]=Variable(p,p,PSD=TRUE) # tissue wise inverse correlation matrix
       if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
       amatrix=0
       # Create a mask matrix
@@ -634,16 +635,16 @@ cvErrorji=function(data.train,data.valid,bi){
 
       xx=as.matrix(cbind(1,data.valid[,index+2,drop=FALSE]))
       err=(yy-xx%*%coef.train)^2
-      cv_error=c(cv_error,mean(err[,,drop=T]))
+      cv_error=c(cv_error,mean(err[,,drop=TRUE]))
       if (any(is.na(cv_error))) {
         print("cv error is missing!")
-        browser()}
+        #browser()}
     }
 
   return(mean(cv_error))
 }
 
-
+}
 
 cvErrorj=function(data.train,data.valid,B){
     a= mean(apply(B, 2, function(bi) cvErrorji(data.train=data.train,data.valid=data.valid,bi=bi)))
@@ -983,11 +984,11 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
   ## true structure
   if (ncol(cc)!=m3){stop("Unmatched inputs!")}
   real_stru=matrix(0, nrow = p, ncol = p)
-  real_stru[lower.tri(real_stru,diag = T)]=1
-  index=which(real_stru==0,arr.ind = T)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
   a=sample(1:nrow(index),m1, replace = F)
   real_stru[index[a,]]=1
-  real_stru[lower.tri(real_stru,diag = T)]=0
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
   real_stru=real_stru+t(real_stru)+diag(p)
   mu=rep(0,p*m3)
   Precision=list()
@@ -1005,7 +1006,7 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
           theta = theta * real_stru
 
           # force it to be positive definite
-          theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
+          theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
           Precision=theta
           Sigma=kronecker(cc,solve(theta))
     fullCovariance=Sigma
@@ -1023,11 +1024,11 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
           next()
         }else{
           distrubance=matrix(0, nrow = p, ncol = p)
-          distrubance[lower.tri(distrubance,diag = T)]=1
-          index=which(distrubance==0,arr.ind = T)
+          distrubance[lower.tri(distrubance,diag = TRUE)]=1
+          index=which(distrubance==0,arr.ind = TRUE)
           a=sample(1:nrow(index),m2, replace = F)
           distrubance[index[a,]]=1
-          distrubance[lower.tri(distrubance,diag = T)]=0
+          distrubance[lower.tri(distrubance,diag = TRUE)]=0
           distrubance=distrubance+t(distrubance)+diag(p)
           prior_stru=(real_stru+distrubance)%%2
 
@@ -1044,7 +1045,7 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
           theta = theta * prior_stru
 
           # force it to be positive definite
-          theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
+          theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
           colnames(theta)=paste0("metabolite",1:p)
           rownames(theta)=paste0("metabolite",1:p)
           Precision[[i]][[j]]=theta
@@ -1057,7 +1058,7 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
       mmlist[[k]]=do.call(cbind,Sigma[[k]])
     }
     fullCovariance=do.call(rbind,mmlist)
-    fullCovariance=MakePositiveDefinite(fullCovariance,pd_strategy = "diagonally_dominant",scale = T)$omega
+    fullCovariance=MakePositiveDefinite(fullCovariance,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
 
   }
 
@@ -1084,23 +1085,45 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
 
 
 
-simulate_long=function(n,p,m1,tau){
+simulate_long=function(n,p,m1,tt=5,m2=0,tau=1){
   ## true structure
-  timepoint=vector("list",n)
+  timepoint1=vector("list",n)
+  timepoint2=vector("list",n)
 
   for (i in 1:n) {
-    m3=sample(x=1:15,1,prob = rep(1,1,length=15))
+    m3=sample(x=1:tt,1,prob = rep(1,1,tt))
+    if (length(tau)==1){
     t1=stats::rexp(m3)
-    timepoint[[i]]=cumsum(t1)
+    timepoint1[[i]]=cumsum(t1)[1:m3]
+    }else{
+      t1=stats::rexp(2*m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+      timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
+    }
   }
-  cc=lapply(timepoint,phifunction, tau=tau)
+  cc1=lapply(timepoint1,phifunction, tau=tau[1])
+  if (length(tau)==2){
+  cc2=lapply(timepoint2,phifunction, tau=tau[2])
+  }
   real_stru=matrix(0, nrow = p, ncol = p)
-  real_stru[lower.tri(real_stru,diag = T)]=1
-  index=which(real_stru==0,arr.ind = T)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
   a=sample(1:nrow(index),m1, replace = F)
   real_stru[index[a,]]=1
-  real_stru[lower.tri(real_stru,diag = T)]=0
-  real_stru=real_stru+t(real_stru)+diag(p)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
+  real_stru1=real_stru+t(real_stru)+diag(p)
+
+
+  distrubance=matrix(0, nrow = p, ncol = p)
+  distrubance[lower.tri(distrubance,diag = TRUE)]=1
+  index=which(distrubance==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m2, replace = F)
+  distrubance[index[a,]]=1
+  distrubance[lower.tri(distrubance,diag = TRUE)]=0
+  distrubance=distrubance+t(distrubance)+diag(p)
+  real_stru2=(real_stru1+distrubance)%%2
+
+
   Precision=list()
   Sigma=list()
 
@@ -1110,28 +1133,54 @@ simulate_long=function(n,p,m1,tau){
   theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
   theta[lower.tri(theta, diag = TRUE)] = 0
   theta = theta + t(theta) + diag(p)
-  theta = theta * real_stru
-  theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
+  theta1 = theta * real_stru1
+  theta2 = theta * real_stru2
+  theta1=MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  theta2=MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
   #colnames(theta)=paste0("metabolite",1:p)
   #rownames(theta)=paste0("metabolite",1:p)
-  sigma=solve(theta)
-  fullCovariance= lapply(cc,function(x,cc) {kronecker(cc,x)},x=sigma)
+  sigma1=solve(theta1)
+  sigma2=solve(theta2)
+  fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
+  if (length(tau)==2){
+    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma1)
+  }
   fulldata=c()
-  a=c()
+  a1=c()
+  a2=c()
   for (i in 1:n) {
     ai=c()
-    m3=length(timepoint[[i]])
-    mu=rep(0,m3*p)
-    data=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance[[i]])
-    for (j in 1:m3) {
-      ai=as.data.frame(rbind(ai,data[c(((j-1)*p+1) :(j*p))]))
+    m3=nrow(fullCovariance1[[i]])
+    mu=rep(0,m3)
+    data1=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance1[[i]])
+    for (j in 1:(m3/p)) {
+      ai=as.data.frame(rbind(ai,data1[c(((j-1)*p+1) :(j*p))]))
     }
-    subject=rep(paste0("subject",i),m3)
-    ai=cbind(subject,timepoint[[i]],ai)
-    a=rbind(a,ai)
+    subject=paste0("subject",i)
+    ai=cbind(subject,timepoint1[[i]],ai)
+    a1=rbind(a1,ai)
+  }
+  colnames(a1)[2]="time"
+
+  if (length(tau)==2){
+    for (i in 1:n) {
+    ai=c()
+    m3=nrow(fullCovariance2[[i]])
+    mu=rep(0,m3)
+    data2=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance2[[i]])
+    for (j in 1:(m3/p)) {
+      ai=as.data.frame(rbind(ai,data2[c(((j-1)*p+1) :(j*p))]))
+    }
+
+    subject=paste0("subject",i)
+    ai=cbind(subject,timepoint2[[i]],ai)
+    a2=rbind(a2,ai)
+    }
+    colnames(a2)[2]="time"
+    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2)))
   }
 
-  return(list(data=a,B=theta,timepoint=timepoint))
+  return(list(data=a1,network=real_stru1))
 }
 
 
@@ -1154,11 +1203,11 @@ simulate_heter=function(n,p,m1,alpha){
   }
 
   real_stru=matrix(0, nrow = p, ncol = p)
-  real_stru[lower.tri(real_stru,diag = T)]=1
-  index=which(real_stru==0,arr.ind = T)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
   a=sample(1:nrow(index),m1, replace = F)
   real_stru[index[a,]]=1
-  real_stru[lower.tri(real_stru,diag = T)]=0
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
   real_stru=real_stru+t(real_stru)+diag(p)
   Precision=list()
   Sigma=list()
@@ -1170,7 +1219,7 @@ simulate_heter=function(n,p,m1,alpha){
   theta = theta + t(theta)
   diag(theta)=1
   theta = theta * real_stru
-  theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = T)$omega
+  theta=MakePositiveDefinite(theta,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
   #colnames(theta)=paste0("metabolite",1:p)
   #rownames(theta)=paste0("metabolite",1:p)
   sigma=solve(theta)
@@ -1220,7 +1269,7 @@ simulate_heter=function(n,p,m1,alpha){
 #'
 #' @returns list that include the relevant inputs and data generated.
 #' @export
-Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,cc=diag(m3),tau=c(2,1),alpha=2){
+Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2){
   type=match.arg(type)
 
   if (type=="general"){
@@ -1228,7 +1277,7 @@ Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=
   }
 
   if (type=="longihomo"){
-    data=simulate_long(n=n,p=p,m1=m1,tau=tau)
+    data=simulate_long(n=n,p=p,m1=m1,m2=m2,tau=tau,tt=tt)
   }
 
   if (type=="longiheter"){

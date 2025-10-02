@@ -11,6 +11,7 @@ Simulate(
   m1 = 20,
   m2 = 10,
   m3 = 3,
+  tt = 5,
   cc = diag(m3),
   tau = c(2, 1),
   alpha = 2

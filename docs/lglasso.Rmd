@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE}
-library(lglasso)
-# library(devtools)
- #load_all()
+#library(lglasso)
+ library(devtools)
+ load_all()
 ```
 
 
@@ -89,18 +89,10 @@ cov2cor(aa$v[[2]])
 ```{r,warning=FALSE}
 library(forcats)
 set.seed(5)
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
-ddata=dd$data
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=3,tau=c(2,1),tt=4)
+ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
-nn=table(subjects)
-group=c()
-for (i in 1:length(nn)) {
- if (nn[i]>2){
-   group=c(group,c(1,1,rep(2,nn[i]-2)))
- }else{
-   group=c(group,rep(1,nn[i]))
- } 
-}
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 ```
 
 
