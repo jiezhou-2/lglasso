@@ -52,7 +52,7 @@ if (!is.list(data)){
       }
     A=Variable(m3,m3,PSD=TRUE) # tissue wise inverse correlation matrix
     obj1=(p*nn)/2*log_det(A)
-    data_sub=split(dd[,-c(1,2)],dd[,1])
+    data_sub=split(dd[,-c(1,2)],f=factor(dd[,1],levels=unique(dd[,1])))
     amatrix=Reduce("+",lapply(data_sub, function(B,xx){as.matrix(xx)%*%B%*%t(as.matrix(xx))}, B=bb))
     obj2=-0.5*matrix_trace(A%*%amatrix)
     obj=-(obj1+obj2)
@@ -80,8 +80,8 @@ if (!is.list(data)){
       }
 
     #YY=Variable(p,p,PSD=TRUE)
-    time_list=split(dd[,2],factor(dd[,1],unique(dd[,1])))
-    subdata_list=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
+    time_list=split(dd[,2],f=factor(dd[,1],levels=unique(dd[,1])))
+    subdata_list=split(dd[,-c(1,2)],factor(dd[,1],levels=unique(dd[,1])))
 
     likefun=function(tau){
       obj1=0
@@ -188,7 +188,7 @@ BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
       Ai=A[[i]]
       dd=data[[i]]
       p=ncol(dd)-2
-      data_sub=split(dd[,-c(1,2)],dd[,1])
+      data_sub=split(dd[,-c(1,2)],f=factor(dd[,1],levels=unique(dd[,1])))
       nn=length(unique(dd[,1]))
       amatrix=Reduce("+",lapply(data_sub,
       function(A,xx){t(as.matrix(xx))%*%solve(A)%*%as.matrix(xx)}, A=Ai))
@@ -269,8 +269,8 @@ return(wiList=S_est)
       for (j in 1:nn) {
         xx=as.matrix(data_sub[[j]])
         yy=solve(as.matrix(Ai[[j]]))
-        #browser()
         amatrix=t(xx)%*%yy%*%xx+amatrix
+        #amatrix=t(xx)%*%xx+amatrix
       }
       obj=log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix)/nrow(dd)+obj
       aa=aa+ sum(abs(B[[i]])*mask1)
@@ -284,13 +284,6 @@ return(wiList=S_est)
       }
     }
 
-
-    # if (m==1){
-    #   contr=list(aa<=1/lambda[1])
-    # }else{
-    #   contr=list(aa<=1/lambda[1],bb<=1/lambda[2])
-    # }
-#obj=-obj+lambda[1]*aa+lambda[2]*bb
     obj=-obj+aa+bb
 if (m==1){
   S_est=list(glasso::glasso(s=amatrix/(nrow(dd)),rho=lambda[1])$wi)
@@ -390,12 +383,21 @@ if (m==1){
 #'    from different tissues or contents, model \code{general} should be adopted.
 #'
 #'
-lglasso=function(data,lambda, type=c("general","expFixed"),expFix=1,group=NULL,maxit=30,
-                 tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"), w.init=NULL, wi.init=NULL,trace=FALSE,
+lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
+                 tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
+                 w.init=NULL, wi.init=NULL,trace=FALSE, type=c("expFixed"),
                  ...)
 
   {
-p=ncol(data)-2
+if (type!="expFixed"){
+  stop("type can be be expFixed currently!")
+}
+
+  p=ncol(data)-2
+  X_bar = apply(data[,-c(1,2)], 2, mean)
+  data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
+
+  if (random==FALSE){
 
 if (is.null(group))  {
   data=list(data)
@@ -410,9 +412,7 @@ if (is.null(group))  {
       stop("group should be the same length of the columns of data!")
     }
 
-    X_bar = apply(data[,-c(1,2)], 2, mean)
-    data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = TRUE)
-    data=split(data,group)
+    data=split(data,f=factor(group,levels = unique(group)))
 
     if (!length(lambda)==2){
       stop("Arguments (group, lambda) do not match!")
@@ -537,8 +537,286 @@ if (k>=maxit){
 
     }
 return(output)
+  }
+  if (random==TRUE){
+
+    if (is.null(group))  {
+      if (length(lambda)!=1){
+        stop("Arguments (group, lambda) do not match!")
+      }
+    }
+
+    if (!is.null(group))  {
+
+      if (length(group)!=nrow(data)){
+        stop("group should be the same length of the columns of data!")
+      }
+
+
+      if (!length(lambda)==2){
+        stop("Arguments (group, lambda) do not match!")
+      }
+
+
+    }
+
+
+
+    if (!all(lambda>0)){
+      stop("lambda must be positive!")
+    }
+output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=maxit,
+                   tol=tol,trace=trace)
+  }
+  return(output)
 }
 
+#' Title
+#'
+#' @param tau
+#' @param datai
+#' @param wi
+#' @param alpha
+#' @param groupi
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+conDensityTau=function(tau, datai,wi,alpha,groupi){
+
+
+  if (is.null(groupi)){
+    groupi=rep(1,nrow(datai))
+  }else{
+    if (length(groupi)!=nrow(datai)){
+      stop("group should be the same length of the columns of data!")
+    }
+
+    if (length(unique(groupi))!= length(wi)){
+      stop("the format of groupi does not match that of sigmaM!")
+    }
+  }
+  data=split(datai,f=factor(groupi,levels = unique(groupi)))
+  nn=length(unique(groupi))
+  likelihood=1
+  p=nrow(wi[[1]])
+  for (i in 1:nn) {
+    timepoints=data[[i]][,2]
+    phiMi=phifunction(t=timepoints,tau=tau)
+    s=t(as.matrix(data[[i]][,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(data[[i]][,-c(1,2)])%*%wi[[i]]
+    a=det(phiMi)^(-p/2)*exp(-0.5*sum(diag(s)))
+    likelihood=a*likelihood
+  }
+  likelihoodi=likelihood*exp(-alpha*tau)
+  return(likelihoodi=likelihoodi)
+}
+
+#' Title
+#'
+#' @param n
+#' @param datai
+#' @param wi
+#' @param alpha
+#' @param groupi
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+importanceSample=function(n,datai,wi,alpha,groupi){
+  dd1=matrix(rexp(n=n,rate=alpha),ncol=1)
+  likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
+  likelihood2=apply(dd1, 1, dexp,rate=alpha)
+  index1=which(!is.nan(likelihood1))
+  index2=which(!is.infinite(likelihood1) )
+index=intersect(index1,index2)
+  weights=likelihood1[index]/likelihood2[index]
+  norWeights=weights/sum(weights)
+  aa=data.frame(sample=dd1[index],weight=norWeights)
+  return(aa)
+}
+
+#' Title
+#'
+#' @param importancesSample
+#' @param datai
+#' @param groupi
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+importanceEstimates=function(importancesSample,datai,groupi){
+
+  data=split(datai,f=factor(groupi,levels = unique(groupi)))
+  sample0=importancesSample[,1]
+  ff=seq(1,length(sample0),1)
+  sampleTau=split(sample0,f=ff)
+  weightTau=importancesSample[,2]
+  estimateTau=sum(sample0*weightTau)
+  estimatePhi=vector("list",length(data))
+  for (i in 1:length(data)) {
+    timepoints=data[[i]][,2]
+    phiMi=lapply(sampleTau,phifunction,t=timepoints)
+    #s=lapply(phiMi,function(phiMi) {t(data[[i]][,-c(1,2)])%*%solve(phiMi)%*%data[[i]][,-c(1,2)]})
+    aa=0
+    for (j in 1:length(phiMi)) {
+      aa=aa+phiMi[[j]]*weightTau[j]
+    }
+    estimatePhi[[i]]=aa
+  }
+  estimates=c(estimateTau=estimateTau,estimatePhi=estimatePhi)
+  return(estimates)
+}
+
+
+#' Title
+#'
+#' @param data
+#' @param wi
+#' @param alpha
+#' @param group
+#' @param l
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+AAheter=function(data,wi,alpha,group,l){
+  subjects=unique(data[,1])
+  nn=length(unique(group))
+  A=vector("list",length(subjects))
+  Tau=matrix(nrow=length(subjects),ncol=1)
+  simTau=matrix(rexp(n=l,rate=alpha),ncol=1)
+  #browser()
+  dataList=split(data,f=factor(data[,1],levels=subjects))
+  groupList=split(group,f=factor(data[,1],levels=subjects))
+  for (i in 1:length(subjects)) {
+    datai=dataList[[i]]
+    groupi=groupList[[i]]
+      imSample=importanceSample(n=l,datai=datai,wi=wi,alpha=alpha,groupi =groupi )
+      index=which(!is.nan(imSample[,2]))
+      imSample=imSample[index,]
+      imporResults=importanceEstimates(importancesSample=imSample,datai=datai,groupi = groupi)
+      Tau[i,1]=imporResults$estimateTau
+      A[[i]]=list(imporResults$estimatePhi1,imporResults$estimatePhi2)
+  }
+  AA=vector("list",nn)
+
+  for (i in 1:nn) {
+    AA[[i]]=vector("list",length(subjects))
+    for (j in 1:length(subjects)) {
+      AA[[i]][[j]]=A[[j]][[i]]
+    }
+  }
+
+  return(list(Tau=Tau,AA=AA))
+}
+
+
+
+#' Title
+#'
+#' @param data
+#' @param lambda
+#' @param expFix
+#' @param group
+#' @param maxit
+#' @param tol
+#' @param trace
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+lglassoHeter=function(data,lambda,expFix,group,maxit,
+                      tol=10^(-3),trace=FALSE,start=c("warm","cold"), w.init=NULL, wi.init=NULL, N)
+
+{
+  p=ncol(data)-2
+  m=length(unique(data[,1]))
+  X_bar = apply(data[,-c(1,2)], 2, mean)
+  data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
+  if (is.null(group))  {
+    if (length(lambda)!=1){
+      stop("Arguments (group, lambda) do not match!")
+    }
+  }
+
+  if (!is.null(group))  {
+
+    if (length(group)!=nrow(data)){
+      stop("group should be the same length of the columns of data!")
+    }
+
+
+    dataList=split(data,f=factor(group,levels = unique(group)))
+
+    if (length(lambda)!= length(unique(group))){
+      stop("Arguments (group, lambda) do not match!")
+    }
+
+  }
+
+nn=length(unique(group))
+
+  if (!all(lambda>0)){
+    stop("lambda must be positive!")
+  }
+
+  # Create a mask matrix
+  mask <- matrix(1, p, p)
+  diag(mask) <- 0
+
+
+  if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){
+    stop("Argument expFix is not correctly specified!")
+  }
+
+  B=vector("list",nn)
+
+  for (i in 1:length(B)) {
+    B[[i]]=diag(p)
+  }
+  k=0
+  tau0=rep(1,m)
+  alpha0=1
+  while(1){
+    k=k+1
+    A1=AAheter(data=data,wi=B,alpha=alpha0,group=group,l=N)
+    B1=BB(data=dataList,A=A1$AA,lambda = lambda, type="expFixed",start=start, w.init=w.init,wi.init=wi.init)
+    d1=c()
+    d2=c()
+    for (i in 1:length(B1)) {
+      d1=c(d1,round(max(abs(B[[i]]-B1[[i]])*mask),3))
+      d2=c(d2,round(max(abs(alpha0-1/mean(A1$Tau))),3))
+    }
+    if (trace){
+      print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation tau difference: ",max(d2)))
+    }
+
+    if (max(d1)<=tol && max(d2)<= tol ){
+      output=structure(list(wi=B1, tau=A1$Tau,alpha=1/mean(A1$Tau)), class="lglasso")
+      break
+    }else{
+      A=A1$AA
+      B=B1
+      tau0=A1$Tau
+      alpha0=1/mean(tau0)
+    }
+
+    if (k>=maxit){
+      warning("Algorithm did not converge!")
+      output=structure(list(wi=B1, tau=tau0,alpha=alpha0), class="lglasso")
+      break
+    }
+
+  }
+
+
+  return(output)
+}
 
 
 
@@ -677,8 +955,8 @@ cvError=function(data.train,data.valid,B,group.train=NULL,group.valid=NULL){
     stop("group does not match dat sets!")
   }
 
-  data.train.sub=split(data.train,group.train)
-  data.valid.sub=split(data.valid,group.valid)
+  data.train.sub=split(data.train,f=factor(group.train,levels=unique(group.train)))
+  data.valid.sub=split(data.valid,f=factor(group.valid,levels=unique(group.valid)))
 
 
 if (any(names(data.train.sub)!=names(B)) | any(names(data.valid.sub)!= names(B))) {
@@ -1085,7 +1363,7 @@ simulate_general=function(n,p,m1,m2=0,m3,cc){
 
 
 
-simulate_long=function(n,p,m1,tt=5,m2=0,tau=1){
+simulate_long=function(n,p,m1,tt=5,m2=0,tau){
   ## true structure
   timepoint1=vector("list",n)
   timepoint2=vector("list",n)
@@ -1184,6 +1462,107 @@ simulate_long=function(n,p,m1,tt=5,m2=0,tau=1){
 }
 
 
+simulate_randomTau=function(n,p,m1,tt,m2,alpha,group){
+  ## true structure
+  timepoint1=vector("list",n)
+  timepoint2=vector("list",n)
+  cc1=vector("list",n)
+  cc2=vector("list",n)
+trueTau=rexp(n=n,rate=alpha)
+  for (i in 1:n) {
+    m3=sample(x=1:tt,1,prob = rep(1,1,tt))
+    if (group==1){
+      t1=stats::rexp(m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
+    }else{
+      t1=stats::rexp(2*m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+      timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
+      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
+      cc2[[i]]=phifunction(t=timepoint2[[i]],tau=trueTau[i])
+    }
+  }
+
+
+
+  real_stru=matrix(0, nrow = p, ncol = p)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m1, replace = F)
+  real_stru[index[a,]]=1
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
+  real_stru1=real_stru+t(real_stru)+diag(p)
+
+
+  distrubance=matrix(0, nrow = p, ncol = p)
+  distrubance[lower.tri(distrubance,diag = TRUE)]=1
+  index=which(distrubance==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m2, replace = F)
+  distrubance[index[a,]]=1
+  distrubance[lower.tri(distrubance,diag = TRUE)]=0
+  distrubance=distrubance+t(distrubance)+diag(p)
+  real_stru2=(real_stru1+distrubance)%%2
+
+
+  Precision=list()
+  Sigma=list()
+
+
+
+  mmlist=list()
+  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+  theta[lower.tri(theta, diag = TRUE)] = 0
+  theta = theta + t(theta) + diag(p)
+  theta1 = theta * real_stru1
+  theta2 = theta * real_stru2
+  theta1=MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  theta2=MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  #colnames(theta)=paste0("metabolite",1:p)
+  #rownames(theta)=paste0("metabolite",1:p)
+  sigma1=solve(theta1)
+  sigma2=solve(theta2)
+  fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
+  if (group==2){
+    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma1)
+  }
+  fulldata=c()
+  a1=c()
+  a2=c()
+  for (i in 1:n) {
+    ai=c()
+    m3=nrow(fullCovariance1[[i]])
+    mu=rep(0,m3)
+    data1=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance1[[i]])
+    for (j in 1:(m3/p)) {
+      ai=as.data.frame(rbind(ai,data1[c(((j-1)*p+1) :(j*p))]))
+    }
+    subject=paste0("subject",i)
+    ai=cbind(subject,timepoint1[[i]],ai)
+    a1=rbind(a1,ai)
+  }
+  colnames(a1)[2]="time"
+
+  if (group==2){
+    for (i in 1:n) {
+      ai=c()
+      m3=nrow(fullCovariance2[[i]])
+      mu=rep(0,m3)
+      data2=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance2[[i]])
+      for (j in 1:(m3/p)) {
+        ai=as.data.frame(rbind(ai,data2[c(((j-1)*p+1) :(j*p))]))
+      }
+
+      subject=paste0("subject",i)
+      ai=cbind(subject,timepoint2[[i]],ai)
+      a2=rbind(a2,ai)
+    }
+    colnames(a2)[2]="time"
+    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=trueTau))
+  }
+
+  return(list(data=list(pre=a1),network=list(pre=real_stru1),tau=trueTau))
+}
 
 
 
@@ -1269,7 +1648,7 @@ simulate_heter=function(n,p,m1,alpha){
 #'
 #' @returns list that include the relevant inputs and data generated.
 #' @export
-Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2){
+Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
   type=match.arg(type)
 
   if (type=="general"){
@@ -1282,7 +1661,7 @@ Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=
 
   if (type=="longiheter"){
 
-    data=simulate_heter(n=n, p=p,m1=m1, alpha=alpha)
+    data=simulate_randomTau(n=n, p=p,m1=m1,m2=m2,tt=tt, alpha=alpha,group = group)
   }
 
   return(data)

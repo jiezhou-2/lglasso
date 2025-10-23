@@ -7,10 +7,11 @@
 lglasso(
   data,
   lambda,
-  type = c("general", "expFixed"),
+  type = c("expFixed", "general"),
   expFix = 1,
+  random = FALSE,
   group = NULL,
-  maxit = 30,
+  maxit = 80,
   tol = 10^(-3),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
