@@ -89,7 +89,7 @@ if (!is.list(data)){
       for (i in 1:nn) {
         datai=as.matrix(subdata_list[[i]])
         t=time_list[[i]]
-        Aa=phifunction(t=t,tau = c(tau,expFix))
+        Aa=phifunction(t=t,tau = tau)
         amatrix=datai%*%bb%*%t(datai)
         obji1=-0.5*p*log(det(Aa))
         obji2= -0.5*sum(diag(solve(Aa)%*%amatrix))
@@ -101,7 +101,7 @@ if (!is.list(data)){
 
     tau=stats::optim(c(tau0[1]),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
     Tau=c(Tau,tau)
-    A=lapply(time_list,phifunction,tau=c(tau,expFix))
+    A=lapply(time_list,phifunction,tau=tau)
     corMatrix[[i]]=A
   }
     return(list(corMatrix=corMatrix,tau=Tau))
@@ -390,7 +390,7 @@ lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
 
   {
 if (type!="expFixed"){
-  stop("type can be be expFixed currently!")
+  stop("type can only be expFixed currently!")
 }
 
   p=ncol(data)-2
@@ -583,7 +583,7 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=
 #' @export
 #'
 #' @examples
-conDensityTau=function(tau, datai,wi,alpha,groupi){
+conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
 
 
   if (is.null(groupi)){
@@ -793,7 +793,7 @@ nn=length(unique(group))
       d2=c(d2,round(max(abs(alpha0-1/mean(A1$Tau))),3))
     }
     if (trace){
-      print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation tau difference: ",max(d2)))
+      print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation alpha difference: ",max(d2)))
     }
 
     if (max(d1)<=tol && max(d2)<= tol ){
