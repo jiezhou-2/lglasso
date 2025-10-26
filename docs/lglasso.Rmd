@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 library(devtools)
 library(forcats)
 load_all()
-set.seed(2)
+set.seed(3)
 ```
 
 
@@ -106,7 +106,7 @@ dd$network
  model <- lm(dd$tau ~ aa$tau)
 plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
 abline(model, col = "red", lwd = 2)
-summary(model)$coef
+summary(model)
 ```
 
 

@@ -1,4 +1,12 @@
 
+#' Title
+#'
+#' @param t a vector specify the time points corresponding to the data
+#' @param tau the damping rate parameter with length 1 or 2
+#'
+#' @returns a square matrix used to constrct the likelihood
+#'
+
 phifunction=function(t,tau){
   n=length(t)
   #print(tau)
@@ -9,7 +17,8 @@ phifunction=function(t,tau){
     M=matrix(nrow = n, ncol = n)
     for (i in 1:n) {
       for (j in i:n){
-        M[i,j]=exp(-tau[1]*(abs(t[i]-t[j])))
+        M[i,j]=ifelse(length(tau)==2,exp(-tau[1]*(abs(t[i]-t[j]))^tau[2])
+                      ,exp(-tau[1]*(abs(t[i]-t[j]))))
         M[j,i]=M[i,j]
       }
     }
@@ -20,6 +29,20 @@ phifunction=function(t,tau){
 
 
 
+
+#' Title
+#'
+#' @param B a p by p given precision matrix
+#' @param data a (p+2)-by-n data frame
+#' @param type specify how to model the covariance matrix
+#' @param expFix the parameter in variance function when the data are longitudinal
+#' @param maxit the maximum iteration number
+#' @param tol the minimum difference for the algorithm to be called converged
+#' @param lower vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
+#' @param upper vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
+#' @param ... other unspecifed parameterss
+#'
+#' @returns a list of matrices
 
 AA=function(B,data,type=c("general","expFixed"),expFix,maxit=30,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5),...){
@@ -148,6 +171,26 @@ if (!is.list(data)){
 
 
 
+#' Title
+#'
+#' @param A
+#' @param data
+#' @param lambda
+#' @param type
+#' @param diagonal
+#' @param maxit
+#' @param tol
+#' @param lower
+#' @param upper
+#' @param start
+#' @param w.init
+#' @param wi.init
+#' @param ...
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("warm","cold"),w.init=NULL,wi.init=NULL,...){
 
