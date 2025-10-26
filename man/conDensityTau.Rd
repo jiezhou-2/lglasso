@@ -4,7 +4,7 @@
 \alias{conDensityTau}
 \title{Title}
 \usage{
-conDensityTau(tau, datai, wi, alpha, groupi = NULL)
+conDensityTau(tau, expFixed, datai, wi, alpha, groupi)
 }
 \arguments{
 \item{groupi}{}

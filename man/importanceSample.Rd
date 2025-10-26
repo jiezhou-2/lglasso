@@ -4,7 +4,7 @@
 \alias{importanceSample}
 \title{Title}
 \usage{
-importanceSample(n = 100, datai, wi, alpha, groupi = NULL)
+importanceSample(n, datai, wi, alpha, groupi)
 }
 \arguments{
 \item{groupi}{}

@@ -4,7 +4,19 @@
 \alias{lglassoHeter}
 \title{Title}
 \usage{
-lglassoHeter(data, lambda, expFix, group, maxit, tol = 10^(-3), trace = FALSE)
+lglassoHeter(
+  data,
+  lambda,
+  expFix,
+  group,
+  maxit,
+  tol = 10^(-3),
+  trace = FALSE,
+  start = c("warm", "cold"),
+  w.init = NULL,
+  wi.init = NULL,
+  N
+)
 }
 \arguments{
 \item{trace}{}

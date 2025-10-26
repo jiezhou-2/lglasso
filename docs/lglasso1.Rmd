@@ -1,0 +1,171 @@
+---
+title: " Identify networks from longitudinal data (1)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction_of_lglasso_package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+
+
+
+
+```{r setup, message=FALSE,warning=FALSE}
+#library(lglasso)
+ library(devtools)
+ load_all()
+```
+
+
+
+```{r, message=FALSE}
+# number of nodes
+p=10
+# number of edge in general network
+m1=9
+# the difference between the number of edges in individual networks and general network
+m2=3
+#  number of tissues
+m3=4
+# number of subjects
+n=20
+# correlation between tissues
+rho=0.8
+
+```
+
+## Model 1: clustered data with no correlation structure
+```{r, message=FALSE, warning=FALSE,eval=FALSE,echo=FALSE}
+set.seed(5)
+cc=matrix(rho,ncol = m3,nrow = m3)
+diag(cc)=1
+dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
+ddata=dd$data
+```
+
+
+
+### estimate one network
+
+```{r, warning=FALSE,eval=FALSE,echo=FALSE}
+aa=lglasso(data=ddata,lambda = 0.01,type="general",tol = 0.01, trace=TRUE)
+
+## precision matrix
+aa$wi
+
+## correlation matrix between different tissues
+
+cov2cor(aa$v[[1]])
+```
+
+### estimate two networks based on a grouping variable
+```{r,warning=FALSE,eval=FALSE,echo=FALSE}
+group=ifelse(ddata[,2]%in%c("tissue1","tissue2"),1,2)
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="general",group = group, ,tol = 0.01, trace=TRUE)
+
+## precision matrices
+aa$wi
+
+## correlation matrices between tissue 1 and tissue 2
+cov2cor(aa$v[[1]])
+
+## correlation matrices between tissue 3 and tissue 4
+cov2cor(aa$v[[2]])
+```
+
+## Model 2: longitudinal data with exponential correlation structure 
+
+
+```{r,warning=FALSE}
+library(forcats)
+set.seed(1)
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
+ddata=do.call(rbind,dd$data)
+subjects=fct_inorder(ddata$subject)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+```
+
+
+
+
+
+### estimate one networks 
+
+```{r,warning=FALSE}
+aa=lglasso(data=ddata,lambda = 0.01,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
+
+## precision matrix 
+aa$wi
+
+## correlation parameter
+aa$tau
+```
+
+
+### estimate two networks based on a grouping variable
+
+```{r,warning=FALSE}
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = 0.01, trace=TRUE)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+
+## pre-treatment network estimate vs true network
+estimates[[1]]
+dd$network$pre
+
+
+## post-treatment network estimate vs true network
+estimates[[2]]
+dd$network$post
+## correlation parameters
+aa$tau
+```
+
+
+### estimate two networks based on a grouping variable with random tau
+
+
+```{r,warning=FALSE}
+library(forcats)
+load_all()
+set.seed(1)
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=5,alpha=0.5,group=2)
+ddata=do.call(rbind,dd$data)
+subjects=fct_inorder(ddata$subject)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+```
+
+```{r,warning=FALSE}
+
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",random=T,expFix=1,N=100,group = group, tol = 0.01, trace=TRUE)
+
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+
+## pre-treatment network estimate vs true network
+estimates[[1]]
+dd$network$pre
+
+
+## post-treatment network estimate vs true network
+estimates[[2]]
+dd$network$post
+
+## correlation parameters
+plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
+```
+
+
+[1] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen AG. Identifying stationary microbial interaction networks based on irregularly spaced longitudinal 16S rRNA gene sequencing data. Front Microbiomes. 2024;3:1366948. doi: 10.3389/frmbi.2024.1366948. Epub 2024 Jun 2. PMID: 40687607; PMCID: PMC12276884.
+
+
+[2] Friedman J., Hastie T., Tibshirani R. (2019)  Graphical Lasso: Estimation of Gaussian Graphical Models, Version: 1.11. https://CRAN.R-project.org/package=glasso. 
+

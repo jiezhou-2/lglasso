@@ -1,5 +1,5 @@
 ---
-title: " Identify networks from longitudinal data (1)"
+title: " Identify networks from longitudinal data: homogeneous vs heterogeneous model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction_of_lglasso_package}
@@ -20,99 +20,112 @@ knitr::opts_chunk$set(
 
 
 
-```{r setup, message=FALSE,warning=FALSE}
+```{r setup, message=FALSE,warning=FALSE,echo=FALSE}
 #library(lglasso)
- library(devtools)
- load_all()
+library(devtools)
+library(forcats)
+load_all()
+set.seed(2)
 ```
 
 
 
 ```{r, message=FALSE}
 # number of nodes
-p=10
+p=20
 # number of edge in general network
-m1=9
+m1=20
 # the difference between the number of edges in individual networks and general network
-m2=3
-#  number of tissues
-m3=4
+m2=0
 # number of subjects
 n=20
-# correlation between tissues
-rho=0.8
 
-```
 
-## Model 1: clustered data with no correlation structure
-```{r, message=FALSE, warning=FALSE,eval=FALSE,echo=FALSE}
-set.seed(5)
-cc=matrix(rho,ncol = m3,nrow = m3)
-diag(cc)=1
-dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
-ddata=dd$data
 ```
 
 
 
-### estimate one network
+## One-stage model
 
-```{r, warning=FALSE,eval=FALSE,echo=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01,type="general",tol = 0.01, trace=TRUE)
 
-## precision matrix
-aa$wi
 
-## correlation matrix between different tissues
+### Estimate the network based on homogeneous one-stage model
 
-cov2cor(aa$v[[1]])
-```
 
-### estimate two networks based on a grouping variable
-```{r,warning=FALSE,eval=FALSE,echo=FALSE}
-group=ifelse(ddata[,2]%in%c("tissue1","tissue2"),1,2)
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="general",group = group, ,tol = 0.01, trace=TRUE)
-
-## precision matrices
-aa$wi
-
-## correlation matrices between tissue 1 and tissue 2
-cov2cor(aa$v[[1]])
-
-## correlation matrices between tissue 3 and tissue 4
-cov2cor(aa$v[[2]])
-```
-
-## Model 2: longitudinal data with exponential correlation structure 
+#### Generate data 
 
 
 ```{r,warning=FALSE}
-library(forcats)
-set.seed(1)
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
-ddata=do.call(rbind,dd$data)
+
+
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
+ddata=dd$data
 subjects=fct_inorder(ddata$subject)
-group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+group=rep(0,nrow(ddata))
 ```
 
 
 
-
-
-### estimate one networks 
+#### Estimation
 
 ```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = 0.01,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
 
-## precision matrix 
-aa$wi
+## estimated vs true network
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+estimates
+dd$network
 
 ## correlation parameter
 aa$tau
 ```
 
 
-### estimate two networks based on a grouping variable
+### Estimate the network based on heterogeneous one-stage model
+
+#### Generate data 
+
+```{r,warning=FALSE}
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group=1)
+ddata=dd$data$pre
+subjects=fct_inorder(ddata$subject)
+```
+
+#### Estimation
+
+```{r,warning=FALSE}
+aa=lglasso(data=ddata,lambda = 0.01,type="expFixed",random=TRUE,expFix=1,tol = 0.01, trace=TRUE,maxit = 30,N=100)
+
+## estimated vs true network
+
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+estimates
+dd$network
+
+## correlation parameter
+ model <- lm(dd$tau ~ aa$tau)
+plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
+abline(model, col = "red", lwd = 2)
+summary(model)$coef
+```
+
+
+## Two-stage model
+
+
+### Estimate the networks based on homogeneous two-stage model
+
+
+#### Generate data 
+
+```{r,warning=FALSE}
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=5)
+ddata=do.call(rbind,dd$data)
+subjects=fct_inorder(ddata$subject)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+```
+
+#### Estimation
 
 ```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = 0.01, trace=TRUE)
@@ -131,22 +144,24 @@ aa$tau
 ```
 
 
-### estimate two networks based on a grouping variable with random tau
+### Estimate the networks based on hetergeneous two-stage model
 
+
+#### Generate data 
 
 ```{r,warning=FALSE}
-library(forcats)
-load_all()
-set.seed(1)
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=5,alpha=0.5,group=2)
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=5,alpha=5,group=2)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 ```
 
+
+#### Estimation
+
 ```{r,warning=FALSE}
 
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",random=T,expFix=1,N=100,group = group, tol = 0.01, trace=TRUE)
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",random=T,expFix=1,N=100,group = group, tol = 0.01,maxit = 30, trace=TRUE)
 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 
@@ -160,7 +175,10 @@ estimates[[2]]
 dd$network$post
 
 ## correlation parameters
+ model <- lm(dd$tau ~ aa$tau)
 plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
+abline(model, col = "red", lwd = 2)
+summary(model)$coef
 ```
 
 

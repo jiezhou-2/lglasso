@@ -397,29 +397,32 @@ if (type!="expFixed"){
   X_bar = apply(data[,-c(1,2)], 2, mean)
   data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
 
+
   if (random==FALSE){
 
+    if (!is.null(group))  {
+
+      if (length(group)!=nrow(data)){
+        stop("group should be the same length of the columns of data!")
+      }
+
+      data=split(data,f=factor(group,levels = unique(group)))
+
+      if (!length(lambda)==2){
+        stop("Arguments (group, lambda) do not match!")
+      }
+
+    }
+
 if (is.null(group))  {
+  group=rep(1,nrow(data))
   data=list(data)
  if (length(lambda)!=1){
   stop("Arguments (group, lambda) do not match!")
  }
 }
 
-  if (!is.null(group))  {
 
-    if (length(group)!=nrow(data)){
-      stop("group should be the same length of the columns of data!")
-    }
-
-    data=split(data,f=factor(group,levels = unique(group)))
-
-    if (!length(lambda)==2){
-      stop("Arguments (group, lambda) do not match!")
-    }
-
-
-  }
 
 
 
@@ -565,6 +568,7 @@ return(output)
     if (!all(lambda>0)){
       stop("lambda must be positive!")
     }
+
 output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=maxit,
                    tol=tol,trace=trace)
   }
@@ -586,9 +590,7 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=
 conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
 
 
-  if (is.null(groupi)){
-    groupi=rep(1,nrow(datai))
-  }else{
+
     if (length(groupi)!=nrow(datai)){
       stop("group should be the same length of the columns of data!")
     }
@@ -596,7 +598,7 @@ conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
     if (length(unique(groupi))!= length(wi)){
       stop("the format of groupi does not match that of sigmaM!")
     }
-  }
+
   data=split(datai,f=factor(groupi,levels = unique(groupi)))
   nn=length(unique(groupi))
   likelihood=1
@@ -666,7 +668,7 @@ importanceEstimates=function(importancesSample,datai,groupi){
     }
     estimatePhi[[i]]=aa
   }
-  estimates=c(estimateTau=estimateTau,estimatePhi=estimatePhi)
+  estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
   return(estimates)
 }
 
@@ -700,7 +702,7 @@ AAheter=function(data,wi,alpha,group,l){
       imSample=imSample[index,]
       imporResults=importanceEstimates(importancesSample=imSample,datai=datai,groupi = groupi)
       Tau[i,1]=imporResults$estimateTau
-      A[[i]]=list(imporResults$estimatePhi1,imporResults$estimatePhi2)
+      A[[i]]=imporResults$estimatePhi
   }
   AA=vector("list",nn)
 
@@ -736,9 +738,8 @@ lglassoHeter=function(data,lambda,expFix,group,maxit,
 {
   p=ncol(data)-2
   m=length(unique(data[,1]))
-  X_bar = apply(data[,-c(1,2)], 2, mean)
-  data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
   if (is.null(group))  {
+    group=rep(1,nrow(data))
     if (length(lambda)!=1){
       stop("Arguments (group, lambda) do not match!")
     }

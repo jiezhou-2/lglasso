@@ -4,7 +4,7 @@
 \alias{importanceEstimates}
 \title{Title}
 \usage{
-importanceEstimates(importancesSample, datai, groupi = NULL)
+importanceEstimates(importancesSample, datai, groupi)
 }
 \arguments{
 \item{groupi}{}

@@ -4,7 +4,7 @@
 \alias{AAheter}
 \title{Title}
 \usage{
-AAheter(data, wi, alpha, group = NULL, l = 100)
+AAheter(data, wi, alpha, group, l)
 }
 \arguments{
 \item{l}{}

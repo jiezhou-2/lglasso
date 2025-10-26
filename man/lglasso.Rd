@@ -7,11 +7,11 @@
 lglasso(
   data,
   lambda,
-  type = c("expFixed", "general"),
-  expFix = 1,
-  random = FALSE,
   group = NULL,
-  maxit = 80,
+  random = FALSE,
+  expFix = 1,
+  N = 100,
+  maxit = 30,
   tol = 10^(-3),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
@@ -19,6 +19,7 @@ lglasso(
   w.init = NULL,
   wi.init = NULL,
   trace = FALSE,
+  type = c("expFixed"),
   ...
 )
 }
@@ -29,14 +30,10 @@ the time point for longitudinal data or tissue ID.}
 \item{lambda}{vector of length 1 or 2,  which
 is the tuning parameter for the identification of the networks. For details, see the explanations in the below.}
 
-\item{type}{a string specifying which model need to be fitted. There are three models available,
-which are referred as \code{general}, \code{expFixed} respectively.
- Please see the details in the below for the meaning of each.}
-
-\item{expFix}{numeric number used in the model specification}
-
 \item{group}{vector  of length \code{n} if supplied which specify which data
 points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.}
+
+\item{expFix}{numeric number used in the model specification}
 
 \item{maxit}{the maximum iterations for the estimation.}
 
@@ -53,6 +50,10 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 \item{wi.init}{inital value for precision matrix}
 
 \item{trace}{whether or not show the progress of the computation}
+
+\item{type}{a string specifying which model need to be fitted. There are three models available,
+which are referred as \code{general}, \code{expFixed} respectively.
+ Please see the details in the below for the meaning of each.}
 
 \item{...}{other inputs}
 }

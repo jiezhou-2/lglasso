@@ -14,7 +14,8 @@ Simulate(
   tt = 5,
   cc = diag(m3),
   tau = c(2, 1),
-  alpha = 2
+  alpha = 2,
+  group
 )
 }
 \arguments{
