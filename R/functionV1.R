@@ -17,8 +17,9 @@ phifunction=function(t,tau){
     M=matrix(nrow = n, ncol = n)
     for (i in 1:n) {
       for (j in i:n){
-        M[i,j]=ifelse(length(tau)==2,exp(-tau[1]*(abs(t[i]-t[j]))^tau[2])
-                      ,exp(-tau[1]*(abs(t[i]-t[j]))))
+        # M[i,j]=ifelse(length(tau)==2,exp(-tau[1]*(abs(t[i]-t[j]))^tau[2])
+        #               ,exp(-tau[1]*(abs(t[i]-t[j]))))
+        M[i,j]= exp(-tau[1]*(abs(t[i]-t[j])))
         M[j,i]=M[i,j]
       }
     }
