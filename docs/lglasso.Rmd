@@ -25,6 +25,7 @@ knitr::opts_chunk$set(
 library(devtools)
 library(forcats)
 load_all()
+source("../scripts/simulations.R")
 set.seed(3)
 ```
 
