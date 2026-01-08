@@ -41,4 +41,5 @@ Imports:
     parallel,
     pheatmap,
     RColorBrewer
+Suggestions:
 Config/testthat/edition: 3

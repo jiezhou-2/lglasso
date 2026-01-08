@@ -21,7 +21,13 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE, echo=FALSE}
-library(lglasso)
+library(devtools)
+library(forcats)
+library(fake)
+library(CVglasso)
+load_all()
+source("../scripts/simulations.R")
+set.seed(3)
 ```
 
 
@@ -44,7 +50,7 @@ rho=0.8
 
 ## Model 1: cross validation plot for clustered data with no correlation structure 
 
-```{r, message=FALSE}
+```{r, message=FALSE,eval=FALSE}
 set.seed(5)
 library(lglasso)
 cc=matrix(rho,ncol = m3,nrow = m3)
@@ -56,7 +62,7 @@ ddata=dd$data
 
 
 
-```{r}
+```{r,eval=FALSE}
 ## clustered data with no correlation structure
 freq=table(ddata[,1])
 group=c()
@@ -82,7 +88,7 @@ plot(bb)
 set.seed(5)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
 ddata=dd$data
-freq=table(ddata[,1])
+freq=table(ddata$pre[,1])
 group=c()
 for (i in 1:length(freq)) {
   group=c(group,1:freq[i])
@@ -94,9 +100,9 @@ lambda=expand.grid(lambda1,lambda2)
 ```
 
 ```{r}
-bb=CVlglasso(type="expFixed",data=ddata,lambda = lambda1,K=5,cores=5)
+bb=CVlglasso(data=ddata$pre,lambda = lambda1,K=2,cores=5,trace = FALSE)
 plot(bb)
-bb=CVlglasso(type="expFixed",group=group,data=ddata,lambda = lambda,K=5,cores=5)
+bb=CVlglasso(group=group,data=ddata$pre,lambda = lambda,K=5,cores=5)
 plot(bb)
 
 ```

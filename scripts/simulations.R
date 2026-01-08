@@ -387,3 +387,222 @@ Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=
   return(data)
 }
 
+
+
+power_compare1=function(sigmaM,timepoints,rho_lglasso,
+                        rho_glasso,rho_jgl,tau,tt)
+{
+  ## generate the network data
+
+
+
+
+  if (length(rho_lglasso)!=2){
+    stop("rho_lglasso should be length 2!")
+  }
+
+  if (length(rho_jgl)!=2){
+    stop("rho_jgl should be length 2!")
+  }
+
+  if (length(rho_glasso)!=2){
+    stop("rho_glasso should be length 2!")
+  }
+
+  if (length(tau)!=length(timepoints[[1]])){
+    stop("tau should have the same length as timepoints!")
+  }
+
+  #simData=sim_data_old(covmat = sigmaM[3:4],timepoints=timepoints, tau = tau)
+  simData=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tt=tt,tau=tau,group=2)
+  preData=simData$data$pre
+  postData=simData$data$post
+  fullData=rbind(preData,postData)
+  groupIndex=c(rep(1,nrow(preData)),rep(2,nrow(postData)))
+
+
+  X_bar = apply(fullData[,-c(1,2)], 2, mean)
+  fullData[,-c(1,2)] = scale(fullData[,-c(1,2)], center = X_bar, scale = FALSE)
+  fullData3=list(pre=fullData[1:nrow(preData),],post=fullData[(1+nrow(preData)):nrow(fullData),])
+  n=length(unique(fullData[,1]))
+
+  edgeProb11=c()
+  edgeProb21=c()
+  edgeProb31=c()
+
+  edgeProb12=c()
+  edgeProb22=c()
+  edgeProb32=c()
+
+  ## lglasso
+  #browser()
+  aa1=lglasso(data = fullData, lambda =  rho_lglasso,type="expFixed",group=groupIndex,random=random)
+  dd11=aa1$wi[[1]][upper.tri(aa1$wi[[1]],diag=F)]
+  edgeProb11=ifelse(abs(dd11)<=10^(-5),0,1)
+  dd12=aa1$wi[[2]][upper.tri(aa1$wi[[2]],diag=F)]
+  edgeProb12=ifelse(abs(dd12)<=10^(-5),0,1)
+
+
+
+
+  ## glasso
+
+
+  ##estiamte the network based on glasso
+  s1=cov(preData[,-c(1,2)])
+  s2=cov(postData[,-c(1,2)])
+  aa21=glasso(s=s1,rho= rho_glasso[1])$wi
+  dd21=aa21[upper.tri(aa21,diag=F)]
+  edgeProb21=ifelse(abs(dd21)<=10^(-5),0,1)
+
+  aa22=glasso(s=s2,rho= rho_glasso[2])$wi
+  dd22=aa22[upper.tri(aa22,diag=F)]
+  edgeProb22=ifelse(abs(dd22)<=10^(-5),0,1)
+
+
+
+  ## EstimateGroupNetwork
+
+  aa3=BBB(data=fullData3,lambda=rho_jgl,type="expFixed")
+  dd31=aa3[[1]][upper.tri(aa3[[1]],diag=F)]
+  edgeProb31=ifelse(abs(dd31)<=10^(-5),0,1)
+  dd32=aa3[[2]][upper.tri(aa3[[2]],diag=F)]
+  edgeProb32=ifelse(abs(dd32)<=10^(-5),0,1)
+
+  ## true networks
+  networkPre=ifelse(abs(sigmaM[[1]])<=10^(-5),0,1)
+  edgeProbPre=networkPre[upper.tri(networkPre,diag = F)]
+  networkPost=ifelse(abs(sigmaM[[2]])<=10^(-5),0,1)
+  edgeProbPost=networkPost[upper.tri(networkPost,diag = F)]
+
+  edgeProb=as.data.frame(rbind(edgeProbPre,edgeProbPost))
+  rownames(edgeProb)=c()
+  edgeProb1=as.data.frame(rbind(edgeProb11,edgeProb12))
+  rownames(edgeProb1)=c()
+  edgeProb2=as.data.frame(rbind(edgeProb21,edgeProb22))
+  rownames(edgeProb2)=c()
+  edgeProb3=as.data.frame(rbind(edgeProb31,edgeProb32))
+  rownames(edgeProb3)=c()
+
+  mprediction=cbind(method="true",type=c("pre","post"),edgeProb)
+  mprediction1=cbind(method="lglasso",type=c("pre","post"),edgeProb1)
+  #colnames(mprediction1)[-c(1,2)]=c()
+  mprediction2=cbind(method="glasso",type=c("pre","post"),edgeProb2)
+  #colnames(mprediction2)[-c(1,2)]=c()
+  mprediction3=cbind(method="jgl",type=c("pre","post"),edgeProb3)
+  #colnames(mprediction3)[-c(1,2)]=c()
+  tau=data.frame(matrix(c(aa1$tau,rep(0,ncol(edgeProb)-length(aa1$tau))),nrow=1))
+  mtau=cbind(method="estiamte",type="tau",tau)
+  colnames(mtau)=colnames(mprediction)
+  prediction=rbind(mprediction,mprediction1,mprediction2,mprediction3,mtau)
+  return(prediction=prediction)
+}
+
+
+
+power_compare_heter=function(n,p,m1,m2,tt,tau,group,rho_lglasso,
+                             rho_glasso,rho_jgl)
+{
+  ## generate the network data
+
+
+
+
+  if (length(rho_lglasso)!=2){
+    stop("rho_lglasso should be length 2!")
+  }
+
+  if (length(rho_jgl)!=2){
+    stop("rho_jgl should be length 2!")
+  }
+
+  if (length(rho_glasso)!=2){
+    stop("rho_glasso should be length 2!")
+  }
+
+
+
+  simData=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=5,tau=tau,group=2)
+  preData=simData$data$pre
+  postData=simData$data$post
+  fullData=rbind(preData,postData)
+  groupIndex=c(rep(1,nrow(preData)),rep(2,nrow(postData)))
+
+
+  X_bar = apply(fullData[,-c(1,2)], 2, mean)
+  fullData[,-c(1,2)] = scale(fullData[,-c(1,2)], center = X_bar, scale = FALSE)
+  fullData3=list(pre=fullData[1:nrow(preData),],post=fullData[(1+nrow(preData)):nrow(fullData),])
+  n=length(unique(fullData[,1]))
+
+  edgeProb11=c()
+  edgeProb21=c()
+  edgeProb31=c()
+
+  edgeProb12=c()
+  edgeProb22=c()
+  edgeProb32=c()
+
+  ## lglasso
+  #browser()
+  aa1=lglasso(data = fullData, lambda =  rho_lglasso,type="expFixed",group=groupIndex,random=TRUE)
+  dd11=aa1$wi[[1]][upper.tri(aa1$wi[[1]],diag=F)]
+  edgeProb11=ifelse(abs(dd11)<=10^(-5),0,1)
+  dd12=aa1$wi[[2]][upper.tri(aa1$wi[[2]],diag=F)]
+  edgeProb12=ifelse(abs(dd12)<=10^(-5),0,1)
+
+
+
+
+  ## glasso
+
+
+  ##estiamte the network based on glasso
+  s1=cov(preData[,-c(1,2)])
+  s2=cov(postData[,-c(1,2)])
+  aa21=glasso(s=s1,rho= rho_glasso[1])$wi
+  dd21=aa21[upper.tri(aa21,diag=F)]
+  edgeProb21=ifelse(abs(dd21)<=10^(-5),0,1)
+
+  aa22=glasso(s=s2,rho= rho_glasso[2])$wi
+  dd22=aa22[upper.tri(aa22,diag=F)]
+  edgeProb22=ifelse(abs(dd22)<=10^(-5),0,1)
+
+
+
+  ## EstimateGroupNetwork
+
+  aa3=BBB(data=fullData3,lambda=rho_jgl,type="expFixed")
+  dd31=aa3[[1]][upper.tri(aa3[[1]],diag=F)]
+  edgeProb31=ifelse(abs(dd31)<=10^(-5),0,1)
+  dd32=aa3[[2]][upper.tri(aa3[[2]],diag=F)]
+  edgeProb32=ifelse(abs(dd32)<=10^(-5),0,1)
+
+  ## true networks
+  networkPre=ifelse(abs(simData$network$pre)<=10^(-5),0,1)
+  edgeProbPre=networkPre[upper.tri(networkPre,diag = F)]
+  networkPost=ifelse(abs(simData$network$post)<=10^(-5),0,1)
+  edgeProbPost=networkPost[upper.tri(networkPost,diag = F)]
+
+  edgeProb=as.data.frame(rbind(edgeProbPre,edgeProbPost))
+  rownames(edgeProb)=c()
+  edgeProb1=as.data.frame(rbind(edgeProb11,edgeProb12))
+  rownames(edgeProb1)=c()
+  edgeProb2=as.data.frame(rbind(edgeProb21,edgeProb22))
+  rownames(edgeProb2)=c()
+  edgeProb3=as.data.frame(rbind(edgeProb31,edgeProb32))
+  rownames(edgeProb3)=c()
+
+  mprediction=cbind(method="true",type=c("pre","post"),edgeProb)
+  mprediction1=cbind(method="lglasso",type=c("pre","post"),edgeProb1)
+  #colnames(mprediction1)[-c(1,2)]=c()
+  mprediction2=cbind(method="glasso",type=c("pre","post"),edgeProb2)
+  #colnames(mprediction2)[-c(1,2)]=c()
+  mprediction3=cbind(method="jgl",type=c("pre","post"),edgeProb3)
+  #colnames(mprediction3)[-c(1,2)]=c()
+  tau=data.frame(matrix(c(simData$tau,rep(0,ncol(edgeProb)-length(simData$tau))),nrow=1))
+  mtau=cbind(method="estiamte",type="tau",tau)
+  colnames(mtau)=colnames(mprediction)
+  prediction=rbind(mprediction,mprediction1,mprediction2,mprediction3,mtau)
+  return(prediction=prediction)
+}
+

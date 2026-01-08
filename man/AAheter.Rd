@@ -7,7 +7,18 @@
 AAheter(data, wi, alpha, group, l)
 }
 \arguments{
-\item{l}{}
+\item{data}{longitudinal data set}
+
+\item{wi}{given precision matrix}
+
+\item{alpha}{expoential distribution with rate alpha}
+
+\item{group}{specify how data is grouped}
+
+\item{l}{number of random samples in importance sampling}
+}
+\value{
+a list for estimates of tau and AA
 }
 \description{
 Title

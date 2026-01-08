@@ -17,8 +17,6 @@ phifunction=function(t,tau){
     M=matrix(nrow = n, ncol = n)
     for (i in 1:n) {
       for (j in i:n){
-        # M[i,j]=ifelse(length(tau)==2,exp(-tau[1]*(abs(t[i]-t[j]))^tau[2])
-        #               ,exp(-tau[1]*(abs(t[i]-t[j]))))
         M[i,j]= exp(-tau[1]*(abs(t[i]-t[j])))
         M[j,i]=M[i,j]
       }
@@ -42,7 +40,6 @@ phifunction=function(t,tau){
 #' @param lower vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
 #' @param upper vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
 #' @param ... other unspecifed parameterss
-#'
 #' @returns a list of matrices
 
 AA=function(B,data,type=c("general","expFixed"),expFix,maxit=30,
@@ -189,9 +186,7 @@ if (!is.list(data)){
 #' @param ...
 #'
 #' @returns
-#' @export
-#'
-#' @examples
+
 BB=function(A,data,lambda,type=c("general","expFixed"),diagonal=TRUE,maxit=100,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5), start=c("warm","cold"),w.init=NULL,wi.init=NULL,...){
 
@@ -480,55 +475,55 @@ if (is.null(group))  {
   mask <- matrix(1, p, p)
   diag(mask) <- 0
 
-  if (type=="general"){
-    m3=sapply(data, function(x){length(unique(x[,2]))})
-    p=ncol(data[[1]])-2
-    A=vector("list",length(data))
-    B=vector("list",length((data)))
-
-    for (j in 1:length(A)) {
-      A[[j]]=diag(m3[j])
-      B[[j]]=diag(p)
-    }
-
-    k=0
-
-    while(1){
-      k=k+1
-      #browser()
-      A1=AA(data = data,B = B, type=type,...)$corMatrix
-      #browser()
-      B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
-      d1=c()
-      d2=c()
-      for (i in 1:length(B1)) {
-        d1=c(d1,round(max(abs(B[[i]]-B1[[i]])*mask),3))
-        d2=c(d2,round(max(abs(A[[i]]-A1[[i]])),3))
-      }
-
-      if (trace){
-      print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation difference: ",max(d2)))
-      }
-
-      if (max(d1)<=tol && max(d2)<= tol ){
-          output=structure(list(wi=B1, v=A1), class="lglasso")
-          break
-      }else{
-        A=A1
-        B=B1
-      }
-
-
-      if (k>=maxit){
-        warning("Algorithm did not converge!")
-          output=structure(list(wi=B1, v=A1), class="lglasso")
-        break
-      }
-
-    }
-
-
-}
+#   if (type=="general"){
+#     m3=sapply(data, function(x){length(unique(x[,2]))})
+#     p=ncol(data[[1]])-2
+#     A=vector("list",length(data))
+#     B=vector("list",length((data)))
+#
+#     for (j in 1:length(A)) {
+#       A[[j]]=diag(m3[j])
+#       B[[j]]=diag(p)
+#     }
+#
+#     k=0
+#
+#     while(1){
+#       k=k+1
+#       #browser()
+#       A1=AA(data = data,B = B, type=type,...)$corMatrix
+#       #browser()
+#       B1=BB(data=data,A=A,lambda = lambda, type=type, start = start, w.init=w.init,wi.init=wi.init,...)
+#       d1=c()
+#       d2=c()
+#       for (i in 1:length(B1)) {
+#         d1=c(d1,round(max(abs(B[[i]]-B1[[i]])*mask),3))
+#         d2=c(d2,round(max(abs(A[[i]]-A1[[i]])),3))
+#       }
+#
+#       if (trace){
+#       print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation difference: ",max(d2)))
+#       }
+#
+#       if (max(d1)<=tol && max(d2)<= tol ){
+#           output=structure(list(wi=B1, v=A1), class="lglasso")
+#           break
+#       }else{
+#         A=A1
+#         B=B1
+#       }
+#
+#
+#       if (k>=maxit){
+#         warning("Algorithm did not converge!")
+#           output=structure(list(wi=B1, v=A1), class="lglasso")
+#         break
+#       }
+#
+#     }
+#
+#
+# }
 
 
   if (type == "expFixed"){
@@ -585,6 +580,8 @@ if (k>=maxit){
     }
 return(output)
   }
+
+
   if (random==TRUE){
 
     if (is.null(group))  {
@@ -660,16 +657,14 @@ conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
 
 #' Title
 #'
-#' @param n
-#' @param datai
-#' @param wi
-#' @param alpha
-#' @param groupi
+#' @param n the number of random samples
+#' @param datai the data for subject i
+#' @param wi the given precision matrix
+#' @param alpha the exponential distribution with rate alpha
+#' @param groupi specify how datai is grouped
 #'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @returns a data frame for samples and their weights
+
 importanceSample=function(n,datai,wi,alpha,groupi){
   dd1=matrix(rexp(n=n,rate=alpha),ncol=1)
   likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
@@ -677,6 +672,7 @@ importanceSample=function(n,datai,wi,alpha,groupi){
   index1=which(!is.nan(likelihood1))
   index2=which(!is.infinite(likelihood1) )
 index=intersect(index1,index2)
+if (length(index)==0){stop("No valid samples are generated!")}
   weights=likelihood1[index]/likelihood2[index]
   norWeights=weights/sum(weights)
   aa=data.frame(sample=dd1[index],weight=norWeights)
@@ -685,14 +681,11 @@ index=intersect(index1,index2)
 
 #' Title
 #'
-#' @param importancesSample
-#' @param datai
-#' @param groupi
-#'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @param importancesSample given random samples
+#' @param datai the data for subject i
+#' @param groupi specify how datai is grouped
+#' @returns a list of estimated
+
 importanceEstimates=function(importancesSample,datai,groupi){
 
   data=split(datai,f=factor(groupi,levels = unique(groupi)))
@@ -719,16 +712,12 @@ importanceEstimates=function(importancesSample,datai,groupi){
 
 #' Title
 #'
-#' @param data
-#' @param wi
-#' @param alpha
-#' @param group
-#' @param l
-#'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @param data longitudinal data set
+#' @param wi given precision matrix
+#' @param alpha expoential distribution with rate alpha
+#' @param group specify how data is grouped
+#' @param l number of random samples in importance sampling
+#' @returns a list for estimates of tau and AA
 AAheter=function(data,wi,alpha,group,l){
   subjects=unique(data[,1])
   nn=length(unique(group))
@@ -829,6 +818,9 @@ nn=length(unique(group))
   alpha0=1
   while(1){
     k=k+1
+    print(k)
+    print(paste0("alpha estimate: ", alpha0))
+    #if (k==11){browser()}
     A1=AAheter(data=data,wi=B,alpha=alpha0,group=group,l=N)
     B1=BB(data=dataList,A=A1$AA,lambda = lambda, type="expFixed",start=start, w.init=w.init,wi.init=wi.init)
     d1=c()
@@ -1030,7 +1022,7 @@ a=c()
 
 
 
-cvlglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+cvlglasso=function(type=c("expFixed"), data,group=NULL,
                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
 
   type=match.arg(type)
@@ -1110,56 +1102,56 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
 
 
 
-    if (type=="general" && is.null(group)){
-      aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
-      cc=lapply(aa, function(B){
-        M=ifelse(abs(B)<=10^(-2), 0,1)
-        diag(M)=2
-        M
-      })
-      bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
-      bb=do.call(c,bb)
-    }
+    # if (type=="general" && is.null(group)){
+    #   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+    #   cc=lapply(aa, function(B){
+    #     M=ifelse(abs(B)<=10^(-2), 0,1)
+    #     diag(M)=2
+    #     M
+    #   })
+    #   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+    #   bb=do.call(c,bb)
+    # }
 
 
 
-  if (type=="general" && !is.null(group)){
-
-    aa=apply(lambda, 1,function(x){lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList} )
-
-
-    cc=lapply(aa, function(B){
-      lapply(B, function(Z){
-        M=ifelse(abs(Z)<=10^(-1), 0,1)
-             diag(M)=2
-             M
-             }
-             )
-    }
-    )
-
-    bb=lapply(cc, function(BB){
-      cvError(data.train=data.train,data.valid=data.valid,B=BB, group.valid=group.valid, group.train = group.train)
-    }
-    )
-    bb=do.call(c,bb)
-}
+#   if (type=="general" && !is.null(group)){
+#
+#     aa=apply(lambda, 1,function(x){lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList} )
+#
+#
+#     cc=lapply(aa, function(B){
+#       lapply(B, function(Z){
+#         M=ifelse(abs(Z)<=10^(-1), 0,1)
+#              diag(M)=2
+#              M
+#              }
+#              )
+#     }
+#     )
+#
+#     bb=lapply(cc, function(BB){
+#       cvError(data.train=data.train,data.valid=data.valid,B=BB, group.valid=group.valid, group.train = group.train)
+#     }
+#     )
+#     bb=do.call(c,bb)
+# }
 
 
   if (type=="expFixed" && is.null(group)){
 
-   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type, expFix = expFix)$wi, simplify = FALSE)
+   aa= sapply(lambda, function(x){lglasso(data=data.train,lambda=x,type=type, expFix = expFix)$wi}, simplify = FALSE)
    cc=lapply(aa, function(B){
      M=ifelse(abs(B)<=10^(-2), 0,1)
      diag(M)=2
      M
    })
-   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+   bb=lapply(cc, function(B){cvError(data.train=data.train,data.valid=data.valid,B=B)})
    bb=do.call(c,bb)
   }
 
   if (type=="expFixed" && !is.null(group)){
-   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, expFix = expFix, group=group.train)$wiList})
+   aa= apply(lambda,1, function(x){lglasso(data=data.train,lambda=x,type=type, expFix = expFix, group=group.train)$wiList})
    cc=lapply(aa, function(B){
      lapply(B, function(Z){
        M=ifelse(abs(Z)<=10^(-1), 0,1)
@@ -1170,45 +1162,44 @@ cv_error=matrix(0,nrow=nnlambda,ncol=K)
    }
    )
 
-   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
-                                      group.valid =   group.valid,group.train = group.train))
+   bb=lapply(cc, function(BB){cvError(data.train=data.train,data.valid=data.valid,B=BB,
+                                      group.valid =   group.valid,group.train = group.train)})
    bb=do.call(c,bb)
   }
 
-  if (type=="twoPara" && is.null(group)){
-    aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
-    cc=lapply(aa, function(B){
-      M=ifelse(abs(B)<=10^(-2), 0,1)
-      diag(M)=2
-      M
-    })
-    bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
-    bb=do.call(c,bb)
-  }
+  # if (type=="twoPara" && is.null(group)){
+  #   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+  #   cc=lapply(aa, function(B){
+  #     M=ifelse(abs(B)<=10^(-2), 0,1)
+  #     diag(M)=2
+  #     M
+  #   })
+  #   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+  #   bb=do.call(c,bb)
+  # }
 
-  if (type=="twoPara" && !is.null(group)){
-   # browser()
-    aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList})
-    cc=lapply(aa, function(B){
-      lapply(B, function(Z){
-        M=ifelse(abs(Z)<=10^(-1), 0,1)
-        diag(M)=2
-        M
-      }
-      )
-    }
-    )
-
-    bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
-                                       group.valid =   group.valid,group.train = group.train))
-    bb=do.call(c,bb)
-  }
+  # if (type=="twoPara" && !is.null(group)){
+  #  # browser()
+  #   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList})
+  #   cc=lapply(aa, function(B){
+  #     lapply(B, function(Z){
+  #       M=ifelse(abs(Z)<=10^(-1), 0,1)
+  #       diag(M)=2
+  #       M
+  #     }
+  #     )
+  #   }
+  #   )
+  #
+  #   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
+  #                                      group.valid =   group.valid,group.train = group.train))
+  #   bb=do.call(c,bb)
+  # }
 cv_error[,k]=bb
 if (trace) {
   utils::setTxtProgressBar(progress,  k)
 }
   }
-
 
 output=structure(list(cv_error=cv_error, lambda=lambda),class="cvlglasso")
 return(output)
@@ -1319,7 +1310,7 @@ return(invisible(heat_plot))
 #' @returns list
 #' @import parallel foreach doParallel
 
-cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+cvplglasso=function(type=c("expFixed"), data,group=NULL,
                      lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
 
   type=match.arg(type)
@@ -1387,8 +1378,9 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
   cv_error=matrix(0,nrow=nnlambda,ncol=K)
 
   k=NULL
-  CV = foreach(k = 1:K, .packages = "CVglasso", .combine = "cbind",
-               .inorder = FALSE) %dopar% {
+  k=1
+     CV = foreach(k = 1:K, .packages = "lglasso", .combine = "cbind",
+                  .inorder = FALSE) %dopar% {
 
                  if (trace) {
                    progress = utils::txtProgressBar(max = K, style = 3)
@@ -1410,24 +1402,67 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 
 
 
-                 if (type=="general" && is.null(group)){
-                   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+                 # if (type=="general" && is.null(group)){
+                 #   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+                 #   cc=lapply(aa, function(B){
+                 #     M=ifelse(abs(B)<=10^(-2), 0,1)
+                 #     diag(M)=2
+                 #     M
+                 #   })
+                 #   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+                 #   bb=do.call(c,bb)
+                 # }
+
+
+
+                 # if (type=="general" && !is.null(group)){
+                 #
+                 #   aa=apply(lambda, 1,function(x){lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList} )
+                 #
+                 #
+                 #   cc=lapply(aa, function(B){
+                 #     lapply(B, function(Z){
+                 #       M=ifelse(abs(Z)<=10^(-1), 0,1)
+                 #       diag(M)=2
+                 #       M
+                 #     }
+                 #     )
+                 #   }
+                 #   )
+                 #
+                 #   bb=lapply(cc, function(BB){
+                 #     cvError(data.train=data.train,data.valid=data.valid,B=BB, group.valid=group.valid, group.train = group.train)
+                 #   }
+                 #   )
+                 #   bb=do.call(c,bb)
+                 # }
+
+
+                 # if (is.null(group)){
+                 #
+                 #   aa= sapply(lambda, function(x) {lglasso(data=data.train,lambda=x, expFix = expFix)$wi})
+                 #   cc=lapply(aa, function(B){
+                 #     M=ifelse(abs(B)<=10^(-2), 0,1)
+                 #     diag(M)=2
+                 #     M
+                 #   })
+                 #   bb=lapply(cc, function(B) {cvError(data.train=data.train,data.valid=data.valid,B=B)})
+                 #   bb=do.call(c,bb)
+                 # }
+
+                 if (is.null(group)){
+
+                   aa= sapply(lambda, function(x) {lglasso(data=data.train,lambda=x)$wi})
                    cc=lapply(aa, function(B){
                      M=ifelse(abs(B)<=10^(-2), 0,1)
                      diag(M)=2
                      M
                    })
-                   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+                   bb=lapply(cc, function(B) {cvError(data.train=data.train,data.valid=data.valid,B=B)})
                    bb=do.call(c,bb)
                  }
-
-
-
-                 if (type=="general" && !is.null(group)){
-
-                   aa=apply(lambda, 1,function(x){lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList} )
-
-
+                 if (!is.null(group)){
+                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x, expFix = expFix, group=group.train)$wiList})
                    cc=lapply(aa, function(B){
                      lapply(B, function(Z){
                        M=ifelse(abs(Z)<=10^(-1), 0,1)
@@ -1438,71 +1473,39 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
                    }
                    )
 
-                   bb=lapply(cc, function(BB){
-                     cvError(data.train=data.train,data.valid=data.valid,B=BB, group.valid=group.valid, group.train = group.train)
-                   }
-                   )
+                   bb=lapply(cc, function(BB){ cvError(data.train=data.train,data.valid=data.valid,B=BB,
+                                                      group.valid=group.valid, group.train = group.train)})
                    bb=do.call(c,bb)
                  }
 
+                 # if (type=="twoPara" && is.null(group)){
+                 #   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
+                 #   cc=lapply(aa, function(B){
+                 #     M=ifelse(abs(B)<=10^(-2), 0,1)
+                 #     diag(M)=2
+                 #     M
+                 #   })
+                 #   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
+                 #   bb=do.call(c,bb)
+                 # }
 
-                 if (type=="expFixed" && is.null(group)){
-
-                   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type, expFix = expFix)$wi, simplify = FALSE)
-                   cc=lapply(aa, function(B){
-                     M=ifelse(abs(B)<=10^(-2), 0,1)
-                     diag(M)=2
-                     M
-                   })
-                   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
-                   bb=do.call(c,bb)
-                 }
-
-                 if (type=="expFixed" && !is.null(group)){
-                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, expFix = expFix, group=group.train)$wiList})
-                   cc=lapply(aa, function(B){
-                     lapply(B, function(Z){
-                       M=ifelse(abs(Z)<=10^(-1), 0,1)
-                       diag(M)=2
-                       M
-                     }
-                     )
-                   }
-                   )
-
-                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
-                                                      group.valid=group.valid, group.train = group.train))
-                   bb=do.call(c,bb)
-                 }
-
-                 if (type=="twoPara" && is.null(group)){
-                   aa= sapply(lambda, function(x) lglasso(data=data.train,lambda=x,type=type)$wi, simplify = FALSE)
-                   cc=lapply(aa, function(B){
-                     M=ifelse(abs(B)<=10^(-2), 0,1)
-                     diag(M)=2
-                     M
-                   })
-                   bb=lapply(cc, function(B) cvError(data.train=data.train,data.valid=data.valid,B=B))
-                   bb=do.call(c,bb)
-                 }
-
-                 if (type=="twoPara" && !is.null(group)){
-                   # browser()
-                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList})
-                   cc=lapply(aa, function(B){
-                     lapply(B, function(Z){
-                       M=ifelse(abs(Z)<=10^(-1), 0,1)
-                       diag(M)=2
-                       M
-                     }
-                     )
-                   }
-                   )
-
-                   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
-                                                      group.valid=group.valid, group.train = group.train))
-                   bb=do.call(c,bb)
-                 }
+                 # if (type=="twoPara" && !is.null(group)){
+                 #   # browser()
+                 #   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x,type=type, group=group.train)$wiList})
+                 #   cc=lapply(aa, function(B){
+                 #     lapply(B, function(Z){
+                 #       M=ifelse(abs(Z)<=10^(-1), 0,1)
+                 #       diag(M)=2
+                 #       M
+                 #     }
+                 #     )
+                 #   }
+                 #   )
+                 #
+                 #   bb=lapply(cc, function(BB) cvError(data.train=data.train,data.valid=data.valid,B=BB,
+                 #                                      group.valid=group.valid, group.train = group.train))
+                 #   bb=do.call(c,bb)
+                 # }
                  cv_error=bb
 
                  if (trace) {
@@ -1537,7 +1540,7 @@ cvplglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
 #' @export
 #' @import parallel foreach doParallel
 #'
-CVlglasso=function(type=c("general","expFixed","twoPara"), data,group=NULL,
+CVlglasso=function(type=c("expFixed"), data,group=NULL,
                     lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=NULL){
 if (is.null(cores)){
 

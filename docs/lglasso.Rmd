@@ -24,6 +24,7 @@ knitr::opts_chunk$set(
 #library(lglasso)
 library(devtools)
 library(forcats)
+library(fake)
 load_all()
 source("../scripts/simulations.R")
 set.seed(3)
@@ -37,7 +38,7 @@ p=20
 # number of edge in general network
 m1=20
 # the difference between the number of edges in individual networks and general network
-m2=0
+m2=10
 # number of subjects
 n=20
 
@@ -70,12 +71,11 @@ group=rep(0,nrow(ddata))
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01,type="expFixed",expFix=1,tol = 0.01, trace=TRUE)
-
+aa=lglasso(data=ddata,lambda = 0.01)
 ## estimated vs true network
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 estimates
-dd$network
+#dd$network
 
 ## correlation parameter
 aa$tau
@@ -95,13 +95,13 @@ subjects=fct_inorder(ddata$subject)
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01,type="expFixed",random=TRUE,expFix=1,tol = 0.01, trace=TRUE,maxit = 30,N=100)
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE)
 
 ## estimated vs true network
 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 estimates
-dd$network
+#dd$network
 
 ## correlation parameter
  model <- lm(dd$tau ~ aa$tau)
@@ -120,7 +120,7 @@ summary(model)
 #### Generate data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=5)
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=20)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
@@ -129,12 +129,14 @@ group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = 0.01, trace=TRUE)
+#aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = #0.01, trace=TRUE)
+
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),group = group)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 
 ## pre-treatment network estimate vs true network
 estimates[[1]]
-dd$network$pre
+#dd$network$pre
 
 
 ## post-treatment network estimate vs true network
@@ -151,7 +153,7 @@ aa$tau
 #### Generate data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=5,alpha=5,group=2)
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=20,alpha=0.5,group=2)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
@@ -162,18 +164,19 @@ group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 
 ```{r,warning=FALSE}
 
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",random=T,expFix=1,N=100,group = group, tol = 0.01,maxit = 30, trace=TRUE)
+#aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",random=T,expFix=1,N=100,group #= group, tol = 0.01,maxit = 30, trace=TRUE)
 
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),random=T,group = group)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 
 ## pre-treatment network estimate vs true network
 estimates[[1]]
-dd$network$pre
+#dd$network$pre
 
 
 ## post-treatment network estimate vs true network
 estimates[[2]]
-dd$network$post
+#dd$network$post
 
 ## correlation parameters
  model <- lm(dd$tau ~ aa$tau)

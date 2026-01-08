@@ -7,7 +7,18 @@
 importanceSample(n, datai, wi, alpha, groupi)
 }
 \arguments{
-\item{groupi}{}
+\item{n}{the number of random samples}
+
+\item{datai}{the data for subject i}
+
+\item{wi}{the given precision matrix}
+
+\item{alpha}{the exponential distribution with rate alpha}
+
+\item{groupi}{specify how datai is grouped}
+}
+\value{
+a data frame for samples and their weights
 }
 \description{
 Title
