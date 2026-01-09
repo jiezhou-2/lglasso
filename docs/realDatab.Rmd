@@ -1,5 +1,5 @@
 ---
-title: "Estimate heterogeneous  microbial interaction networks from high-dimensional longitudinal data"
+title: "Case study: antibody interaction networks in MADI"
 author: "Jie Zhou"
 date: "2025-07-10"
 output: html_document
