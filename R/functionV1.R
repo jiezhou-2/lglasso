@@ -1272,6 +1272,7 @@ cvplglasso=function(type=c("expFixed"), data,group=NULL,
   cv_error=matrix(0,nrow=nnlambda,ncol=K)
 
   k=NULL
+  k=1
      CV = foreach(k = 1:K, .packages = "lglasso", .combine = "cbind",
                   .inorder = FALSE) %dopar% {
 
@@ -1305,7 +1306,7 @@ cvplglasso=function(type=c("expFixed"), data,group=NULL,
                    bb=do.call(c,bb)
                  }
                  if (!is.null(group)){
-                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x, expFix = expFix, group=group.train)$wiList})
+                   aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x, expFix = expFix, group=group.train)$wi})
                    cc=lapply(aa, function(B){
                      lapply(B, function(Z){
                        M=ifelse(abs(Z)<=10^(-1), 0,1)

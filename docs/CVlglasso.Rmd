@@ -61,7 +61,7 @@ colnames(data2)[1]="group"
 ddata=rbind(data1,data2)
 
 
-lambda1=exp(seq(-10,-1,length=5))
+lambda1=exp(seq(-5,-1,length=5))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
 ```
@@ -85,7 +85,7 @@ plot(bb)
 
 ## Model 2:  heterogeneous individuals
 
-```{r}
+```{r,eval=FALSE}
 set.seed(5)
 dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2)
 ddata=dd$data
@@ -104,7 +104,7 @@ lambda=expand.grid(lambda1,lambda2)
 
 ### one-stage model
 
-```{r}
+```{r,eval=FALSE}
 
 bb=CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5)
 plot(bb)s
@@ -113,7 +113,7 @@ plot(bb)s
 
 ### two-stage model
 
-```{r}
+```{r,eval=FALSE}
 bb=CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=5)
 plot(bb)
 ```
