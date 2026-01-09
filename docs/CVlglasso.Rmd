@@ -48,67 +48,42 @@ rho=0.8
 
 ```
 
-## Model 1: cross validation plot for clustered data with no correlation structure 
 
-```{r, message=FALSE,eval=FALSE}
-set.seed(5)
-library(lglasso)
-cc=matrix(rho,ncol = m3,nrow = m3)
-diag(cc)=1
-dd=Simulate(type="general",n=n,p=p,m1=m1,m2=m2,m3=m3,cc=cc)
-ddata=dd$data
-```
-
-
-
-
-```{r,eval=FALSE}
-## clustered data with no correlation structure
-freq=table(ddata[,1])
-group=c()
-for (i in 1:length(freq)) {
-  group=c(group,1:freq[i])
-}
-group=ifelse(group==1,1,2)
-lambda1=exp(seq(-5,-4,length=3))
-lambda2=lambda1
-lambda=expand.grid(lambda1,lambda2)
-
-bb=CVlglasso(type="general",data=ddata,lambda = lambda1,K=5, cores=5)
-a=plot(bb)
-
-bb=CVlglasso(type="general",group=group,data=ddata,lambda = lambda,K=5,cores=5)
-plot(bb)
-
-```
-
-## Model 2: cross validation plot for longitudinal data with one-parameter structured correlation 
+## Model 1:  homogeneous individuals
 
 ```{r}
 set.seed(5)
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tau=c(2,1))
-ddata=dd$data
-freq=table(ddata$pre[,1])
-group=c()
-for (i in 1:length(freq)) {
-  group=c(group,1:freq[i])
-}
-group=ifelse(group==1,1,2)
-lambda1=exp(seq(-5,-4,length=3))
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tt=10,tau=c(2,1))
+data1=cbind(1,dd$data$pre)
+colnames(data1)[1]="group"
+data2=cbind(2,dd$data$post)
+colnames(data2)[1]="group"
+ddata=rbind(data1,data2)
+
+
+lambda1=exp(seq(-10,-1,length=5))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
 ```
 
-```{r}
-bb=CVlglasso(data=ddata$pre,lambda = lambda1,K=2,cores=5,trace = FALSE)
-plot(bb)
-bb=CVlglasso(group=group,data=ddata$pre,lambda = lambda,K=5,cores=5)
-plot(bb)
 
+### one-stage model
+
+```{r}
+bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=8,cores=10,trace = FALSE)
+plot(bb)
 ```
 
 
-## Model 3: cross validation plot for longitudinal data with two-parameter structured correlation 
+### two-stage model
+
+```{r}
+bb=CVlglasso(data=ddata[,-1],lambda = lambda,group=ddata[,1],K=8,cores=10,trace = FALSE)
+plot(bb)
+```
+
+
+## Model 2:  heterogeneous individuals
 
 ```{r}
 set.seed(5)
@@ -127,10 +102,18 @@ lambda=expand.grid(lambda1,lambda2)
 ```
 
 
+### one-stage model
+
 ```{r}
 
 bb=CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5)
-plot(bb)
+plot(bb)s
+```
+
+
+### two-stage model
+
+```{r}
 bb=CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=5)
 plot(bb)
 ```

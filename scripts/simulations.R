@@ -149,9 +149,6 @@ simulate_long=function(n,p,m1,tt=5,m2=0,tau){
 
   Precision=list()
   Sigma=list()
-
-
-
   mmlist=list()
   theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
   theta[lower.tri(theta, diag = TRUE)] = 0
@@ -166,7 +163,7 @@ simulate_long=function(n,p,m1,tt=5,m2=0,tau){
   sigma2=solve(theta2)
   fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
   if (length(tau)==2){
-    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma1)
+    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma2)
   }
   fulldata=c()
   a1=c()
@@ -269,7 +266,7 @@ trueTau=rexp(n=n,rate=alpha)
   sigma2=solve(theta2)
   fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
   if (group==2){
-    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma1)
+    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma2)
   }
   fulldata=c()
   a1=c()
@@ -368,7 +365,7 @@ simulate_heter=function(n,p,m1,alpha){
 
 
 
-Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=10,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
+Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=1,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
   type=match.arg(type)
 
   if (type=="general"){
