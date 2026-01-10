@@ -61,7 +61,7 @@ colnames(data2)[1]="group"
 ddata=rbind(data1,data2)
 
 
-lambda1=exp(seq(-5,-1,length=5))
+lambda1=exp(seq(-5,-1,length=20))
 lambda2=lambda1
 lambda=expand.grid(lambda1,lambda2)
 ```
@@ -70,7 +70,7 @@ lambda=expand.grid(lambda1,lambda2)
 ### one-stage model
 
 ```{r}
-bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=8,cores=10,trace = FALSE)
+bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=8,cores=14,trace = FALSE)
 plot(bb)
 ```
 

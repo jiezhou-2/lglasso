@@ -1127,7 +1127,8 @@ plot.cvlglasso=function(x, xvar=c("lambda","step"),...){
 
 
   lambda=x$lambda
-  err=apply(x$cv_error, 1, mean)
+  #err=apply(x$cv_error, 1, mean)
+  err=x$cv_error
   if (is.vector(lambda)){
     graphics::plot(x=x_data,y=err,xlab=xlab_label,ylab="CV Error", main = "cvlglasso Fit",
                    type = "b", ...)
@@ -1364,10 +1365,176 @@ if (is.null(cores)){
 
 }else{
 
-  results=cvplglasso(type=type,data=data,group=group,lambda = lambda,nlam=nlam,
-                    lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace,cores=cores)
+  # results=cvplglasso(type=type,data=data,group=group,lambda = lambda,nlam=nlam,
+  #                   lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace,cores=cores)
+  results=cvlglassofull(data=data,group=group,lambda = lambda,nlam=nlam,
+                        lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace,cores=cores)
 }
   return(results)
+}
+
+
+
+#' Title
+#'
+#' @param type model type
+#' @param data raw data
+#' @param group group variable
+#' @param lambda tuning parameter
+#' @param nlam number of tuning parameter
+#' @param lam.min.ratio ratio of largest lambda vs smallest lambda
+#' @param K cv folds
+#' @param expFix given parameter
+#' @param trace whether show the process
+#' @param cores parallel computing
+#' @returns list
+#' @import parallel foreach doParallel
+
+cvlglassofull=function(data,group=NULL,
+                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
+
+
+  if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
+  {stop("group and lambda does not match!")}
+
+  if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
+
+  if (any(lambda<=0)) {stop("tuning parameter lambda should be positive!")}
+
+  if (any(K<=1 | K%%1 !=0)){
+    stop("K should be an integer greater than 1!")
+  }
+
+  num_cores=detectCores()
+  if (cores > num_cores) {
+    cat("\nOnly detected", paste(num_cores, "cores...", sep = " "))
+  }
+  if (cores > K) {
+    cat("\nNumber of cores exceeds K... setting cores = K")
+    cores = K
+  }
+  cluster = makeCluster(cores)
+  registerDoParallel(cluster)
+  subjects=unique(data[,1])
+  n=length(subjects)
+  p=ncol(data)-2
+  ind = sample(n)
+
+  X=data[,-c(1,2)]
+
+
+  S = (nrow(X) - 1)/nrow(X) * stats::cov(X)
+  # crit.cv = match.arg(crit.cv)
+  # start = match.arg(start)
+
+  Sminus = S
+  diag(Sminus) = 0
+  if (is.null(lambda)) {
+    if (!((lam.min.ratio <= 1) && (lam.min.ratio > 0))) {
+      cat("\nlam.min.ratio must be in (0, 1]... setting to 1e-2!")
+      lam.min.ratio = 0.01
+    }
+    if (!((nlam > 0) && (nlam%%1 == 0))) {
+      cat("\nnlam must be a positive integer... setting to 10!")
+      nlam = 10
+    }
+    lam.max = max(abs(Sminus))
+    lam.min = lam.min.ratio * lam.max
+    lambda = 10^seq(log10(lam.min), log10(lam.max), length = nlam)
+    if (!is.null(group)){
+      lambda=expand.grid(lambda,lambda)
+    }
+  }
+  else {
+    if (is.null(group)){
+      lambda = sort(lambda)
+    }
+  }
+
+
+  nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
+  cv_error=matrix(0,nrow=nnlambda,ncol=K)
+
+  crossData=vector("list",K)
+  for (k in 1:K) {
+    crossData[[k]]=ifelse(is.null(group),vector("list",2),vector("list",4))
+    leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
+                                                               n/K)]]
+    indexValid=which(data[,1] %in% leave.out)
+    data.train = data[-indexValid, , drop = FALSE]
+    data_bar = apply(data.train[,-c(1,2)], 2, mean)
+    data.train[,-c(1,2)] = scale(data.train[,-c(1,2)], center = data_bar, scale = FALSE)
+    data.valid = data[indexValid,, drop = FALSE]
+    data.valid[,-c(1,2)] = scale(data.valid[,-c(1,2)], center = data_bar, scale = FALSE)
+    crossData[[k]][[1]]=data.train
+    crossData[[k]][[2]]=data.valid
+    if (!is.null(group)){
+      crossData[[k]][[3]]=group[-indexValid]
+      crossData[[k]][[4]]=group[indexValid]
+    }
+  }
+
+
+
+crossDataLambda=vector("list",K*length(lambda))
+  for (j1 in 1:length(lambda)) {
+    for (j2 in 1:K){
+      i=(j1-1)*K+j2
+      crossDataLambda[[i]]=vector("list",2)
+      crossDataLambda[[i]][[1]]=lambda[j1]
+      crossDataLambda[[i]][[2]]=crossData[[j2]]
+
+    }
+  }
+
+
+  k=NULL
+
+    CV = foreach(k = 1:length(crossDataLambda), .packages = "lglasso", .combine = "cbind",
+                 .inorder = TRUE) %dopar% {
+                 if (trace) {
+                   progress = utils::txtProgressBar(max = K, style = 3)
+                 }
+
+                 if (is.null(group)){
+                   aa= lglasso(data=crossDataLambda[[k]][[2]][[1]],lambda=crossDataLambda[[k]][[1]])$wi[[1]]
+                   cc=ifelse(abs(aa)<=10^(-2), 0,1)
+                   diag(cc)=2
+                   bb= cvError(data.train=crossDataLambda[[k]][[2]][[1]],
+                               data.valid=crossDataLambda[[k]][[2]][[2]],
+                               B=cc)
+                 }
+                 if (!is.null(group)){
+                   aa=lglasso(data=crossDataLambda[[k]][[2]][[1]],
+                              lambda=crossDataLambda[[k]][[1]],
+                              expFix = expFix,
+                              group=crossDataLambda[[k]][[2]][[3]])$wi
+                   cc=ifelse(abs(aa)<=10^(-1), 0,1)
+                   diag(cc)=2
+                   bb=cvError(data.train=crossDataLambda[[k]][[2]][[1]],
+                              data.valid=crossDataLambda[[k]][[2]][[2]],
+                              B=cc,
+                              group.valid=crossDataLambda[[k]][[2]][[4]],
+                              group.train = crossDataLambda[[k]][[2]][[3]])
+                 }
+
+                 cv_error=bb
+
+                 if (trace) {
+                   utils::setTxtProgressBar(progress,  k)
+                 }
+
+                 return(cv_error=cv_error)
+                 }
+    aa=c()
+    for (i in 1:nnlambda) {
+     aa=c(aa, mean(CV[((i-1)*K+1):(i*K)]))
+    }
+    names(aa)=paste0("lambda",1:nnlambda)
+
+  stopCluster(cluster)
+  output=structure(list(cv_error=aa, lambda=lambda),class="cvlglasso")
+  return(output)
 }
 
 
