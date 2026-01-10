@@ -119,7 +119,6 @@ if (!is.list(data)){
       }
       obj=-(obj1+obj2)
     }
-
     tau=stats::optim(c(tau0[1]),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
     Tau=c(Tau,tau)
     A=lapply(time_list,phifunction,tau=tau)
