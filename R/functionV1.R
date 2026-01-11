@@ -1454,10 +1454,9 @@ cvlglassofull=function(data,group=NULL,
 
   nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
   cv_error=matrix(0,nrow=nnlambda,ncol=K)
-
   crossData=vector("list",K)
-  for (k in 1:K) {
-    crossData[[k]]=ifelse(is.null(group),vector("list",2),vector("list",4))
+  names(crossData)=paste0("CVdata",1:K)
+  for (k in seq_len(K)) {
     leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
                                                                n/K)]]
     indexValid=which(data[,1] %in% leave.out)
@@ -1466,56 +1465,66 @@ cvlglassofull=function(data,group=NULL,
     data.train[,-c(1,2)] = scale(data.train[,-c(1,2)], center = data_bar, scale = FALSE)
     data.valid = data[indexValid,, drop = FALSE]
     data.valid[,-c(1,2)] = scale(data.valid[,-c(1,2)], center = data_bar, scale = FALSE)
-    crossData[[k]][[1]]=data.train
-    crossData[[k]][[2]]=data.valid
-    if (!is.null(group)){
-      crossData[[k]][[3]]=group[-indexValid]
-      crossData[[k]][[4]]=group[indexValid]
-    }
+
+
+    if(is.null(group)){
+      crossData[[k]]=list(train=data.train,
+                          validation=data.valid)
+    }else{
+   crossData[[k]]=list(train=data.train,
+                          validation=data.valid,
+                          trainGroup=group[-indexValid],
+                          validationGroup=group[indexValid])
+      }
   }
 
 
 
 crossDataLambda=vector("list",K*length(lambda))
-  for (j1 in 1:length(lambda)) {
+  for (j1 in 1:nnlambda) {
     for (j2 in 1:K){
       i=(j1-1)*K+j2
-      crossDataLambda[[i]]=vector("list",2)
-      crossDataLambda[[i]][[1]]=lambda[j1]
-      crossDataLambda[[i]][[2]]=crossData[[j2]]
-
+      if (is.null(group)){
+        LL=lambda[j1]
+      }else{
+        LL=unlist(lambda[j1,])
+      }
+      crossDataLambda[[i]]=list(lambda=LL,crossData=crossData[[j2]])
     }
   }
 
 
   k=NULL
+  k=1
 
-    CV = foreach(k = 1:length(crossDataLambda), .packages = "lglasso", .combine = "cbind",
-                 .inorder = TRUE) %dopar% {
+       CV = foreach(k = 1:length(crossDataLambda), .packages = "lglasso", .combine = "cbind",
+                    .inorder = TRUE) %dopar% {
                  if (trace) {
                    progress = utils::txtProgressBar(max = K, style = 3)
                  }
-
                  if (is.null(group)){
-                   aa= lglasso(data=crossDataLambda[[k]][[2]][[1]],lambda=crossDataLambda[[k]][[1]])$wi[[1]]
+                   aa= lglasso(data=crossDataLambda[[k]]$crossData$train,lambda=crossDataLambda[[k]]$lambda)$wi[[1]]
                    cc=ifelse(abs(aa)<=10^(-2), 0,1)
                    diag(cc)=2
-                   bb= cvError(data.train=crossDataLambda[[k]][[2]][[1]],
-                               data.valid=crossDataLambda[[k]][[2]][[2]],
+                   bb= cvError(data.train=crossDataLambda[[k]]$crossData$train,
+                               data.valid=crossDataLambda[[k]]$crossData$validation,
                                B=cc)
                  }
                  if (!is.null(group)){
-                   aa=lglasso(data=crossDataLambda[[k]][[2]][[1]],
-                              lambda=crossDataLambda[[k]][[1]],
+                   aa=lglasso(data=crossDataLambda[[k]]$crossData$train,
+                              lambda=crossDataLambda[[k]]$lambda,
                               expFix = expFix,
-                              group=crossDataLambda[[k]][[2]][[3]])$wi
-                   cc=ifelse(abs(aa)<=10^(-1), 0,1)
-                   diag(cc)=2
-                   bb=cvError(data.train=crossDataLambda[[k]][[2]][[1]],
-                              data.valid=crossDataLambda[[k]][[2]][[2]],
+                              group=crossDataLambda[[k]]$crossData$trainGroup)$wi
+                   aa[[1]]=ifelse(abs(aa[[1]])<=10^(-1), 0,1)
+                   diag(aa[[1]])=2
+                   aa[[2]]=ifelse(abs(aa[[2]])<=10^(-1), 0,1)
+                   diag(aa[[2]])=2
+                   cc=aa
+                   bb=cvError(data.train=crossDataLambda[[k]]$crossData$train,
+                              data.valid=crossDataLambda[[k]]$crossData$validation,
                               B=cc,
-                              group.valid=crossDataLambda[[k]][[2]][[4]],
-                              group.train = crossDataLambda[[k]][[2]][[3]])
+                              group.valid=crossDataLambda[[k]]$crossData$validationGroup,
+                              group.train = crossDataLambda[[k]]$crossData$trainGroup)
                  }
 
                  cv_error=bb
