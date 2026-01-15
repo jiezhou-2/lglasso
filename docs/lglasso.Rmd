@@ -27,18 +27,17 @@ library(forcats)
 library(fake)
 load_all()
 source("../scripts/simulations.R")
-set.seed(3)
 ```
 
 
 
 ```{r, message=FALSE}
 # number of nodes
-p=20
+p=10
 # number of edge in general network
 m1=20
 # the difference between the number of edges in individual networks and general network
-m2=10
+m2=2
 # number of subjects
 n=20
 
@@ -49,21 +48,20 @@ n=20
 
 ## One-stage model
 
-
-
 ### Estimate the network based on homogeneous one-stage model
-
 
 #### Generate data 
 
 
 ```{r,warning=FALSE}
 
-
+set.seed(1)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
 ddata=dd$data
 subjects=fct_inorder(ddata$subject)
 group=rep(0,nrow(ddata))
+homoData=list(data=ddata)
+saveRDS(homoData,file="homoOneStageData.rds")
 ```
 
 
@@ -71,11 +69,14 @@ group=rep(0,nrow(ddata))
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01)
-## estimated vs true network
+set.seed(1)
+aa=lglasso(data=ddata,lambda = 0.01,trace=T)
+saveRDS(aa,file="homoOneStageResult.rds")
+## estimated network 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 estimates
-#dd$network
+## true network 
+dd$network
 
 ## correlation parameter
 aa$tau
@@ -87,21 +88,26 @@ aa$tau
 #### Generate data 
 
 ```{r,warning=FALSE}
+set.seed(1)
 dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group=1)
 ddata=dd$data$pre
 subjects=fct_inorder(ddata$subject)
+heterData=list(data=ddata)
+saveRDS(heterData,file="heterOneStageData.rds")
 ```
 
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01,random=TRUE)
-
-## estimated vs true network
+set.seed(1)
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T)
+saveRDS(aa,file="heterOneStageResult.rds")
+## estimated network  
 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 estimates
-#dd$network
+##  true network
+dd$network
 
 ## correlation parameter
  model <- lm(dd$tau ~ aa$tau)
@@ -120,27 +126,34 @@ summary(model)
 #### Generate data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=20)
+set.seed(1)
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=2)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+homoTwoStageData=list(data=ddata,group=group)
+saveRDS(homoTwoStageData,file="homoTwoStageData.rds")
 ```
 
 #### Estimation
 
 ```{r,warning=FALSE}
-#aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",expFix=1,group = group, tol = #0.01, trace=TRUE)
-
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),group = group)
+set.seed(1)
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),group = group,trace=T)
+saveRDS(aa,file="homoTwoStageResult.rds")
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 
-## pre-treatment network estimate vs true network
+## pre-treatment network estimate 
 estimates[[1]]
-#dd$network$pre
+
+##  true post-treatment network
+dd$network$pre
 
 
-## post-treatment network estimate vs true network
+## post-treatment network estimate 
 estimates[[2]]
+
+##  true post-treatment network
 dd$network$post
 ## correlation parameters
 aa$tau
@@ -153,30 +166,36 @@ aa$tau
 #### Generate data 
 
 ```{r,warning=FALSE}
+set.seed(1)
 dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=20,alpha=0.5,group=2)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+heterTwoStageData=list(data=ddata,group=group)
+saveRDS(heterTwoStageData,file="heterTwoStageData.rds")
 ```
 
 
 #### Estimation
 
 ```{r,warning=FALSE}
-
-#aa=lglasso(data=ddata,lambda = c(0.1,0.1),type="expFixed",random=T,expFix=1,N=100,group #= group, tol = 0.01,maxit = 30, trace=TRUE)
-
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),random=T,group = group)
+set.seed(1)
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),random=T,group = group,trace=T)
+saveRDS(aa,file="heterTwoStageResult.rds")
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 
-## pre-treatment network estimate vs true network
+## pre-treatment network estimate 
 estimates[[1]]
-#dd$network$pre
+
+##  true pre-treatment network
+dd$network$pre
 
 
-## post-treatment network estimate vs true network
+## post-treatment network estimate 
 estimates[[2]]
-#dd$network$post
+
+##  true post-treatment network
+dd$network$post
 
 ## correlation parameters
  model <- lm(dd$tau ~ aa$tau)

@@ -61,8 +61,8 @@ colnames(data2)[1]="group"
 ddata=rbind(data1,data2)
 
 
-lambda1=exp(seq(-5,-1,length=10))
-lambda2=lambda1
+lambda1=exp(seq(-5,-1,length=5))
+lambda2=lambda1[1:2]
 lambda=expand.grid(lambda1,lambda2)
 ```
 
@@ -70,7 +70,7 @@ lambda=expand.grid(lambda1,lambda2)
 ### one-stage model
 
 ```{r}
-bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=10,cores=14,trace = FALSE)
+bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=3,cores=14,trace = FALSE)
 plot(bb)
 ```
 
@@ -85,18 +85,17 @@ plot(bb)
 
 ## Model 2:  heterogeneous individuals
 
-```{r,eval=FALSE}
+```{r}
 set.seed(5)
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2)
-ddata=dd$data
-freq=table(ddata[,1])
-group=c()
-for (i in 1:length(freq)) {
-  group=c(group,1:freq[i])
-}
-group=ifelse(group==1,1,2)
-lambda1=exp(seq(-3,-2,length=3))
-lambda2=exp(seq(-3,-2,length=3))
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2,group=2)
+data1=cbind(1,dd$data$pre)
+colnames(data1)[1]="group"
+data2=cbind(2,dd$data$post)
+colnames(data2)[1]="group"
+ddata=rbind(data1,data2)
+
+lambda1=exp(seq(-5,0,length=5))
+lambda2=exp(seq(-5,-0,length=2))
 lambda=expand.grid(lambda1,lambda2)
 
 ```
@@ -104,17 +103,17 @@ lambda=expand.grid(lambda1,lambda2)
 
 ### one-stage model
 
-```{r,eval=FALSE}
+```{r}
 
-bb=CVlglasso(type="twoPara",data=ddata,lambda = lambda1,K=5,cores=5)
-plot(bb)s
+bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=3,cores=14,random=TRUE)
+plot(bb)
 ```
 
 
 ### two-stage model
 
-```{r,eval=FALSE}
-bb=CVlglasso(type="twoPara",group=group,data=ddata,lambda = lambda,K=5,cores=5)
+```{r}
+bb=CVlglasso(data=ddata[,-1],group=ddata[,1],lambda = lambda,K=3,cores=14,random = TRUE)
 plot(bb)
 ```
 

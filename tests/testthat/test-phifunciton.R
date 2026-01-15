@@ -1,10 +1,40 @@
-expected_matrix1=readRDS("phidata1.rds")
-expected_matrix2=readRDS("phidata2.rds")
-test_that("phifunction generate phi matrix correctly", {
-  expect_equal(phifunction(t=1:15,tau = c(1.4,1)), expected_matrix1)
+
+homo1data=readRDS("homoOneStageData.rds")
+homo1result=readRDS("homoOneStageResult.rds")
+homo2data=readRDS("homoTwoStageData.rds")
+homo2result=readRDS("homoTwoStageResult.rds")
+heter1data=readRDS("heterOneStageData.rds")
+heter1result=readRDS("heterOneStageResult.rds")
+heter2data=readRDS("heterTwoStageData.rds")
+heter2result=readRDS("heterTwoStageResult.rds")
+set.seed(1)
+test_that("lglasso", {
+  expect_equal(lglasso(data=homo1data[[1]],lambda = 0.01,trace=T), homo1result)
+})
+set.seed(1)
+test_that("lglasso", {
+  expect_equal(lglasso(data=homo2data[[1]],lambda = c(0.1,0.1),group = homo2data[[2]],trace=T),
+               homo2result)
+})
+
+set.seed(1)
+test_that("lglasso", {
+
+  expect_equal(lglasso(data=heter1data[[1]],lambda = 0.01,random=T,trace=T)$wi,
+               heter1result$wi)
 })
 
 
-test_that("phifunction generate phi matrix correctly", {
-  expect_equal(phifunction(t=1:15,tau = 1.4), expected_matrix2)
+set.seed(1)
+test_that("lglasso", {
+  expect_equal(lglasso(data=heter2data[[1]],lambda = c(0.1,0.1),random=T,trace=T,
+                       group = heter2data[[2]])$wi,
+               heter2result$wi)
 })
+
+
+
+
+
+
+

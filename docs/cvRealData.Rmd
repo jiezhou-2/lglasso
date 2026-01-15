@@ -51,8 +51,15 @@ for (i in 1:nrow(index)) {
 }
 postdata[,-c(1,2)]=log10(1+postdata[,-c(1,2)])
 group=ifelse(postdata$visit_name==2,1,2)
-aa1=lglasso(data=postdata,lambda = 0.5,random = FALSE)
-aa1$wi[[1]][1:10,1:10]
+lambda=exp(seq(-5,-1,length=3))
+aa1=CVlglasso(data=postdata,lambda = lambda,K=3,cores=14,trace = FALSE,random = FALSE)
+plot(aa1)
+```
+
+
+```{r,echo=FALSE}
+aa1=readRDS("homo1.rds")
+plot(aa1)
 ```
 
 
@@ -70,9 +77,11 @@ fulldata[,-c(1,2)]=log10(1+fulldata[,-c(1,2)])
 index=which(fulldata$subject_accession==23)
 fulldata=fulldata[-index,]
 group=ifelse(fulldata$visit_name==2,1,2)
-aa2=lglasso(data=fulldata,lambda = c(0.5,0.1),group = group,random = FALSE)
-aa2$wi[[1]][1:10,1:10]
-aa2$wi[[2]][1:10,1:10]
+lambda1=exp(seq(-5,-1,length=3))
+lambda2=lambda1
+lambda=expand.grid(lambda1,lambda2)
+aa1=CVlglasso(data=fulldata,lambda = lambda,K=3,cores=14,trace = FALSE,random = FALSE,group = group)
+plot(aa1)
 ```
 
 
@@ -80,16 +89,24 @@ aa2$wi[[2]][1:10,1:10]
 
 ### one-stage model (post vaccination data)
 
-```{r}
-aa1=lglasso(data=postdata,lambda = 0.1,random = TRUE)
-aa1$wi[[1]][1:10,1:10]
+```{r,eval=FALSE}
+lambda=exp(seq(-5,-1,length=10))
+aa1=CVlglasso(data=postdata,lambda = lambda,K=3,cores=14,trace = FALSE,random = TRUE)
+plot(aa1)
+```
+
+```{r,echo=FALSE}
+aa1=readRDS("heter1.rds")
+plot(aa1)
 ```
 
 ### two-stage model (full data)
 
-```{r}
-aa2=lglasso(data=fulldata,lambda = c(0.5,0.1),group = group,random = TRUE)
-aa2$wi[[1]][1:10,1:10]
-aa2$wi[[2]][1:10,1:10]
+```{r,eval=FALSE}
+lambda1=exp(seq(-5,-1,length=10))
+lambda2=lambda1
+lambda=expand.grid(lambda1,lambda2)
+aa1=CVlglasso(data=fulldata,lambda = lambda,K=3,cores=14,trace = FALSE,random = TRUE,group = group)
+plot(aa1)
 ```
 
