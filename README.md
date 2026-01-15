@@ -27,7 +27,7 @@ two more features, which are
 2)  Cross validation. This version added function *CVlglasso* to select
     tuning parameter using cross validation method, where MSE of testing
     sets is minimized. Note we conduct the cross validation on the
-    subject level instead of individual data level.
+    subject level instead of individual data point level.
 
 </div>
 
