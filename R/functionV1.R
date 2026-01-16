@@ -347,7 +347,7 @@ if (max(d1)<=tol && max(d2)<= tol ){
 
 
 if (k>=maxit){
-  warning("Algorithm did not converge!")
+  message("Algorithm reached the maximum iteration!")
   output=structure(list(wi=B1, v=A1$corMatrix, tau=tau0), class="lglasso")
   break
 }
@@ -447,7 +447,7 @@ importanceSample=function(n,datai,wi,alpha,groupi){
   likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
   likelihood2=apply(dd1, 1, dexp,rate=alpha)
   index1=which(!is.nan(likelihood1))
-  index2=which(!is.infinite(likelihood1) )
+  index2=which(!is.infinite(likelihood1))
 index=intersect(index1,index2)
 if (length(index)==0){stop("No valid samples are generated!")}
   weights=likelihood1[index]/likelihood2[index]
@@ -458,33 +458,57 @@ if (length(index)==0){stop("No valid samples are generated!")}
 
 #' Title
 #'
-#' @param importancesSample given random samples
+#' @param importancesSample the random samples
 #' @param datai the data for subject i
 #' @param groupi specify how datai is grouped
 #' @returns a list of estimated
 
 importanceEstimates=function(importancesSample,datai,groupi){
-
   data=split(datai,f=factor(groupi,levels = unique(groupi)))
+  tt=split(datai[,2],f=factor(groupi,levels = unique(groupi)))
   sample0=importancesSample[,1]
   ff=seq(1,length(sample0),1)
   sampleTau=split(sample0,f=ff)
   weightTau=importancesSample[,2]
   estimateTau=sum(sample0*weightTau)
-  estimatePhi=vector("list",length(data))
-  for (i in 1:length(data)) {
-    timepoints=data[[i]][,2]
-    phiMi=lapply(sampleTau,phifunction,t=timepoints)
-    #s=lapply(phiMi,function(phiMi) {t(data[[i]][,-c(1,2)])%*%solve(phiMi)%*%data[[i]][,-c(1,2)]})
-    aa=0
-    for (j in 1:length(phiMi)) {
-      aa=aa+phiMi[[j]]*weightTau[j]
-    }
-    estimatePhi[[i]]=aa
-  }
+  estimatePhi=lapply(tt, phifunction,tau=estimateTau)
+  #estimatePhi=vector("list",length(data))
+  # for (i in 1:length(data)) {
+  #   timepoints=data[[i]][,2]
+  #   phiMi=lapply(sampleTau,phifunction,t=timepoints)
+  #   #s=lapply(phiMi,function(phiMi) {t(data[[i]][,-c(1,2)])%*%solve(phiMi)%*%data[[i]][,-c(1,2)]})
+  #   aa=0
+  #   for (j in 1:length(phiMi)) {
+  #     aa=aa+phiMi[[j]]*weightTau[j]
+  #   }
+  #   estimatePhi[[i]]=aa
+  # }
   estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
   return(estimates)
 }
+
+# importanceEstimates=function(importancesSample,datai,groupi){
+#
+#   data=split(datai,f=factor(groupi,levels = unique(groupi)))
+#   sample0=importancesSample[,1]
+#   ff=seq(1,length(sample0),1)
+#   sampleTau=split(sample0,f=ff)
+#   weightTau=importancesSample[,2]
+#   estimateTau=sum(sample0*weightTau)
+#   estimatePhi=vector("list",length(data))
+#   for (i in 1:length(data)) {
+#     timepoints=data[[i]][,2]
+#     phiMi=lapply(sampleTau,phifunction,t=timepoints)
+#     #s=lapply(phiMi,function(phiMi) {t(data[[i]][,-c(1,2)])%*%solve(phiMi)%*%data[[i]][,-c(1,2)]})
+#     aa=0
+#     for (j in 1:length(phiMi)) {
+#       aa=aa+phiMi[[j]]*weightTau[j]
+#     }
+#     estimatePhi[[i]]=aa
+#   }
+#   estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
+#   return(estimates)
+# }
 
 
 #' Title
@@ -501,7 +525,6 @@ AAheter=function(data,wi,alpha,group,l){
   A=vector("list",length(subjects))
   Tau=matrix(nrow=length(subjects),ncol=1)
   simTau=matrix(rexp(n=l,rate=alpha),ncol=1)
-  #browser()
   dataList=split(data,f=factor(data[,1],levels=subjects))
   groupList=split(group,f=factor(data[,1],levels=subjects))
   for (i in 1:length(subjects)) {
@@ -558,14 +581,14 @@ lglassoHeter=function(data,lambda,expFix,group,maxit,
   if (!is.null(group))  {
 
     if (length(group)!=nrow(data)){
-      stop("group should be the same length of the columns of data!")
+      stop("Argument group should be the same length as  the number of the columns of data!")
     }
-
-
-    dataList=split(data,f=factor(group,levels = unique(group)))
-
-    if (length(lambda)!= length(unique(group))){
-      stop("Arguments (group, lambda) do not match!")
+    if (length(unique(group))!=2){
+      stop("Data can only be divided into two groups at most, such as pre/post treatment!")
+    }
+    if (length(lambda)!= 2){
+      stop("Tuning parameter lambda can only be of length 2 if data is
+           divided into two groups!")
     }
 
   }
@@ -619,82 +642,14 @@ nn=length(unique(group))
     }
 
     if (k>=maxit){
-      warning("Algorithm did not converge!")
+      message("Algorithm reached the maximum iteration!")
       output=structure(list(wi=B1, tau=tau0,alpha=alpha0), class="lglasso")
       break
     }
 
   }
-
-
   return(output)
 }
-
-
-
-#   if (type == "twoPara"){
-#     p=ncol(data)-2
-#     fre=table(data[,1])
-#     A=vector("list",length(fre))
-#     for (i in 1:length(A)) {
-#       A[[i]]=diag(fre[i])
-#     }
-#     B=diag(p)
-#     k=0
-# tau0=tau0
-#     while(1){
-#       k=k+1
-#       A1=AA(data = data,B = B, type=type, fix=fix)
-#       B1=BB(data=data,A=A,lambda = lambda[1], type=type,start=start, w.init=w.init,wi.init=wi.init,...)
-#
-#       d1=round(max(abs(B-B1$preMatrix)),4)
-#       d2=round(max(abs(tau0-A1$tau)),4)
-#       if (trace){
-#       print(paste0("iteration ",k, " precision difference: ",d1 , " /correlation tau difference: ",d2))
-#       }
-#       if (d1<= tol & d2<= tol ){
-#
-#         if (is.null(group)){
-#           output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-#         }else{
-#
-#           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-#           output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-#         }
-#         break
-#       }else{
-#         A=A1$corMatrixList
-#         B=B1$preMatrix
-#         tau0=A1$tau
-#       }
-#       if (k>= maxit){
-#         warning("Algorithm did not converge!")
-#
-#         if (is.null(group)){
-#           output=structure(list(wi=B1$preMatrix, wList=NULL,vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-#
-#         }else{
-#           #browser()
-#           individial=heternetwork(data = data,lambda = lambda[2],homo = B1$preMatrix, group=group)
-#           output=structure(list(wi=B1$preMatrix, wiList=individial, vList=A1$corMatrixList, tauhat=tau0), class="lglasso")
-#       }
-#         break
-#           }
-#
-#     }
-#
-#   }
-
-
-
-
-
-
-
-
-
-
-
 
 cvErrorji=function(data.train,data.valid,bi){
 
@@ -715,7 +670,6 @@ cvErrorji=function(data.train,data.valid,bi){
 
       y=data.train[,i+2]
       x=as.matrix(data.train[,index+2])
-      #browser()
       coef.train=stats::lm(y~x)$coef
       yy=data.valid[,i+2, drop=FALSE]
       # if(nrow(data.valid)>1 && ncol(data.valid>1)){
@@ -728,7 +682,6 @@ cvErrorji=function(data.train,data.valid,bi){
       cv_error=c(cv_error,mean(err[,,drop=TRUE]))
       if (any(is.na(cv_error))) {
         print("cv error is missing!")
-        #browser()}
     }
 
   return(mean(cv_error))
@@ -754,7 +707,6 @@ cvErrorj=function(data.train,data.valid,B){
 #' @returns a matrix
 #'
 cvError=function(data.train,data.valid,B,group.train=NULL,group.valid=NULL){
-#browser()
 
   if (is.matrix(B)){
     a=  cvErrorj(data.train=data.train,data.valid=data.valid,B=B)
@@ -1181,19 +1133,11 @@ cvplglasso=function(type=c("expFixed"), data,group=NULL,
 #' @import parallel foreach doParallel
 #'
 CVlglasso=function(type=c("expFixed"), data,group=NULL,random=FALSE,
-                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=NULL){
-#if (is.null(cores)){
+                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
 
-#   results=cvlglasso(type=type,data=data,group=group,lambda = lambda,nlam=nlam,
-#                     lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace)
-#
-# }else{
-
-  # results=cvplglasso(type=type,data=data,group=group,lambda = lambda,nlam=nlam,
-  #                   lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace,cores=cores)
   results=cvlglassofull(data=data,group=group,lambda = lambda,nlam=nlam,random = random,
-                        lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace,cores=cores)
-#}
+                        lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace)
+
   return(results)
 }
 
@@ -1215,30 +1159,40 @@ CVlglasso=function(type=c("expFixed"), data,group=NULL,random=FALSE,
 #' @import parallel foreach doParallel
 
 cvlglassofull=function(data,group=NULL,
-                    lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
+                    lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
 
-
-  if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
+if (!is.null(lambda)){
+  if (is.null(group) && !is.vector(lambda))
   {stop("group and lambda does not match!")}
 
-  if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
-
+  if (!is.null(group) && ncol(lambda)!=2)
+  {stop("group and lambda does not match!")}
   if (any(lambda<=0)) {stop("tuning parameter lambda should be positive!")}
+
+}
 
   if (any(K<=1 | K%%1 !=0)){
     stop("K should be an integer greater than 1!")
   }
 
-  num_cores=detectCores()
-  if (cores > num_cores) {
-    cat("\nOnly detected", paste(num_cores, "cores...", sep = " "))
+  cores=detectCores()
+
+
+  if (is.null(lambda)){
+    if (is.null(group)){
+      N=K*nlam
+    }else{
+      N=K*nlam^2
+    }
+  }else{
+N=ifelse(is.vector(lambda),K*length(lambda),K*nrow(lambda))
   }
-#browser()
-  N=ifelse(is.null(lambda),K*nlam,ifelse(is.vector(lambda),length(lambda),K*nrow(lambda)))
-  if (cores > N) {
-    cat("\nNumber of cores exceeds K*nlambda... setting cores = K*nlambda")
-    cores = N
-  }
+
+
+
+  if (cores > N) {cores = N}
+  cat("\nNumber of cores used =", cores, "\n")
+
   cluster = makeCluster(cores)
   registerDoParallel(cluster)
   subjects=unique(data[,1])
@@ -1273,7 +1227,7 @@ cvlglassofull=function(data,group=NULL,
   }
   else {
     if (is.null(group)){
-      lambda = sort(lambda)
+      lambda = sort(lambda,decreasing = FALSE)
     }
   }
 

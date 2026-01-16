@@ -39,7 +39,7 @@ wideData=wideData[order(wideData$subject_accession,wideData$visit_name),]
 
 ###  one-stage model (post vaccination data)
 
-```{r}
+```{r,eval=FALSE}
 index=which(wideData$visit_name<3)
 postdata=wideData[-index,]
 index=which(is.na(postdata),arr.ind = T)
@@ -52,7 +52,7 @@ for (i in 1:nrow(index)) {
 postdata[,-c(1,2)]=log10(1+postdata[,-c(1,2)])
 group=ifelse(postdata$visit_name==2,1,2)
 lambda=exp(seq(-5,-1,length=3))
-aa1=CVlglasso(data=postdata,lambda = lambda,K=3,cores=14,trace = FALSE,random = FALSE)
+aa1=CVlglasso(data=postdata,lambda = lambda,K=3,trace = FALSE,random = FALSE)
 plot(aa1)
 ```
 
@@ -65,7 +65,7 @@ plot(aa1)
 
 ### two-stage model (full data)
 
-```{r}
+```{r,eval=FALSE}
 index=which(is.na(wideData),arr.ind = T)
 aa=as.numeric(names(which(table(index[,2])>0.1*nrow(wideData))))
 fulldata=wideData[,-aa]
@@ -96,8 +96,8 @@ plot(aa1)
 ```
 
 ```{r,echo=FALSE}
-aa1=readRDS("heter1.rds")
-plot(aa1)
+aa2=readRDS("heter1.rds")
+plot(aa2)
 ```
 
 ### two-stage model (full data)

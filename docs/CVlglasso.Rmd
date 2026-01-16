@@ -34,13 +34,13 @@ set.seed(3)
 
 ```{r, message=FALSE}
 # number of nodes
-p=20
+p=10
 # number of edge in general network
-m1=100
+m1=10
 # the difference between the number of edges in individual networks and general network
-m2=0
+m2=1
 #  number of clusters
-m3=4
+m3=0
 # number of subjects
 n=20
 # correlation between cluster
@@ -70,7 +70,7 @@ lambda=expand.grid(lambda1,lambda2)
 ### one-stage model
 
 ```{r}
-bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=3,cores=14,trace = FALSE)
+ bb=CVlglasso(data=data1[,-1],nlam =  10,K=3)
 plot(bb)
 ```
 
@@ -78,7 +78,7 @@ plot(bb)
 ### two-stage model
 
 ```{r}
-bb=CVlglasso(data=ddata[,-1],lambda = lambda,group=ddata[,1],K=3,cores=14,trace = FALSE)
+bb=CVlglasso(data=ddata[,-1],nlam = 5,group=ddata[,1],K=3)
 plot(bb)
 ```
 
@@ -105,7 +105,7 @@ lambda=expand.grid(lambda1,lambda2)
 
 ```{r}
 
-bb=CVlglasso(data=data1[,-1],lambda = lambda1,K=3,cores=14,random=TRUE)
+bb=CVlglasso(data=data1[,-1],nlam = 10,K=3,random=TRUE)
 plot(bb)
 ```
 
@@ -113,7 +113,7 @@ plot(bb)
 ### two-stage model
 
 ```{r}
-bb=CVlglasso(data=ddata[,-1],group=ddata[,1],lambda = lambda,K=3,cores=14,random = TRUE)
+bb=CVlglasso(data=ddata[,-1],group=ddata[,1],nlam = 5,K=3,random = TRUE)
 plot(bb)
 ```
 
