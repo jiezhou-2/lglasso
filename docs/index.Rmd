@@ -21,10 +21,10 @@ knitr::opts_chunk$set(
 
 [CVlglasso examples](CVlglasso.html)
 
-[MADI antibody interaction networks](realDatab.html)
+[Antibody interaction networks](realDatab.html)
 
 
-
+[Antibody interaction networks: cross validation](cvRealData.html)
 
 
 
