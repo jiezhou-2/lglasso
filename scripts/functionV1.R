@@ -248,7 +248,7 @@ if (m==1){
 #'    from different tissues or contents, model \code{general} should be adopted.
 #'
 #'
-lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
+lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=2000,maxit=30,
                  tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
                  w.init=NULL, wi.init=NULL,trace=FALSE, type=c("expFixed"),
                  ...)
@@ -472,43 +472,9 @@ importanceEstimates=function(importancesSample,datai,groupi){
   weightTau=importancesSample[,2]
   estimateTau=sum(sample0*weightTau)
   estimatePhi=lapply(tt, phifunction,tau=estimateTau)
-  #estimatePhi=vector("list",length(data))
-  # for (i in 1:length(data)) {
-  #   timepoints=data[[i]][,2]
-  #   phiMi=lapply(sampleTau,phifunction,t=timepoints)
-  #   #s=lapply(phiMi,function(phiMi) {t(data[[i]][,-c(1,2)])%*%solve(phiMi)%*%data[[i]][,-c(1,2)]})
-  #   aa=0
-  #   for (j in 1:length(phiMi)) {
-  #     aa=aa+phiMi[[j]]*weightTau[j]
-  #   }
-  #   estimatePhi[[i]]=aa
-  # }
   estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
   return(estimates)
 }
-
-# importanceEstimates=function(importancesSample,datai,groupi){
-#
-#   data=split(datai,f=factor(groupi,levels = unique(groupi)))
-#   sample0=importancesSample[,1]
-#   ff=seq(1,length(sample0),1)
-#   sampleTau=split(sample0,f=ff)
-#   weightTau=importancesSample[,2]
-#   estimateTau=sum(sample0*weightTau)
-#   estimatePhi=vector("list",length(data))
-#   for (i in 1:length(data)) {
-#     timepoints=data[[i]][,2]
-#     phiMi=lapply(sampleTau,phifunction,t=timepoints)
-#     #s=lapply(phiMi,function(phiMi) {t(data[[i]][,-c(1,2)])%*%solve(phiMi)%*%data[[i]][,-c(1,2)]})
-#     aa=0
-#     for (j in 1:length(phiMi)) {
-#       aa=aa+phiMi[[j]]*weightTau[j]
-#     }
-#     estimatePhi[[i]]=aa
-#   }
-#   estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
-#   return(estimates)
-# }
 
 
 #' Title
@@ -571,27 +537,46 @@ lglassoHeter=function(data,lambda,expFix,group,maxit,
 {
   p=ncol(data)-2
   m=length(unique(data[,1]))
+
+
+  # if (!is.null(group))  {
+  #
+  #   if (length(group)!=nrow(data)){
+  #     stop("Argument group should be the same length as  the number of the columns of data!")
+  #   }
+  #   if (length(unique(group))!=2){
+  #     stop("Data can only be divided into two groups at most, such as pre/post treatment!")
+  #   }
+  #   if (length(lambda)!= 2){
+  #     stop("Tuning parameter lambda can only be of length 2 if data is
+  #          divided into two groups!")
+  #   }
+  #
+  # }
+  #
+  # if (is.null(group))  {
+  #   group=rep(1,nrow(data))
+  #   if (length(lambda)!=1){
+  #     stop("Arguments (group, lambda) do not match!")
+  #   }
+  # }
+
   if (is.null(group))  {
-    group=rep(1,nrow(data))
-    if (length(lambda)!=1){
-      stop("Arguments (group, lambda) do not match!")
-    }
-  }
+         group=rep(1,nrow(data))
+         if (length(lambda)!=1){
+             stop("Arguments (group, lambda) do not match!")
+           }
+       }
 
-  if (!is.null(group))  {
+         dataList=split(data,f=factor(group,levels = unique(group)))
 
-    if (length(group)!=nrow(data)){
-      stop("Argument group should be the same length as  the number of the columns of data!")
-    }
-    if (length(unique(group))!=2){
-      stop("Data can only be divided into two groups at most, such as pre/post treatment!")
-    }
-    if (length(lambda)!= 2){
-      stop("Tuning parameter lambda can only be of length 2 if data is
-           divided into two groups!")
-    }
+         if (length(lambda)!= length(unique(group))){
+             stop("Arguments (group, lambda) do not match!")
+           }
 
-  }
+
+
+
 
 nn=length(unique(group))
 

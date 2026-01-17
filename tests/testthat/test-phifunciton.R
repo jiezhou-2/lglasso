@@ -20,7 +20,7 @@ test_that("lglasso", {
 set.seed(1)
 test_that("lglasso", {
 
-  expect_equal(lglasso(data=heter1data[[1]],lambda = 0.01,random=T,trace=T)$wi,
+  expect_equal(lglasso(data=heter1data[[1]],lambda = 0.01,random=T,trace=T,N=100)$wi,
                heter1result$wi)
 })
 
@@ -28,7 +28,7 @@ test_that("lglasso", {
 set.seed(1)
 test_that("lglasso", {
   expect_equal(lglasso(data=heter2data[[1]],lambda = c(0.1,0.1),random=T,trace=T,
-                       group = heter2data[[2]])$wi,
+                       group = heter2data[[2]],N=100)$wi,
                heter2result$wi)
 })
 
