@@ -53,7 +53,7 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 
 \item{type}{a string specifying which model need to be fitted. There are three models available,
 which are referred as \code{general}, \code{expFixed} respectively.
- Please see the details in the below for the meaning of each.}
+Please see the details in the below for the meaning of each.}
 
 \item{...}{other inputs}
 }
@@ -76,19 +76,19 @@ list which include following components:
 }
 \description{
 This is the main function of the package, which identifies the underlying  network model from clustered data. Here
- clustered data include longitudinal data, or spatially correlated data,
- e.g, metabolites in different tissues of a same subject.  .
- or more broadly, clustered data for given tuning parameters.
+clustered data include longitudinal data, or spatially correlated data,
+e.g, metabolites in different tissues of a same subject.  .
+or more broadly, clustered data for given tuning parameters.
 }
 \details{
 This function implements three statistical models for  network inference,
 according to how the correlations is specified between time points (or tissues or
 contents in some clinical studies). These three models are referred as
- \code{general}, \code{expFixed}.Let's say we have
- two time points,t_i,t_j, then in model \code{general}, the correlation is
-  tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
-  with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
-  both alpha_1 and alpha_2 is unknown and need to be inferred from the data.
-   For longitudinal data, model \code{expFixed} is recommended while for omics data
-   from different tissues or contents, model \code{general} should be adopted.
+\code{general}, \code{expFixed}.Let's say we have
+two time points,t_i,t_j, then in model \code{general}, the correlation is
+tau_ij, while in model \emph{expFixed}, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
+with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
+both alpha_1 and alpha_2 is unknown and need to be inferred from the data.
+For longitudinal data, model \code{expFixed} is recommended while for omics data
+from different tissues or contents, model \code{general} should be adopted.
 }

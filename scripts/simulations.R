@@ -1,7 +1,15 @@
 
 
 
-
+phifunction=function(t,tau){
+  n=length(t)
+  if (any(tau<=0)){stop("tau should be positive!")}
+  if (n==1) return(matrix(1,1,1))
+  d=abs(outer(t,t,"-"))
+  M=exp(-tau[1]*d)
+  diag(M)=1
+  M
+}
 
 simulate_general=function(n,p,m1,m2=0,m3,cc){
   ## true structure

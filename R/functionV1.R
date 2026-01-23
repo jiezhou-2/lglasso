@@ -12,7 +12,7 @@ phifunction=function(t,tau){
   if (any(tau<=0)){stop("tau should be positive!")}
   if (n==1) return(matrix(1,1,1))
    d=abs(outer(t,t,"-"))
-   M=exp(-tau*d)
+   M=exp(-tau[1]*d)
   diag(M)=1
    M
 }
@@ -150,7 +150,7 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE,maxit=100,
       nn=length(unique(dd[,1]))
       p=ncol(dd)-2
       data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
-      B[[i]]=Variable(p,p,PSD=TRUE) ## pre/post treatment networks
+      B[[i]]=Variable(p,p,PSD=TRUE) # tissue wise inverse correlation matrix
       if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
       amatrix=0
       # Create a mask matrix
@@ -162,6 +162,7 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE,maxit=100,
         xx=as.matrix(data_sub[[j]])
         yy=solve(as.matrix(Ai[[j]]))
         amatrix=t(xx)%*%yy%*%xx+amatrix
+        #amatrix=t(xx)%*%xx+amatrix
       }
       obj=log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix)/nrow(dd)+obj
       aa=aa+ sum(abs(B[[i]])*mask1)
@@ -247,7 +248,7 @@ if (m==1){
 #'    from different tissues or contents, model \code{general} should be adopted.
 #'
 #'
-lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=2000,maxit=30,
+lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
                  tol=10^(-3),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
                  w.init=NULL, wi.init=NULL,trace=FALSE, type=c("expFixed"),
                  ...)
@@ -538,27 +539,7 @@ lglassoHeter=function(data,lambda,expFix,group,maxit,
   m=length(unique(data[,1]))
 
 
-  # if (!is.null(group))  {
-  #
-  #   if (length(group)!=nrow(data)){
-  #     stop("Argument group should be the same length as  the number of the columns of data!")
-  #   }
-  #   if (length(unique(group))!=2){
-  #     stop("Data can only be divided into two groups at most, such as pre/post treatment!")
-  #   }
-  #   if (length(lambda)!= 2){
-  #     stop("Tuning parameter lambda can only be of length 2 if data is
-  #          divided into two groups!")
-  #   }
-  #
-  # }
-  #
-  # if (is.null(group))  {
-  #   group=rep(1,nrow(data))
-  #   if (length(lambda)!=1){
-  #     stop("Arguments (group, lambda) do not match!")
-  #   }
-  # }
+
 
   if (is.null(group))  {
          group=rep(1,nrow(data))

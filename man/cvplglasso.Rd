@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 cvplglasso(
-  type = c("general", "expFixed", "twoPara"),
+  type = c("expFixed"),
   data,
   group = NULL,
   lambda = NULL,

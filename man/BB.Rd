@@ -8,7 +8,7 @@ BB(
   A,
   data,
   lambda,
-  type = c("general", "expFixed"),
+  type = c("expFixed"),
   diagonal = TRUE,
   maxit = 100,
   tol = 10^(-4),

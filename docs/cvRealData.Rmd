@@ -49,16 +49,18 @@ index=which(is.na(postdata),arr.ind = T)
 for (i in 1:nrow(index)) {
   postdata[index[i,1],index[i,2]]=0
 }
-postdata[,-c(1,2)]=log10(1+postdata[,-c(1,2)])
+postdata[,-c(1:5)]=log10(1+postdata[,-c(1:5)])
 group=ifelse(postdata$visit_name==2,1,2)
 lambda=exp(seq(-5,-1,length=3))
-aa1=CVlglasso(data=postdata,lambda = lambda,K=3,trace = FALSE,random = FALSE)
+aa1=CVlglasso(data=postdata[,-c(3:5)],lambda = lambda,K=3,trace = FALSE,random = FALSE)
 plot(aa1)
 ```
 
 
 ```{r,echo=FALSE}
 aa1=readRDS("homo1.rds")
+index=which.min(aa1$cv_error)
+print(aa1$lambda[index])
 plot(aa1)
 ```
 
@@ -97,6 +99,8 @@ plot(aa1)
 
 ```{r,echo=FALSE}
 aa2=readRDS("heter1.rds")
+index=which.min(aa2$cv_error)
+print(aa2$lambda[index])
 plot(aa2)
 ```
 

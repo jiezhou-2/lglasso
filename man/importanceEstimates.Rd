@@ -7,7 +7,14 @@
 importanceEstimates(importancesSample, datai, groupi)
 }
 \arguments{
-\item{groupi}{}
+\item{importancesSample}{the random samples}
+
+\item{datai}{the data for subject i}
+
+\item{groupi}{specify how datai is grouped}
+}
+\value{
+a list of estimated
 }
 \description{
 Title

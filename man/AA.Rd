@@ -7,7 +7,7 @@
 AA(
   B,
   data,
-  type = c("general", "expFixed"),
+  type = c("expFixed"),
   expFix,
   maxit = 30,
   tol = 10^(-4),
