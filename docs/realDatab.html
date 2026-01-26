@@ -388,8 +388,8 @@ fulldata=ddd[order(ddd$subject_accession,ddd$visit_name),]</code></pre>
 </div>
 <div id="homogeneous-subjects" class="section level2">
 <h2>homogeneous subjects</h2>
-<div id="one-stage-model-post-vaccination-data" class="section level3">
-<h3>one-stage model (post vaccination data)</h3>
+<div id="one-stage-model-post-vaccination-data2.2min" class="section level3">
+<h3>one-stage model (post vaccination data,2.2min)</h3>
 <pre class="r"><code>index=which(fulldata$visit_name==2)
 postdata=fulldata[-index,]
 aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE,trace = T,tol = 0.01)</code></pre>
@@ -452,9 +452,9 @@ aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE,trace = 
 </div>
 <div id="heterogeneous-subjects" class="section level2">
 <h2>heterogeneous subjects</h2>
-<div id="one-stage-model-post-vaccination-data-1" class="section level3">
-<h3>one-stage model (post vaccination data)</h3>
-<pre class="r"><code>aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T,N=100)</code></pre>
+<div id="one-stage-model-post-vaccination-data2.2min-1" class="section level3">
+<h3>one-stage model (post vaccination data,2.2min)</h3>
+<pre class="r"><code>aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T)</code></pre>
 <pre><code>## [1] &quot;alpha estimate: 1&quot;
 ## [1] &quot;iteration 1 precision difference: 12.628 /correlation alpha difference: 14.051&quot;
 ## [1] &quot;alpha estimate: 15.051201861239&quot;
@@ -812,8 +812,8 @@ boxplot(aa1$tau~dd$infant_arm)</code></pre>
 ## Multiple R-squared:  0.04435,    Adjusted R-squared:  0.03215 
 ## F-statistic: 3.635 on 3 and 235 DF,  p-value: 0.01357</code></pre>
 </div>
-<div id="two-stage-model-full-data-1" class="section level3">
-<h3>two-stage model (full data)</h3>
+<div id="two-stage-model-full-data5.7min" class="section level3">
+<h3>two-stage model (full data,5.7min)</h3>
 <pre class="r"><code>group=ifelse(fulldata$visit_name==2,1,2)
 aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T)</code></pre>
 <pre><code>## [1] &quot;alpha estimate: 1&quot;

@@ -55,7 +55,7 @@ fulldata=ddd[order(ddd$subject_accession,ddd$visit_name),]
 
 ## homogeneous subjects
 
-###  one-stage model (post vaccination data)
+###  one-stage model (post vaccination data,2.2min)
 
 ```{r}
 index=which(fulldata$visit_name==2)
@@ -79,10 +79,10 @@ aa2$tau
 
 ## heterogeneous subjects
 
-### one-stage model (post vaccination data)
+### one-stage model (post vaccination data,2.2min)
 
 ```{r}
-aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T,N=100)
+aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T)
 aa1$wi[[1]][1:10,1:10]
 aa1$tau
 aa1$alpha
@@ -100,7 +100,7 @@ summary(lm(aa1$tau~dd$arm_name))
 
 
 
-### two-stage model (full data)
+### two-stage model (full data,5.7min)
 
 ```{r}
 group=ifelse(fulldata$visit_name==2,1,2)
