@@ -13,7 +13,8 @@ cvlglassofull(
   lam.min.ratio = 0.01,
   K,
   expFix = 1,
-  trace = FALSE
+  trace = FALSE,
+  NN = NN
 )
 }
 \arguments{

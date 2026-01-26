@@ -31,8 +31,6 @@ Maintainer: Jie Zhou <chowstat@gmail.com>
 Repository: CRAN
 Date/Publication: 2022-01-15 08:52:46 UTC
 Imports: 
-    Rcpp (>= 1.0.0),
-    RcppArmadillo,
     CVXR,
     igraph,
     doParallel,
@@ -45,9 +43,6 @@ Imports:
     pheatmap,
     RColorBrewer,
     pbapply
-LinkingTo:
-    Rcpp,
-    RcppArmadillo
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggestions:

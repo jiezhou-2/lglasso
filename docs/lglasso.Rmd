@@ -129,7 +129,7 @@ summary(model)
 
 ```{r,warning=FALSE}
 set.seed(1)
-dd=Simulate(type="longihomo",n=n,p=200,m1=m1,m2=m2,tau=c(2,1),tt=2)
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=2)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
@@ -182,7 +182,7 @@ saveRDS(heterTwoStageData,file="heterTwoStageData.rds")
 
 ```{r,warning=FALSE}
 set.seed(1)
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),random=T,group = group,trace=T, N=500)
+aa=lglasso(data=ddata,lambda = c(0.1,0.1),random=T,group = group,trace=T)
 saveRDS(aa,file="heterTwoStageResult.rds")
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 
