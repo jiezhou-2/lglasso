@@ -1,0 +1,45 @@
+library(matrixcalc)
+library(RCy3)
+library(igraph)
+library(fake)
+library(tidyr)
+library(devtools)
+load_all("..")
+load("~/lglassoAnalysis/version2/b_set.RData")
+variables=c("subject_accession","visit_name","feature","value_reported","infant_arm","delivery_mode","arm_name")
+data=data_extra[,variables]
+set.seed(1)
+
+## data
+
+
+ wideData=reshape(data=data,idvar =  c("subject_accession","visit_name","infant_arm","delivery_mode","arm_name"),
+                  timevar = "feature", direction = "wide")
+
+wideData=wideData[,-c(3:5)]
+timepoints=ifelse(wideData$visit_name=="prevaccinated",2,ifelse(wideData$visit_name=="mo4",4,ifelse(wideData$visit_name=="vaccinated",5,9)))
+wideData$visit_name=timepoints
+wideData=wideData[order(wideData$subject_accession,wideData$visit_name),]
+
+
+## homogeneous subjects
+
+###  one-stage model (post vaccination data)
+
+index=which(wideData$visit_name<3)
+postdata=wideData[-index,]
+index=which(is.na(postdata),arr.ind = T)
+aa=as.numeric(names(which(table(index[,2])>0.1*nrow(postdata))))
+postdata=postdata[,-aa]
+index=which(is.na(postdata),arr.ind = T)
+for (i in 1:nrow(index)) {
+  postdata[index[i,1],index[i,2]]=0
+}
+postdata[,-c(1,2)]=log10(1+postdata[,-c(1,2)])
+group=ifelse(postdata$visit_name==2,1,2)
+lambda=exp(seq(-10,0,length=50))
+aa1=CVlglasso(data=postdata,lambda = lambda,K=5,trace = FALSE,random = FALSE)
+#plot(aa1)
+saveRDS(aa1,file="homo1.rds")
+
+

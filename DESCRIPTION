@@ -37,6 +37,7 @@ Imports:
     igraph,
     doParallel,
     fake,
+    Matrix,
     foreach,
     glasso,
     MASS,

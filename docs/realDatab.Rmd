@@ -12,6 +12,7 @@ library(RCy3)
 library(igraph)
 library(fake)
 library(tidyr)
+library(Matrix)
 library(devtools)
 load_all()
 load("/Users/f003r0s/Desktop/Anne_lab_projects/lglassoProject/data/b_set.Rdata")
@@ -29,8 +30,26 @@ set.seed(1)
 
 #wideData=wideData[,-c(3:5)]
 timepoints=ifelse(wideData$visit_name=="prevaccinated",2,ifelse(wideData$visit_name=="mo4",4,ifelse(wideData$visit_name=="vaccinated",5,9)))
+
 wideData$visit_name=timepoints
 wideData=wideData[order(wideData$subject_accession,wideData$visit_name),]
+index=which(is.na(wideData),arr.ind = T)
+aa=as.numeric(names(which(table(index[,2])>0.1*nrow(wideData))))
+fulldata=wideData[,-aa]
+fulldata[78,4]="Vaginal Delivery"
+fulldata[is.na(fulldata)]<- 0
+fulldata[,-c(1:5)]=log10(1+fulldata[,-c(1:5)])
+index=which(fulldata$subject_accession==23)
+fulldata=fulldata[-index,]
+
+ddd=c()
+for (i in c(2,4,5,9)) {
+  index=which(fulldata$visit_name==i)
+  dd=fulldata[index,]
+  dd[,-c(1:5)]=scale(dd[,-c(1:5)],center = TRUE,scale = FALSE)
+  ddd=rbind(ddd,dd)
+}
+fulldata=ddd[order(ddd$subject_accession,ddd$visit_name),]
 
 ```
 
@@ -39,39 +58,22 @@ wideData=wideData[order(wideData$subject_accession,wideData$visit_name),]
 ###  one-stage model (post vaccination data)
 
 ```{r}
-index=which(wideData$visit_name<3)
-postdata=wideData[-index,]
-index=which(is.na(postdata),arr.ind = T)
-aa=as.numeric(names(which(table(index[,2])>0.1*nrow(postdata))))
-postdata=postdata[,-aa]
-index=which(is.na(postdata),arr.ind = T)
-for (i in 1:nrow(index)) {
-  postdata[index[i,1],index[i,2]]=0
-}
-postdata[,-c(1:5)]=log10(1+postdata[,-c(1:5)])
-group=ifelse(postdata$visit_name==2,1,2)
-aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE)
+index=which(fulldata$visit_name==2)
+postdata=fulldata[-index,]
+aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE,trace = T,tol = 0.01)
 aa1$wi[[1]][1:10,1:10]
+aa1$tau
 ```
 
 
 ### two-stage model (full data)
 
-```{r}
-index=which(is.na(wideData),arr.ind = T)
-aa=as.numeric(names(which(table(index[,2])>0.1*nrow(wideData))))
-fulldata=wideData[,-aa]
-index=which(is.na(fulldata),arr.ind = T)
-for (i in 1:nrow(index)) {
-  fulldata[index[i,1],index[i,2]]=0
-}
-fulldata[,-c(1:5)]=log10(1+fulldata[,-c(1:5)])
-index=which(fulldata$subject_accession==23)
-fulldata=fulldata[-index,]
+```{r,eval=FALSE,echo=FALSE}
 group=ifelse(fulldata$visit_name==2,1,2)
-aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.5,0.1),group = group,random = FALSE)
+aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.005,1),group = group,random = FALSE,trace = T,tol=0.01)
 aa2$wi[[1]][1:10,1:10]
 aa2$wi[[2]][1:10,1:10]
+aa2$tau
 ```
 
 
@@ -80,8 +82,10 @@ aa2$wi[[2]][1:10,1:10]
 ### one-stage model (post vaccination data)
 
 ```{r}
-aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE)
+aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T,N=100)
 aa1$wi[[1]][1:10,1:10]
+aa1$tau
+aa1$alpha
 ```
 
 ```{r}
@@ -99,7 +103,8 @@ summary(lm(aa1$tau~dd$arm_name))
 ### two-stage model (full data)
 
 ```{r}
-aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.5,0.1),group = group,random = TRUE)
+group=ifelse(fulldata$visit_name==2,1,2)
+aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T)
 aa2$wi[[1]][1:10,1:10]
 aa2$wi[[2]][1:10,1:10]
 ```
