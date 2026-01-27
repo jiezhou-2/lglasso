@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{cvError}
 \alias{cvError}
-\title{Title}
+\title{Compute the cross validation error}
 \usage{
 cvError(data.train, data.valid, B, group.train = NULL, group.valid = NULL)
 }
@@ -21,5 +21,5 @@ cvError(data.train, data.valid, B, group.train = NULL, group.valid = NULL)
 a matrix
 }
 \description{
-Title
+Compute the cross validation error
 }

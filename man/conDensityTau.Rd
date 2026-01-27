@@ -2,13 +2,21 @@
 % Please edit documentation in R/functionV1.R
 \name{conDensityTau}
 \alias{conDensityTau}
-\title{Title}
+\title{density function in EM algorithm}
 \usage{
 conDensityTau(tau, expFixed, datai, wi, alpha, groupi)
 }
 \arguments{
-\item{groupi}{}
+\item{tau}{the dampening rate}
+
+\item{datai}{the data set for subject i}
+
+\item{wi}{the given precision matrices}
+
+\item{alpha}{the  rate in exponential distribution}
+
+\item{groupi}{the data point indices}
 }
 \description{
-Title
+density function in EM algorithm
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{AAheter}
 \alias{AAheter}
-\title{Title}
+\title{Estimate the phimatrix in heterogeneous model}
 \usage{
 AAheter(data, wi, alpha, group, l)
 }
@@ -21,5 +21,5 @@ AAheter(data, wi, alpha, group, l)
 a list for estimates of tau and AA
 }
 \description{
-Title
+Estimate the phimatrix in heterogeneous model
 }

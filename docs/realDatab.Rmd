@@ -14,6 +14,7 @@ library(fake)
 library(tidyr)
 library(Matrix)
 library(devtools)
+library(igraph)
 load_all()
 load("/Users/f003r0s/Desktop/Anne_lab_projects/lglassoProject/data/b_set.Rdata")
 variables=c("subject_accession","visit_name","feature","value_reported","infant_arm","delivery_mode","arm_name")
@@ -50,7 +51,8 @@ for (i in c(2,4,5,9)) {
   ddd=rbind(ddd,dd)
 }
 fulldata=ddd[order(ddd$subject_accession,ddd$visit_name),]
-
+antibodyName=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)]
+colnames(fulldata)[-c(1:5)]=antibodyName
 ```
 
 ## homogeneous subjects
@@ -63,7 +65,22 @@ postdata=fulldata[-index,]
 aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE,trace = T,tol = 0.01)
 aa1$wi[[1]][1:10,1:10]
 aa1$tau
+
 ```
+
+```{r}
+adjMatrix=ifelse(abs(aa1$wi[[1]])<10^(-5),0,1)
+gg=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix,
+mode = c("undirected"),
+weighted = NULL,
+diag = FALSE
+)
+edgeListHomo1=as_edgelist(gg)
+write.csv(edgeListHomo1,file="edgeListHomo1.CSV")
+saveRDS(edgeListHomo1,file="edgeListHomo1.rds")
+```
+
 
 
 ### two-stage model (full data)
@@ -98,6 +115,19 @@ boxplot(aa1$tau~dd$arm_name)
 summary(lm(aa1$tau~dd$arm_name))
 ```
 
+```{r}
+adjMatrix=ifelse(abs(aa1$wi[[1]])<10^(-5),0,1)
+gg=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix,
+mode = c("undirected"),
+weighted = NULL,
+diag = FALSE
+)
+edgeListHeter1=as_edgelist(gg)
+write.csv(edgeListHeter1,file="edgeListHeter1.CSV")
+saveRDS(edgeListHeter1,file="edgeListHeter1.rds")
+```
+
 
 
 ### two-stage model (full data,5.7min)
@@ -118,4 +148,26 @@ summary(lm(aa2$tau~dd$delivery_mode))
 boxplot(aa2$tau~dd$arm_name)
 summary(lm(aa2$tau~dd$arm_name))
 ```
+```{r}
+adjMatrix1=ifelse(abs(aa2$wi[[1]])<10^(-5),0,1)
+adjMatrix2=ifelse(abs(aa2$wi[[2]])<10^(-5),0,1)
+gg1=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix1,
+mode = c("undirected"),
+weighted = NULL,
+diag = FALSE
+)
 
+gg2=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix2,
+mode = c("undirected"),
+weighted = NULL,
+diag = FALSE
+)
+edgeListHeter21=as_edgelist(gg1)
+edgeListHeter22=as_edgelist(gg2)
+edgeListHeter2=list(edgeListHeter21,edgeListHeter22)
+write.csv(edgeListHeter21,file="edgeListHeter21.CSV")
+write.csv(edgeListHeter22,file="edgeListHeter22.CSV")
+saveRDS(edgeListHeter2,file="edgeListHeter2.rds")
+```

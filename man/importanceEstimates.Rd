@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{importanceEstimates}
 \alias{importanceEstimates}
-\title{Title}
+\title{Function for computing estimates in EM algorithm}
 \usage{
 importanceEstimates(importancesSample, datai, groupi)
 }
@@ -17,5 +17,5 @@ importanceEstimates(importancesSample, datai, groupi)
 a list of estimated
 }
 \description{
-Title
+Function for computing estimates in EM algorithm
 }

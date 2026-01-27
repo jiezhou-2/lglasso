@@ -189,7 +189,11 @@ simulate_long=function(n,p,m1,tt=5,m2=0,tau){
     a1=rbind(a1,ai)
   }
   colnames(a1)[2]="time"
-
+featureName1=colnames(a1)[-c(1,2)]
+colnames(real_stru1)=featureName1
+rownames(real_stru1)=featureName1
+colnames(real_stru2)=featureName1
+rownames(real_stru2)=featureName1
   if (length(tau)==2){
     for (i in 1:n) {
     ai=c()
@@ -373,12 +377,9 @@ simulate_heter=function(n,p,m1,alpha){
 
 
 
-Simulate=function(type=c("general","longihomo","longiheter"),n=20,p=20,m1=20,m2=1,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
+Simulate=function(type=c("longihomo","longiheter"),n=20,p=20,m1=20,m2=1,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
   type=match.arg(type)
 
-  if (type=="general"){
-    data=simulate_general(n=n,p=p,m1=m1,m2=m2,m3=m3,cc)
-  }
 
   if (type=="longihomo"){
     data=simulate_long(n=n,p=p,m1=m1,m2=m2,tau=tau,tt=tt)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{importanceSample}
 \alias{importanceSample}
-\title{Title}
+\title{Function for generating the samples from posteior distribution in EM algorithm}
 \usage{
 importanceSample(n, datai, wi, alpha, groupi)
 }
@@ -21,5 +21,5 @@ importanceSample(n, datai, wi, alpha, groupi)
 a data frame for samples and their weights
 }
 \description{
-Title
+Function for generating the samples from posteior distribution in EM algorithm
 }

@@ -4,24 +4,19 @@
 \alias{BB}
 \title{Title}
 \usage{
-BB(
-  A,
-  data,
-  lambda,
-  type = c("expFixed"),
-  diagonal = TRUE,
-  maxit = 100,
-  tol = 10^(-4),
-  lower = c(0.01, 0.1),
-  upper = c(10, 5),
-  start = c("warm", "cold"),
-  w.init = NULL,
-  wi.init = NULL,
-  ...
-)
+BB(A, data, lambda, type = c("expFixed"), diagonal = TRUE)
 }
 \arguments{
-\item{...}{}
+\item{A}{a list representing the phimatrices}
+
+\item{data}{a (p+2)-by-n data frame}
+
+\item{lambda}{given tuning parameter(s)}
+
+\item{type}{specify model type}
+}
+\value{
+a list with the same length as A
 }
 \description{
 Title

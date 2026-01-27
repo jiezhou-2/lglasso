@@ -240,10 +240,32 @@ data</h1>
 
 
 
-<p><a href="lglasso.html">lglasso examples</a></p>
-<p><a href="CVlglasso.html">CVlglasso examples</a></p>
-<p><a href="realDatab.html">Antibody interaction networks</a></p>
-<p><a href="cvRealData.html">Antibody interaction networks: cross
+<p>In this vignette, we show how to use <strong>lglasso</strong> package
+to estimate single-stage or double-stage networks from longitudinal
+data.</p>
+<p>In section 1 and 2, we use simulated data to demonstrate how to use
+the two main function <em>lglasso()</em> and <em>CVlglasso()</em>
+respectively.</p>
+<p>In section 3 and 4, we use the real antibody titer data from a large
+vaccine study to show that the how the analysis can lead to meaningful
+biological interpretations.</p>
+<p>The function <em>Simulate()</em> for generating the simulated data
+can be found in file <em>simulations.R</em> in folder <em>scripts</em>
+of this repo. You can use it to play around to test the main functions.
+Unfortunately, the antibody real data is not publicly available. If you
+need these data for your research, please contact me at <em><a href="mailto:chowstat@gmail.com" class="email">chowstat@gmail.com</a></em> .</p>
+<p>The algorithm is pretty stable, as you can see it converged nicely
+for both the simulated data and real data. However, based on my
+experience, the computational speed is not ideal yet. For the real data
+in which there are 83 features, it takes <em>lglasso</em> 2.2 minutes to
+converge for single network estimation and 5.7 minutes for double
+network estimation ( the results are listed in section 3). But if you
+think the speed is acceptable for you data, go ahead and give it a
+try!</p>
+<p><a href="lglasso.html">1.lglasso examples</a></p>
+<p><a href="CVlglasso.html">2.CVlglasso examples</a></p>
+<p><a href="realDatab.html">3.Antibody interaction networks</a></p>
+<p><a href="cvRealData.html">4.Antibody interaction networks: cross
 validation</a></p>
 
 

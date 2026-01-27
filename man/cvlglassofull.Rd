@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{cvlglassofull}
 \alias{cvlglassofull}
-\title{Title}
+\title{Cross validation for lglasso}
 \usage{
 cvlglassofull(
   data,
@@ -42,5 +42,5 @@ cvlglassofull(
 list
 }
 \description{
-Title
+Cross validation for lglasso
 }

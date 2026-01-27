@@ -26,7 +26,8 @@ The previous version implemented the algorithms proposed in *Zhou et al. (2024)*
 
 (1) Joint estimation of multiple networks from longitudinal data. The models in previous version (i.e., in the 2024 paper) assumed a stationary process for the longitudinal data. This might not be the case if the treatment has multiple stages, e.g, the antibody network before and after vaccination.   In this version, the function *lglasso* is extended to accommodate such scenarios.   
 
-(2) Cross validation. This version added function  *CVlglasso* to select tuning parameter using cross validation method, where MSE of testing sets is minimized. Note we conduct the cross validation on the subject level instead of individual data point level.  
+(2) Cross validation. This version added function  *CVlglasso* to select tuning parameter using cross validation method, where MSE of testing sets is minimized. Note we conduct the cross validation on the subject level instead of individual data point level. 
+
 
 
 </div>
@@ -50,7 +51,7 @@ remotes::install_github("jiezhou-2/lglasso", ref ="main")
 
 ## How to use
 
- Please see [package website](https://jiezhou-2.github.io/lglasso/). 
+ Please see [package website](https://jiezhou-2.github.io/lglasso/).
  
  
 **Reference** 
