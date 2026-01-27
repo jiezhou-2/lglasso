@@ -24,16 +24,17 @@ The function *Simulate()* for generating the simulated data can be found in file
 
 The algorithm is pretty stable, as you can see it converged nicely for both the simulated data and real data. However, based on my experience, the computational speed is not ideal yet. For the real data in which there are 83 features, it takes *lglasso* 2.2 minutes  to converge for single network estimation and 5.7 minutes for double network estimation (  the results are listed in section 3).    But if you think the speed is acceptable for you data, go ahead and give it a try! 
 
+### Simulation
 
+[1. lglasso examples](lglasso.html)
 
-[1.lglasso examples](lglasso.html)
+[2. CVlglasso examples](CVlglasso.html)
 
-[2.CVlglasso examples](CVlglasso.html)
+### Real data
 
-[3.Antibody interaction networks](realDatab.html)
+[3.lglasso examples](realDatab.html)
 
-
-[4.Antibody interaction networks: cross validation](cvRealData.html)
+[4.CVlglasso examples](cvRealData.html)
 
 
 
