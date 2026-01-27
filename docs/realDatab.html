@@ -13,7 +13,7 @@
 
 <meta name="date" content="2025-07-10" />
 
-<title>Case study: antibody interaction networks in MADI</title>
+<title>Case study: antibody interaction networks</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,8 +350,8 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Case study: antibody interaction networks
-in MADI</h1>
+<h1 class="title toc-ignore">Case study: antibody interaction
+networks</h1>
 <h4 class="author">Jie Zhou</h4>
 <h4 class="date">2025-07-10</h4>
 
@@ -447,6 +447,16 @@ aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE,trace = 
 ## PT_FcgR2a  -0.7282688  0.0000000  0.000000 17.84096343</code></pre>
 <pre class="r"><code>aa1$tau</code></pre>
 <pre><code>## [1] 0.245302</code></pre>
+<pre class="r"><code>adjMatrix=ifelse(abs(aa1$wi[[1]])&lt;10^(-5),0,1)
+gg=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix,
+mode = c(&quot;undirected&quot;),
+weighted = NULL,
+diag = FALSE
+)
+edgeListHomo1=as_edgelist(gg)
+write.csv(edgeListHomo1,file=&quot;edgeListHomo1.CSV&quot;)
+saveRDS(edgeListHomo1,file=&quot;edgeListHomo1.rds&quot;)</code></pre>
 </div>
 <div id="two-stage-model-full-data" class="section level3">
 <h3>two-stage model (full data)</h3>
@@ -813,6 +823,16 @@ boxplot(aa1$tau~dd$infant_arm)</code></pre>
 ## Residual standard error: 0.2295 on 235 degrees of freedom
 ## Multiple R-squared:  0.04435,    Adjusted R-squared:  0.03215 
 ## F-statistic: 3.635 on 3 and 235 DF,  p-value: 0.01357</code></pre>
+<pre class="r"><code>adjMatrix=ifelse(abs(aa1$wi[[1]])&lt;10^(-5),0,1)
+gg=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix,
+mode = c(&quot;undirected&quot;),
+weighted = NULL,
+diag = FALSE
+)
+edgeListHeter1=as_edgelist(gg)
+write.csv(edgeListHeter1,file=&quot;edgeListHeter1.CSV&quot;)
+saveRDS(edgeListHeter1,file=&quot;edgeListHeter1.rds&quot;)</code></pre>
 </div>
 <div id="two-stage-model-full-data5.7min" class="section level3">
 <h3>two-stage model (full data,5.7min)</h3>
@@ -968,6 +988,27 @@ boxplot(aa2$tau~dd$infant_arm)</code></pre>
 ## Residual standard error: 0.2749 on 235 degrees of freedom
 ## Multiple R-squared:  0.0323, Adjusted R-squared:  0.01994 
 ## F-statistic: 2.614 on 3 and 235 DF,  p-value: 0.0519</code></pre>
+<pre class="r"><code>adjMatrix1=ifelse(abs(aa2$wi[[1]])&lt;10^(-5),0,1)
+adjMatrix2=ifelse(abs(aa2$wi[[2]])&lt;10^(-5),0,1)
+gg1=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix1,
+mode = c(&quot;undirected&quot;),
+weighted = NULL,
+diag = FALSE
+)
+
+gg2=graph_from_adjacency_matrix(
+adjmatrix =  adjMatrix2,
+mode = c(&quot;undirected&quot;),
+weighted = NULL,
+diag = FALSE
+)
+edgeListHeter21=as_edgelist(gg1)
+edgeListHeter22=as_edgelist(gg2)
+edgeListHeter2=list(edgeListHeter21,edgeListHeter22)
+write.csv(edgeListHeter21,file=&quot;edgeListHeter21.CSV&quot;)
+write.csv(edgeListHeter22,file=&quot;edgeListHeter22.CSV&quot;)
+saveRDS(edgeListHeter2,file=&quot;edgeListHeter2.rds&quot;)</code></pre>
 </div>
 </div>
 
