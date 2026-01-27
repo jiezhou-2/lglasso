@@ -1,5 +1,5 @@
 ---
-title: "lglasso: identify networks from correlated data"
+title: "lglasso: identify networks from longitudinal data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction_of_lglasso_package}
@@ -22,7 +22,7 @@ In section 3 and 4, we use the real antibody titer data from a large vaccine stu
 
 The function *Simulate()* for generating the simulated data can be found in file *simulations.R* in folder *scripts* of this repo. You can use it to play around to test the main functions.  Unfortunately, the antibody real data is not publicly available. If you need these data for your research, please contact me at *chowstat@gmail.com* .   
 
-The algorithm is pretty stable, as you can see it converged nicely for both the simulated data and real data. However, based on my experience, the computational speed is not ideal yet. For the real data in which there are 83 features, it takes *lglasso* 2.2 minutes  to converge for single network estimation and 5.7 minutes for double network estimation (  the results are listed in section 3).    But if you think the speed is acceptable for you data, go ahead and give it a try! 
+The algorithm is pretty stable, as you can see it converges nicely for both the simulated data and real data. However, based on my experience, the computational speed is not ideal yet. For the real data in which there are 83 features, it takes *lglasso* 2.2 minutes  to converge for single network estimation and 5.7 minutes for double network estimation (  the results are listed in section 3). For  function *CVlglasso*  which has employed parallel method such as *foreach* package to speed up the computation, it is advised to run it on HPC where more cores and memory could be allocated. 
 
 ### Simulation
 
