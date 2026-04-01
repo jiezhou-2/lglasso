@@ -39,6 +39,12 @@ aa=as.numeric(names(which(table(index[,2])>0.1*nrow(wideData))))
 fulldata=wideData[,-aa]
 fulldata[78,4]="Vaginal Delivery"
 fulldata[is.na(fulldata)]<- 0
+index1=which(fulldata$visit_name==2)
+index2=which(fulldata$visit_name!=2)
+abundancePre=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index1,-c(1:5)], 2, mean))
+abundancePost=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index2,-c(1:5)], 2, mean))
+write.csv(abundancePre,file = "abundancePre.CSV")
+write.csv(abundancePost,file = "abundancePost.CSV")
 fulldata[,-c(1:5)]=log10(1+fulldata[,-c(1:5)])
 index=which(fulldata$subject_accession==23)
 fulldata=fulldata[-index,]
@@ -134,7 +140,7 @@ saveRDS(edgeListHeter1,file="edgeListHeter1.rds")
 
 ```{r}
 group=ifelse(fulldata$visit_name==2,1,2)
-aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T)
+aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T,tol = 0.01)
 aa2$wi[[1]][1:10,1:10]
 aa2$wi[[2]][1:10,1:10]
 ```
@@ -151,6 +157,8 @@ summary(lm(aa2$tau~dd$arm_name))
 ```{r}
 adjMatrix1=ifelse(abs(aa2$wi[[1]])<10^(-5),0,1)
 adjMatrix2=ifelse(abs(aa2$wi[[2]])<10^(-5),0,1)
+write.csv(adjMatrix1,file = "adjMatrixPre.CSV")
+write.csv(adjMatrix2,file = "adjMatrixPost.CSV")
 gg1=graph_from_adjacency_matrix(
 adjmatrix =  adjMatrix1,
 mode = c("undirected"),

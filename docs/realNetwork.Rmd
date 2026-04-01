@@ -1,0 +1,99 @@
+---
+title: "Case study: antibody interaction networks"
+author: "Jie Zhou"
+date: "2025-07-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(matrixcalc)
+library(RCy3)
+library(igraph)
+library(fake)
+library(tidyr)
+library(Matrix)
+library(devtools)
+library(igraph)
+library(pheatmap)
+library(vegan)
+library(data.table)
+library(corrplot)
+library(stringr)
+library(lessR)
+library(Hmisc)
+library(CVglasso)
+library(correlation)
+library(annotables)
+library(tidyverse)
+library(UniProt.ws)
+library(ggplot2)
+load_all()
+load("/Users/f003r0s/Desktop/Anne_lab_projects/lglassoProject/data/b_set.Rdata")
+variables=c("subject_accession","visit_name","feature","value_reported","infant_arm","delivery_mode","arm_name")
+data=data_extra[,variables]
+set.seed(1)
+```
+
+## data
+
+
+```{r}
+ wideData=reshape(data=data,idvar =  c("subject_accession","visit_name","infant_arm","delivery_mode","arm_name"),
+                  timevar = "feature", direction = "wide")
+
+#wideData=wideData[,-c(3:5)]
+timepoints=ifelse(wideData$visit_name=="prevaccinated",2,ifelse(wideData$visit_name=="mo4",4,ifelse(wideData$visit_name=="vaccinated",5,9)))
+
+wideData$visit_name=timepoints
+wideData=wideData[order(wideData$subject_accession,wideData$visit_name),]
+index=which(is.na(wideData),arr.ind = T)
+aa=as.numeric(names(which(table(index[,2])>0.1*nrow(wideData))))
+full=wideData[,-aa]
+full[78,4]="Vaginal Delivery"
+full[is.na(full)]<- 0
+
+
+fulldata=wideData[,-aa]
+fulldata[78,4]="Vaginal Delivery"
+fulldata[is.na(fulldata)]<- 0
+index1=which(fulldata$visit_name==2)
+index2=which(fulldata$visit_name!=2)
+abundancePre=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index1,-c(1:5)], 2, mean))
+abundancePost=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index2,-c(1:5)], 2, mean))
+write.csv(abundancePre,file = "abundancePre.CSV")
+write.csv(abundancePost,file = "abundancePost.CSV")
+fulldata[,-c(1:5)]=log10(1+fulldata[,-c(1:5)])
+index=which(fulldata$subject_accession==23)
+fulldata=fulldata[-index,]
+
+ddd=c()
+for (i in c(2,4,5,9)) {
+  index=which(fulldata$visit_name==i)
+  dd=fulldata[index,]
+  dd[,-c(1:5)]=scale(dd[,-c(1:5)],center = TRUE,scale = FALSE)
+  ddd=rbind(ddd,dd)
+}
+fulldata=ddd[order(ddd$subject_accession,ddd$visit_name),]
+antibodyName=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)]
+colnames(fulldata)[-c(1:5)]=antibodyName
+```
+
+
+```{r}
+beta_con=betadiver(full[,-c(1:5)],"w")
+par(mfrow=c(1,1))
+pcoa=wcmdscale(beta_con)[,c(1,2)]
+colnames(pcoa)=c("pcoa1","pcoa2")
+meta_con=cbind(full[,c(1:5)],pcoa)
+meta_con$group=as.factor(ifelse(meta_con$visit_name==2,0,1))
+theme_set(theme_bw()+
+            theme(legend.position = "right"))
+ggplot(meta_con,aes(x=pcoa1,y=pcoa2))+
+  geom_point(aes(color=group),size=5)+
+  #scale_color_gradient2(low = "blue", mid = "white", high = "red",midpoint = 29)+
+  ggtitle("PCoA Based on Beta Diversity") +
+  xlab("PCoA 1") + ylab("PCoA 2")
+  
+```
+

@@ -10,7 +10,6 @@
 phifunction=function(t,tau){
   n=length(t)
   if (any(tau<=0)){
-    browser()
     stop("tau should be positive!")}
   if (n==1) return(matrix(1,1,1))
    d=abs(outer(t,t,"-"))
