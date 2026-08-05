@@ -22,11 +22,11 @@ knitr::opts_chunk$set(
 
 <div style="text-align: justify"> 
 
-The previous version aimed to estimate a high-dimensional network  from longitudinal data using Gaussian graphical models. This new update adds two new  features, which are
+The previous version aimed to estimate a high-dimensional network  from longitudinal data using Gaussian graphical models. This new update added two new  features, which are
 
 (i) Heterogeneous networks. Jointly estimate two networks from longitudinal data. Previous version assumed a stationary process that underlies the longitudinal data. The new version extended this assumption to include the cases where the longitudinal data cover two stages, one for pre-treatment, one for post-treatment. Each stage has its own correlation structure.
 
-(ii) Cross validation. This version added cross validation method  to select tuning parameter.  Note the cross validation is carried out on the subject level instead of individual data point level. 
+(ii) Cross validation. This version added cross validation method for users  to select tuning parameter.  The cross validation is carried out on the subject level instead of individual data point level. 
 
 
 

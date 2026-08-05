@@ -12,7 +12,7 @@ status](https://www.r-pkg.org/badges/version/lglasso)](https://CRAN.R-project.or
 <div style="text-align: justify">
 
 The previous version aimed to estimate a high-dimensional network from
-longitudinal data using Gaussian graphical models. This new update adds
+longitudinal data using Gaussian graphical models. This new update added
 two new features, which are
 
 1)  Heterogeneous networks. Jointly estimate two networks from
@@ -22,9 +22,9 @@ two new features, which are
     two stages, one for pre-treatment, one for post-treatment. Each
     stage has its own correlation structure.
 
-2)  Cross validation. This version added cross validation method to
-    select tuning parameter. Note the cross validation is carried out on
-    the subject level instead of individual data point level.
+2)  Cross validation. This version added cross validation method for
+    users to select tuning parameter. The cross validation is carried
+    out on the subject level instead of individual data point level.
 
 </div>
 
