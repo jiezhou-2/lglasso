@@ -11,7 +11,7 @@ AAheter(data, wi, alpha, group, l)
 
 \item{wi}{given precision matrix}
 
-\item{alpha}{expoential distribution with rate alpha}
+\item{alpha}{exponential distribution with rate alpha}
 
 \item{group}{specify how data is grouped}
 

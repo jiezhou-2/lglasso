@@ -7,9 +7,10 @@
 BB(A, data, lambda, type = c("expFixed"), diagonal = TRUE)
 }
 \arguments{
-\item{A}{a list representing the phimatrices}
+\item{A}{a list of length 1 or 2 corresponding to the number of phases. The each entry of A is a
+list representing all phi matrices before or after the treatment.}
 
-\item{data}{a (p+2)-by-n data frame}
+\item{data}{a list of (p+2)-by-ni data frame}
 
 \item{lambda}{given tuning parameter(s)}
 

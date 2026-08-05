@@ -2,7 +2,7 @@
 % Please edit documentation in R/functionV1.R
 \name{AA}
 \alias{AA}
-\title{Title}
+\title{Find the tau's for homogeneous model}
 \usage{
 AA(
   B,
@@ -17,7 +17,9 @@ AA(
 )
 }
 \arguments{
-\item{B}{a p by p given precision matrix}
+\item{B}{a list of length 1 or 2.  If B is of length 1, then its entry is a
+p by p given precision matrix representing the whole data points.
+If B is of length 2, then they reprenst the before and after the vaccination network.}
 
 \item{data}{a (p+2)-by-n data frame}
 
@@ -39,5 +41,5 @@ AA(
 a list of matrices
 }
 \description{
-Title
+Find the tau's for homogeneous model
 }

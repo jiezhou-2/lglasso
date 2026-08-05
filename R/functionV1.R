@@ -21,9 +21,11 @@ phifunction=function(t,tau){
 
 
 
-#' Title
+#' Find the tau's for homogeneous model
 #'
-#' @param B a p by p given precision matrix
+#' @param B a list of length 1 or 2.  If B is of length 1, then its entry is a
+#'   p by p given precision matrix representing the whole data points.
+#'   If B is of length 2, then they reprenst the before and after the vaccination network.
 #' @param data a (p+2)-by-n data frame
 #' @param type specify how to model the covariance matrix
 #' @param expFix the parameter in variance function when the data are longitudinal
@@ -54,7 +56,7 @@ if (is.data.frame(data)){
   if (type == "expFixed"){
     corMatrix=vector("list",length(B))
     Tau=c()
-    for (i in 1:length(B)) {
+    for (i in 1:length(B)){
       dd=data[[i]]
       bb=B[[i]]
       p=ncol(dd)-2
@@ -91,8 +93,9 @@ if (is.data.frame(data)){
 
 #' Title
 #'
-#' @param A a list representing the phimatrices
-#' @param data a (p+2)-by-n data frame
+#' @param A a list of length 1 or 2 corresponding to the number of phases. The each entry of A is a
+#'  list representing all phi matrices before or after the treatment.
+#' @param data a list of (p+2)-by-ni data frame
 #' @param lambda given tuning parameter(s)
 #' @param type specify model type
 #' @returns a list with the same length as A
@@ -110,7 +113,7 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
 
   if (type == "expFixed"){
     m= length(A)
-    for (i in 1:length(A)) {
+    for (i in 1:length(A)){
       Ai=A[[i]]
       datai=data[[i]]
       if (length(Ai)!=length(unique(datai[,1]))){
@@ -142,7 +145,7 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
       nn=length(unique(dd[,1]))
       p=ncol(dd)-2
       data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
-      B[[i]]=Variable(p,p,PSD=TRUE) # tissue wise inverse correlation matrix
+      B[[i]]=Variable(p,p,PSD=TRUE)
       if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
       amatrix[[i]]=0
       # Create a mask matrix
@@ -259,8 +262,7 @@ if (m==1){
 #'
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
                  tol=10^(-1),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
-                 w.init=NULL, wi.init=NULL,trace=FALSE, type=c("expFixed"),
-                 ...)
+                 w.init=NULL, wi.init=NULL,trace=FALSE, type=c("expFixed"),...)
 
   {
 if (type!="expFixed"){
@@ -289,7 +291,7 @@ if (type!="expFixed"){
 
 if (is.null(group))  {
   group=rep(1,nrow(data))
-  data=list(data)
+   data=list(data)
  if (length(lambda)!=1){
   stop("Arguments (group, lambda) do not match!")
  }
@@ -410,9 +412,6 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=
 #'
 #' @examples
 conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
-
-
-
     if (length(groupi)!=nrow(datai)){
       stop("group should be the same length of the columns of data!")
     }
@@ -484,7 +483,7 @@ importanceEstimates=function(importancesSample,datai,groupi){
 #' Estimate the phimatrix in heterogeneous model
 #' @param data longitudinal data set
 #' @param wi given precision matrix
-#' @param alpha expoential distribution with rate alpha
+#' @param alpha exponential distribution with rate alpha
 #' @param group specify how data is grouped
 #' @param l number of random samples in importance sampling
 #' @returns a list for estimates of tau and AA
@@ -617,8 +616,10 @@ nn=length(unique(group))
   }
   return(output)
 }
-cvErrorji=function(data.train,data.valid,bi){
 
+
+
+cvErrorji=function(data.train,data.valid,bi){
   if (any(! bi %in% c(0,1,2))) {stop("entries of vector bi should be 0,  1 or 2!")}
   i=which(bi==2)
   cv_error=c()
@@ -627,7 +628,6 @@ cvErrorji=function(data.train,data.valid,bi){
     index=which(bi==1)
     if (length(index)==0){
       cv_error=stats::var(data.valid[,i+2])
-
     }else{
       if (length(index)>= nrow(data.train)){
         print(paste("number of variable ", length(index)))
@@ -1119,7 +1119,7 @@ CVlglasso=function(type=c("expFixed"), data,group=NULL,random=FALSE,
 #' @import parallel foreach doParallel
 
 cvlglassofull=function(data,group=NULL,
-                    lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE,NN=NN){
+                    lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE,NN){
 
 if (!is.null(lambda)){
   if (is.null(group) && !is.vector(lambda))
@@ -1208,7 +1208,7 @@ N=ifelse(is.vector(lambda),K*length(lambda),K*nrow(lambda))
 
     if(is.null(group)){
       crossData[[k]]=list(train=data.train,
-                          validation=data.valid)
+                        validation=data.valid)
     }else{
    crossData[[k]]=list(train=data.train,
                           validation=data.valid,
