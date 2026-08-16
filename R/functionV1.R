@@ -4,16 +4,18 @@
 #' @param t a vector specify the time points corresponding to the data
 #' @param tau the damping rate parameter with length 1 or 2
 #'
-#' @returns a square matrix used to constrct the likelihood
+#' @returns a square matrix used to construct the likelihood
 #'
 
-phifunction=function(t,tau){
+phifunction=function(t,tau,expFix=1){
   n=length(t)
-  if (any(tau<=0)){
-    stop("tau should be positive!")}
+  if (length(tau)>1){stop("Tau should be a scalar!")}
+  if (tau<=0){
+    stop("tau should be positive!")
+    }
   if (n==1) return(matrix(1,1,1))
-   d=abs(outer(t,t,"-"))
-   M=exp(-tau[1]*d)
+   d=(abs(outer(t,t,"-")))^{expFix}
+   M=exp(-tau*d)
   diag(M)=1
    M
 }
@@ -25,19 +27,19 @@ phifunction=function(t,tau){
 #'
 #' @param B a list of length 1 or 2.  If B is of length 1, then its entry is a
 #'   p by p given precision matrix representing the whole data points.
-#'   If B is of length 2, then they reprenst the before and after the vaccination network.
+#'   If B is of length 2, then they represent the pre- and post-treatment network.
 #' @param data a (p+2)-by-n data frame
-#' @param type specify how to model the covariance matrix
+#' @param type specify the model for the covariance matrix
 #' @param expFix the parameter in variance function when the data are longitudinal
-#' @param maxit the maximum iteration number
-#' @param tol the minimum difference for the algorithm to be called converged
+#' @param maxit the maximum of iteration number
+#' @param tol the minimum difference of algorithm convergence
 #' @param lower vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
 #' @param upper vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
-#' @param ... other unspecifed parameterss
+#' @param ... other unspecified parameters
 #' @returns a list of matrices
 
-AA=function(B,data,type=c("expFixed"),expFix,maxit=30,
-            tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5),...){
+AA=function(B,data,expFix=1,maxit=30,
+            tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5)){
   ### clustered data
 if (!is.list(B)){
   B=list(B)
@@ -51,9 +53,7 @@ if (is.data.frame(data)){
     stop(" B should have same length as  data!")
   }
 
-  type=match.arg(type)
   ### longitudinal data
-  if (type == "expFixed"){
     corMatrix=vector("list",length(B))
     Tau=c()
     for (i in 1:length(B)){
@@ -62,7 +62,7 @@ if (is.data.frame(data)){
       p=ncol(dd)-2
       nn=length(unique(dd[,1]))
       if (ncol(bb)!=p | nrow(bb)!=p){
-        stop("Inputs do not match with each other!")
+        stop("Precision matrix has to be a square one!")
       }
     time_list=split(dd[,2],f=factor(dd[,1],levels=unique(dd[,1])))
     subdata_list=split(dd[,-c(1,2)],factor(dd[,1],levels=unique(dd[,1])))
@@ -73,6 +73,7 @@ if (is.data.frame(data)){
       for (i in 1:nn) {
         datai=as.matrix(subdata_list[[i]])
         t=time_list[[i]]
+        if (nrow(datai)==0 | length(t)==0){next}
         Aa=phifunction(t=t,tau = tau)
         amatrix=datai%*%bb%*%t(datai)
         obji1=-0.5*p*log(det(Aa))
@@ -82,13 +83,13 @@ if (is.data.frame(data)){
       }
       obj=-(obj1+obj2)
     }
-    tau=stats::optim(c(tau0[1]),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
+    tau=stats::optim(c(1),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
     Tau=c(Tau,tau)
     A=lapply(time_list,phifunction,tau=tau)
     corMatrix[[i]]=A
   }
     return(list(corMatrix=corMatrix,tau=Tau))
-}
+
 }
 
 #' Title
@@ -99,19 +100,21 @@ if (is.data.frame(data)){
 #' @param lambda given tuning parameter(s)
 #' @param type specify model type
 #' @returns a list with the same length as A
-BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
-  type=match.arg(type)
+BB=function(A,data,lambda,random=FALSE,tau){
   if (!is.list(data) | !is.list(A)){
-    stop("A and data must be a list!")
+    stop("A and data must be lists!")
   }
   featureNames=colnames(data[[1]])[-c(1,2)]
 
 
   if (length(A)!= length(data)){
-    stop(" A should have same length as  data!")
+    stop(" List A should have same length as list  data!")
   }
 
-  if (type == "expFixed"){
+  # if (length(A)!=length(tau)){
+  #   stop(" List A should have same length as tau!")
+  # }
+
     m= length(A)
     for (i in 1:length(A)){
       Ai=A[[i]]
@@ -125,7 +128,7 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
         index=which(datai[,1]==subjects[j])
         dataij=datai[index,]
         if (nrow(Aij)!= nrow(dataij))
-        {stop("The format of A does not match the format of data!")}
+        {stop("The format of A does not match the format of data!!")}
       }
 
     }
@@ -133,7 +136,7 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
 
 
     B=vector("list",m)
-    obj=0
+    likeli=0
     aa=0
     bb=0
     amatrix=list()
@@ -153,13 +156,19 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
       diag(mask1) <- 0
       mask2 <- matrix(lambda[2], p, p)
       diag(mask2) <- 0
+      extra=0
       for (j in 1:nn) {
         xx=as.matrix(data_sub[[j]])
         yy=solve(as.matrix(Ai[[j]]))
         amatrix[[i]]=t(xx)%*%yy%*%xx+amatrix[[i]]
-        #amatrix=t(xx)%*%xx+amatrix
+        extra=extra+p*log(det(as.matrix(Ai[[j]])))
       }
-      obj=log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)+obj
+      if (!random){
+      likeli=-extra/nrow(dd)+log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)+likeli
+    }else{
+      likeli=-extra/nrow(dd)+log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)
+      -2*nn*log(mean(tau))/nrow(dd)+likeli
+    }
       aa=aa+ sum(abs(B[[i]])*mask1)
 
       if (m>1){
@@ -171,33 +180,30 @@ BB=function(A,data,lambda,type=c("expFixed"),diagonal=TRUE){
       }
     }
 
-    obj=-obj+aa+bb
+    obj=-likeli+aa+bb
 if (m==1){
-  S_est=list(glasso::glasso(s=amatrix[[1]]/(nrow(dd)),rho=lambda[1])$wi)
+  results=glasso::glasso(s=amatrix[[1]]/(nrow(dd)),rho=lambda[1])
+  S_est=list(results$wi)
   colnames(S_est[[1]])=featureNames
   rownames(S_est[[1]])=featureNames
+  likelihood=ifelse(!random,
+                    -extra/nrow(dd)+log(det(results$wi)-sum(diag(results$wi%*%(amatrix[[1]]/(nrow(dd)))))),
+    -extra/nrow(dd)+log(det(results$wi)-sum(diag(results$wi%*%(amatrix[[1]]/(nrow(dd))))))-2*nn*log(mean(tau))/nrow(dd)
+    )
 }else{
-  # ST=JGL_cov(SS=amatrix,n=sz,lambda1 = lambda[1],lambda2 = lambda[2])
-  # S_est1=bdiag(ST$theta[[1]],diag(ST$theta.unconnected[[1]]))
-  # colnames(S_est1)=c(colnames(ST$theta[[1]]),names(ST$theta.unconnected[[1]]))
-  # rownames(S_est1)=c(colnames(ST$theta[[1]]),names(ST$theta.unconnected[[1]]))
-  # S_est2=bdiag(ST$theta[[2]],diag(ST$theta.unconnected[[2]]))
-  # colnames(S_est2)=c(colnames(ST$theta[[2]]),names(ST$theta.unconnected[[2]]))
-  # rownames(S_est2)=c(colnames(ST$theta[[2]]),names(ST$theta.unconnected[[2]]))
-  # mm=colnames(data[[1]])[-c(1,2)]
-  # S_est1=S_est1[mm,mm]
-  # S_est2=S_est2[mm,mm]
-  # S_est=list(S_est1,S_est2)
     prob=Problem(Minimize(obj))
     result=CVXR::solve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
-    for (i in 1:2) {
+    likelihood=-(result$value
+    -lambda[1]*(sum(abs(S_est[[1]])+abs(S_est[[2]])))
+    -lambda[2]*(sum(abs(S_est[[1]]-S_est[[2]]))))
+    for (i in 1:length(S_est)) {
       colnames(S_est[[i]])=featureNames
       rownames(S_est[[i]])=featureNames
     }
 }
-    return(wiList=S_est)
-  }
+    return(list(wiList=S_est,ll=likelihood))
+
 }
 
 
@@ -262,13 +268,9 @@ if (m==1){
 #'
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
                  tol=10^(-1),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
-                 w.init=NULL, wi.init=NULL,trace=FALSE, type=c("expFixed"),...)
+                 w.init=NULL, wi.init=NULL,trace=FALSE,...)
 
   {
-if (type!="expFixed"){
-  stop("type can only be expFixed currently!")
-}
-
   p=ncol(data)-2
   X_bar = apply(data[,-c(1,2)], 2, mean)
   data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
@@ -293,25 +295,20 @@ if (is.null(group))  {
   group=rep(1,nrow(data))
    data=list(data)
  if (length(lambda)!=1){
-  stop("Arguments (group, lambda) do not match!")
+  stop("Arguments (group, lambda) do not match!!")
  }
 }
 
-
-
-
-
   if (!all(lambda>0)){
-    stop("lambda must be positive!")
+    stop("Tuning parameter lambda must be positive!")
   }
 
-  type=match.arg(type)
   start=match.arg(start)
   # Create a mask matrix
   mask <- matrix(1, p, p)
   diag(mask) <- 0
 
-    if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){
+    if (is.null(expFix)  | !is.numeric(expFix)){
       stop("Argument expFix is not correctly specified!")
     }
     A=vector("list",length(data))
@@ -328,14 +325,16 @@ if (is.null(group))  {
       B[[i]]=diag(p)
     }
 k=0
+tau0=0.5
 while(1){
   k=k+1
-A1=AA(data = data,B = B, type=type,expFix,...)
-B1=BB(data=data,A=A,lambda = lambda, type=type)
+A1=AA(data = data,B = B,expFix=expFix)
+B1=BB(data=data,A=A,lambda = lambda,tau=A1$tau)
+
 d1=c()
 d2=c()
-for (i in 1:length(B1)) {
-    d1=c(d1,round(max(mask*abs(B[[i]]-B1[[i]])),3))
+for (i in 1:length(B1[[1]])) {
+    d1=c(d1,round(max(mask*abs(B[[i]]-B1$wiList[[i]])),3))
     d2=c(d2,round(abs(tau0-A1$tau),3))
   }
 if (trace){
@@ -343,26 +342,23 @@ if (trace){
 }
 
 if (max(d1)<=tol && max(d2)<= tol ){
-    output=structure(list(wi=B1, v=A1$corMatrix, tau=A1$tau), class="lglasso")
+    output=structure(list(wi=B1$wiList, v=A1$corMatrix, tau=A1$tau,ll=B1$ll), class="lglasso")
   break
 }else{
   A=A1$corMatrix
-  B=B1
+  B=B1$wiList
   tau0=A1$tau
 }
 
-
 if (k>=maxit){
   message("Algorithm reached the maximum iteration!")
-  output=structure(list(wi=B1, v=A1$corMatrix, tau=tau0), class="lglasso")
+  output=structure(list(wi=B1$wiList, v=A1$corMatrix, tau=tau0,ll=B1$ll), class="lglasso")
   break
 }
 
 }
   return(output)
     }
-
-
 
 
   if (random==TRUE){
@@ -372,23 +368,14 @@ if (k>=maxit){
         stop("Arguments (group, lambda) do not match!")
       }
     }
-
     if (!is.null(group))  {
-
       if (length(group)!=nrow(data)){
         stop("group should be the same length of the columns of data!")
       }
-
-
       if (!length(lambda)==2){
         stop("Arguments (group, lambda) do not match!")
       }
-
-
     }
-
-
-
     if (!all(lambda>0)){
       stop("lambda must be positive!")
     }
@@ -411,7 +398,7 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=
 #' @export
 #'
 #' @examples
-conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
+conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
     if (length(groupi)!=nrow(datai)){
       stop("group should be the same length of the columns of data!")
     }
@@ -426,7 +413,7 @@ conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
   p=nrow(wi[[1]])
   for (i in 1:nn) {
     timepoints=data[[i]][,2]
-    phiMi=phifunction(t=timepoints,tau=tau)
+    phiMi=phifunction(t=timepoints,tau=tau,expFix=expFix)
     s=t(as.matrix(data[[i]][,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(data[[i]][,-c(1,2)])%*%wi[[i]]
     a=det(phiMi)^(-p/2)*exp(-0.5*sum(diag(s)))
     likelihood=a*likelihood
@@ -435,7 +422,7 @@ conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
   return(likelihoodi=likelihoodi)
 }
 
-#' Function for generating the samples from posteior distribution in EM algorithm
+#' Function for generating the samples from posterior distribution in EM algorithm
 #'
 #' @param n the number of random samples
 #' @param datai the data for subject i
@@ -445,7 +432,7 @@ conDensityTau=function(tau,expFixed, datai,wi,alpha,groupi){
 #'
 #' @returns a data frame for samples and their weights
 
-importanceSample=function(n,datai,wi,alpha,groupi){
+importanceSample=function(n,datai,wi,alpha,groupi,expFix=1){
   dd1=matrix(rexp(n=n,rate=alpha),ncol=1)
   likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
   likelihood2=apply(dd1, 1, dexp,rate=alpha)
@@ -466,15 +453,13 @@ if (length(index)==0){stop("No valid samples are generated!")}
 #' @param groupi specify how datai is grouped
 #' @returns a list of estimated
 
-importanceEstimates=function(importancesSample,datai,groupi){
+importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
   data=split(datai,f=factor(groupi,levels = unique(groupi)))
   tt=split(datai[,2],f=factor(groupi,levels = unique(groupi)))
   sample0=importancesSample[,1]
-  ff=seq(1,length(sample0),1)
-  sampleTau=split(sample0,f=ff)
   weightTau=importancesSample[,2]
   estimateTau=sum(sample0*weightTau)
-  estimatePhi=lapply(tt, phifunction,tau=estimateTau)
+  estimatePhi=lapply(tt, phifunction,tau=estimateTau, expFix=expFix)
   estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
   return(estimates)
 }
@@ -487,7 +472,7 @@ importanceEstimates=function(importancesSample,datai,groupi){
 #' @param group specify how data is grouped
 #' @param l number of random samples in importance sampling
 #' @returns a list for estimates of tau and AA
-AAheter=function(data,wi,alpha,group,l){
+AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
   subjects=unique(data[,1])
   nn=length(unique(group))
   A=vector("list",length(subjects))
@@ -498,10 +483,11 @@ AAheter=function(data,wi,alpha,group,l){
   for (i in 1:length(subjects)) {
     datai=dataList[[i]]
     groupi=groupList[[i]]
-      imSample=importanceSample(n=l,datai=datai,wi=wi,alpha=alpha,groupi =groupi )
+      imSample=importanceSample(n=l,datai=datai,wi=wi,alpha=alpha,groupi =groupi,expFix=expFix )
       index=which(!is.nan(imSample[,2]))
       imSample=imSample[index,]
-      imporResults=importanceEstimates(importancesSample=imSample,datai=datai,groupi = groupi)
+      imporResults=importanceEstimates(importancesSample=imSample,datai=datai,
+                                       groupi = groupi,expFix=expFix,...)
       Tau[i,1]=imporResults$estimateTau
       A[[i]]=imporResults$estimatePhi
   }
@@ -533,15 +519,12 @@ AAheter=function(data,wi,alpha,group,l){
 #' @export
 #'
 #' @examples
-lglassoHeter=function(data,lambda,expFix,group,maxit,
-                      tol=10^(-3),trace=FALSE,start=c("warm","cold"), w.init=NULL, wi.init=NULL, N)
+lglassoHeter=function(data,lambda,group,maxit,
+                      tol=10^(-3),trace=FALSE,start=c("warm","cold"), w.init=NULL, wi.init=NULL, N,expFix=1,...)
 
 {
   p=ncol(data)-2
   m=length(unique(data[,1]))
-
-
-
 
   if (is.null(group))  {
          group=rep(1,nrow(data))
@@ -556,10 +539,6 @@ lglassoHeter=function(data,lambda,expFix,group,maxit,
              stop("Arguments (group, lambda) do not match!")
            }
 
-
-
-
-
 nn=length(unique(group))
 
   if (!all(lambda>0)){
@@ -571,7 +550,7 @@ nn=length(unique(group))
   diag(mask) <- 0
 
 
-  if (is.null(expFix) | length(expFix)!=1 | !is.numeric(expFix)){
+  if (is.null(expFix) | !is.numeric(expFix)){
     stop("Argument expFix is not correctly specified!")
   }
 
@@ -585,32 +564,31 @@ nn=length(unique(group))
   alpha0=1
   while(1){
     k=k+1
-    A1=AAheter(data=data,wi=B,alpha=alpha0,group=group,l=N)
-    B1=BB(data=dataList,A=A1$AA,lambda = lambda, type="expFixed")
+    A1=AAheter(data=data,wi=B,alpha=alpha0,group=group,expFix=expFix,l=N,...)
+    B1=BB(data=dataList,A=A1$AA,lambda = lambda,random=T,tau=A1$Tau,...)
     d1=c()
-    d2=c()
-    for (i in 1:length(B1)) {
-      d1=c(d1,round(max(mask*abs(B[[i]]-B1[[i]])),3))
-      d2=c(d2,round(abs(alpha0-1/mean(A1$Tau)),3))
+    d2=round(abs(alpha0-1/mean(A1$Tau)),3)
+    for (i in 1:length(B1[[1]])) {
+      d1=c(d1,round(max(mask*abs(B[[i]]-B1$wiList[[i]])),3))
     }
     if (trace){
       print(paste0("alpha estimate: ", alpha0))
       print(paste0("iteration ",k, " precision difference: ",max(d1) , " /correlation alpha difference: ",max(d2)))
     }
 
-    if (max(d1)<=tol && max(d2)<= tol ){
-      output=structure(list(wi=B1, tau=A1$Tau,alpha=1/mean(A1$Tau)), class="lglasso")
+    if (max(d1)<=tol && d2<= tol ){
+      output=structure(list(wi=B1$wiList, tau=A1$Tau,alpha=1/mean(A1$Tau),ll=B1$ll), class="lglasso")
       break
     }else{
       A=A1$AA
-      B=B1
+      B=B1$wiList
       tau0=A1$Tau
       alpha0=1/mean(tau0)
     }
 
     if (k>=maxit){
       message("Algorithm reached the maximum iteration!")
-      output=structure(list(wi=B1, tau=tau0,alpha=alpha0), class="lglasso")
+      output=structure(list(wi=B1$wiList, tau=tau0,alpha=alpha0,ll=B1$ll), class="lglasso")
       break
     }
   }
@@ -638,11 +616,6 @@ cvErrorji=function(data.train,data.valid,bi){
       x=as.matrix(data.train[,index+2])
       coef.train=stats::lm(y~x)$coef
       yy=data.valid[,i+2, drop=FALSE]
-      # if(nrow(data.valid)>1 && ncol(data.valid>1)){
-      #   xx=cbind(1,X.valid[,index])
-      # }else{
-      #   xx=c(1,c(X.valid[index]))}
-
       xx=as.matrix(cbind(1,data.valid[,index+2,drop=FALSE]))
       err=(yy-xx%*%coef.train)^2
       cv_error=c(cv_error,mean(err[,,drop=TRUE]))
@@ -708,132 +681,6 @@ a=c()
 
 
 
-# cvlglasso=function(type=c("expFixed"), data,group=NULL,
-#                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE){
-#
-#   type=match.arg(type)
-#
-#
-#   if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
-#   {stop("group and lambda does not match!")}
-#
-#   if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
-#
-#   if (any(lambda<=0)) {stop("tuning parameter lambda should be positive!")}
-#
-#   if (any(K<=1 | K%%1 !=0)){
-#     stop("K should be an integer greater than 1!")
-#   }
-#
-#
-#   n=length(unique(data[,1]))
-#   subjects=unique(data[,1])
-#   p=ncol(data)-2
-#   ind = sample(n)
-#
-#   X=data[,-c(1,2)]
-#
-#
-#
-#
-#   S = (nrow(X) - 1)/nrow(X) * stats::cov(X)
-#   # crit.cv = match.arg(crit.cv)
-#   # start = match.arg(start)
-#
-#   Sminus = S
-#   diag(Sminus) = 0
-#   if (is.null(lambda)) {
-#     if (!((lam.min.ratio <= 1) && (lam.min.ratio > 0))) {
-#       cat("\nlam.min.ratio must be in (0, 1]... setting to 1e-2!")
-#       lam.min.ratio = 0.01
-#     }
-#     if (!((nlam > 0) && (nlam%%1 == 0))) {
-#       cat("\nnlam must be a positive integer... setting to 10!")
-#       nlam = 10
-#     }
-#     lam.max = max(abs(Sminus))
-#     lam.min = lam.min.ratio * lam.max
-#     lambda = 10^seq(log10(lam.min), log10(lam.max), length = nlam)
-#     if (!is.null(group)){
-#       lambda=cbind(lambda,lambda)
-#     }
-#   }
-#   else {
-#     if (is.null(group)){
-#       lambda = sort(lambda)
-#       }
-#   }
-#
-#
-# nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
-# cv_error=matrix(0,nrow=nnlambda,ncol=K)
-#   if (trace) {
-#     progress = utils::txtProgressBar(max = K, style = 3)
-#   }
-#
-#   for (k in 1:K) {
-#       leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
-#                                                          n/K)]]
-#       indexValid=which(data[,1] %in% leave.out)
-#       data.train = data[-indexValid, , drop = FALSE]
-#       data_bar = apply(data.train[,-c(1,2)], 2, mean)
-#       data.train[,-c(1,2)] = scale(data.train[,-c(1,2)], center = data_bar, scale = FALSE)
-#       data.valid = data[indexValid,, drop = FALSE]
-#       data.valid[,-c(1,2)] = scale(data.valid[,-c(1,2)], center = data_bar, scale = FALSE)
-#       group.train=group[-indexValid]
-#       group.valid=group[indexValid]
-#       #S.train = crossprod(data.train[,-c(1,2)])/(dim(data.train)[1])
-#       #S.valid = crossprod(data.valid[,-c(1,2)])/(dim(data.valid)[1])
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#   if (type=="expFixed" && is.null(group)){
-#
-#    aa= sapply(lambda, function(x){lglasso(data=data.train,lambda=x,type=type, expFix = expFix)$wi}, simplify = FALSE)
-#    cc=lapply(aa, function(B){
-#      M=ifelse(abs(B)<=10^(-2), 0,1)
-#      diag(M)=2
-#      M
-#    })
-#    bb=lapply(cc, function(B){cvError(data.train=data.train,data.valid=data.valid,B=B)})
-#    bb=do.call(c,bb)
-#   }
-#
-#   if (type=="expFixed" && !is.null(group)){
-#    aa= apply(lambda,1, function(x){lglasso(data=data.train,lambda=x,type=type, expFix = expFix, group=group.train)$wiList})
-#    cc=lapply(aa, function(B){
-#      lapply(B, function(Z){
-#        M=ifelse(abs(Z)<=10^(-1), 0,1)
-#        diag(M)=2
-#        M
-#      }
-#      )
-#    }
-#    )
-#
-#    bb=lapply(cc, function(BB){cvError(data.train=data.train,data.valid=data.valid,B=BB,
-#                                       group.valid =   group.valid,group.train = group.train)})
-#    bb=do.call(c,bb)
-#   }
-#
-# cv_error[,k]=bb
-# if (trace) {
-#   utils::setTxtProgressBar(progress,  k)
-# }
-#   }
-#
-# output=structure(list(cv_error=cv_error, lambda=lambda),class="cvlglasso")
-# return(output)
-# }
-#
 
 
 
@@ -879,9 +726,6 @@ for (i in 1:length(a1)){
     err_matrix[i,j]=err[index]
   }
 }
-
-
-
   # heat_plot <- pheatmap::pheatmap(err_matrix,
   #                       col = brewer.pal(8, 'OrRd'), # choose a colour scale for your data
   #                       cluster_rows = F, cluster_cols = F, # set to FALSE if you want to remove the dendograms
@@ -925,152 +769,7 @@ return(invisible(heat_plot))
 
 
 
-#' #' Title
-#' #'
-#' #' @param type model type
-#' #' @param data raw data
-#' #' @param group group variable
-#' #' @param lambda tuning parameter
-#' #' @param nlam number of tuning parameter
-#' #' @param lam.min.ratio ratio of largest lambda vs smallest lambda
-#' #' @param K cv folds
-#' #' @param expFix given parameter
-#' #' @param trace whether show the process
-#' #' @param cores parallel computing
-#' #' @returns list
-#' #' @import parallel foreach doParallel
-#'
-#' cvplglasso=function(type=c("expFixed"), data,group=NULL,
-#'                      lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE, cores=1){
-#'
-#'   type=match.arg(type)
-#'
-#'
-#'   if (is.null(group) && any( !is.vector(lambda) |  !all(is.numeric(lambda)) | !all(lambda>0)))
-#'   {stop("group and lambda does not match!")}
-#'
-#'   if (ncol(lambda)!=2 && !is.null(group)){stop("lambda should be a n by 2 matrix when group is specified!")}
-#'
-#'   if (any(lambda<=0)) {stop("tuning parameter lambda should be positive!")}
-#'
-#'   if (any(K<=1 | K%%1 !=0)){
-#'     stop("K should be an integer greater than 1!")
-#'   }
-#'
-#'   num_cores=detectCores()
-#'   if (cores > num_cores) {
-#'     cat("\nOnly detected", paste(num_cores, "cores...", sep = " "))
-#'   }
-#'   if (cores > K) {
-#'     cat("\nNumber of cores exceeds K... setting cores = K")
-#'     cores = K
-#'   }
-#'   cluster = makeCluster(cores)
-#'   registerDoParallel(cluster)
-#'   subjects=unique(data[,1])
-#'   n=length(subjects)
-#'   p=ncol(data)-2
-#'   ind = sample(n)
-#'
-#'   X=data[,-c(1,2)]
-#'
-#'
-#'   S = (nrow(X) - 1)/nrow(X) * stats::cov(X)
-#'   # crit.cv = match.arg(crit.cv)
-#'   # start = match.arg(start)
-#'
-#'   Sminus = S
-#'   diag(Sminus) = 0
-#'   if (is.null(lambda)) {
-#'     if (!((lam.min.ratio <= 1) && (lam.min.ratio > 0))) {
-#'       cat("\nlam.min.ratio must be in (0, 1]... setting to 1e-2!")
-#'       lam.min.ratio = 0.01
-#'     }
-#'     if (!((nlam > 0) && (nlam%%1 == 0))) {
-#'       cat("\nnlam must be a positive integer... setting to 10!")
-#'       nlam = 10
-#'     }
-#'     lam.max = max(abs(Sminus))
-#'     lam.min = lam.min.ratio * lam.max
-#'     lambda = 10^seq(log10(lam.min), log10(lam.max), length = nlam)
-#'     if (!is.null(group)){
-#'       lambda=expand.grid(lambda,lambda)
-#'     }
-#'   }
-#'   else {
-#'     if (is.null(group)){
-#'       lambda = sort(lambda)
-#'     }
-#'   }
-#'
-#'
-#'   nnlambda=ifelse(is.null(group),length(lambda),nrow(lambda))
-#'   cv_error=matrix(0,nrow=nnlambda,ncol=K)
-#'
-#'   k=NULL
-#'   k=1
-#'      CV = foreach(k = 1:K, .packages = "lglasso", .combine = "cbind",
-#'                   .inorder = FALSE) %dopar% {
-#'
-#'                  if (trace) {
-#'                    progress = utils::txtProgressBar(max = K, style = 3)
-#'                  }
-#'
-#'                  leave.out =subjects[ind[(1 + floor((k - 1) * n/K)):floor(k *
-#'                                                                             n/K)]]
-#'                  indexValid=which(data[,1] %in% leave.out)
-#'                  data.train = data[-indexValid, , drop = FALSE]
-#'                  data_bar = apply(data.train[,-c(1,2)], 2, mean)
-#'                  data.train[,-c(1,2)] = scale(data.train[,-c(1,2)], center = data_bar, scale = FALSE)
-#'                  data.valid = data[indexValid,, drop = FALSE]
-#'                  data.valid[,-c(1,2)] = scale(data.valid[,-c(1,2)], center = data_bar, scale = FALSE)
-#'                  group.train=group[-indexValid]
-#'                  group.valid=group[indexValid]
-#'                  #S.train = crossprod(data.train[,-c(1,2)])/(dim(data.train)[1])
-#'                  #S.valid = crossprod(data.valid[,-c(1,2)])/(dim(data.valid)[1])
-#'
-#'
-#'                  if (is.null(group)){
-#'
-#'                    aa= sapply(lambda, function(x) {lglasso(data=data.train,lambda=x)$wi})
-#'                    cc=lapply(aa, function(B){
-#'                      M=ifelse(abs(B)<=10^(-2), 0,1)
-#'                      diag(M)=2
-#'                      M
-#'                    })
-#'                    bb=lapply(cc, function(B) {cvError(data.train=data.train,data.valid=data.valid,B=B)})
-#'                    bb=do.call(c,bb)
-#'                  }
-#'                  if (!is.null(group)){
-#'                    aa= apply(lambda,1, function(x) {lglasso(data=data.train,lambda=x, expFix = expFix, group=group.train)$wi})
-#'                    cc=lapply(aa, function(B){
-#'                      lapply(B, function(Z){
-#'                        M=ifelse(abs(Z)<=10^(-1), 0,1)
-#'                        diag(M)=2
-#'                        M
-#'                      }
-#'                      )
-#'                    }
-#'                    )
-#'
-#'                    bb=lapply(cc, function(BB){cvError(data.train=data.train,data.valid=data.valid,B=BB,
-#'                                                       group.valid=group.valid, group.train = group.train)})
-#'                    bb=do.call(c,bb)
-#'                  }
-#'
-#'                  cv_error=bb
-#'
-#'                  if (trace) {
-#'                    utils::setTxtProgressBar(progress,  k)
-#'                  }
-#'
-#'                  return(cv_error=cv_error)
-#'                }
-#'
-#'   stopCluster(cluster)
-#'   output=structure(list(cv_error=CV, lambda=lambda),class="cvlglasso")
-#'   return(output)
-#' }
+
 
 
 #' @title Cross validation for \code{lglasso}
@@ -1092,7 +791,7 @@ return(invisible(heat_plot))
 #' @export
 #' @import parallel foreach doParallel
 #'
-CVlglasso=function(type=c("expFixed"), data,group=NULL,random=FALSE,
+CVlglasso=function(data,group=NULL,random=FALSE,
                     lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE,NN=500){
 
   results=cvlglassofull(data=data,group=group,lambda = lambda,nlam=nlam,random = random,
@@ -1234,7 +933,6 @@ crossDataLambda=vector("list",N)
 
 
   k=NULL
-  #browser()
         CV = foreach(k = 1:length(crossDataLambda), .packages = "lglasso", .combine = "cbind",
                      .inorder = TRUE) %dopar% {
                  if (trace) {
@@ -1295,5 +993,4 @@ crossDataLambda=vector("list",N)
   output=structure(list(cv_error=aa, lambda=lambda),class="cvlglasso")
   return(output)
 }
-
 

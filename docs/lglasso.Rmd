@@ -27,7 +27,8 @@ library(forcats)
 library(fake)
 library(igraph)
 library(Matrix)
-load_all()
+library(lglasso)
+#load_all()
 source("../scripts/simulations.R")
 ```
 
@@ -63,7 +64,7 @@ ddata=dd$data
 subjects=fct_inorder(ddata$subject)
 group=rep(0,nrow(ddata))
 homoData=list(data=ddata)
-saveRDS(homoData,file="homoOneStageData.rds")
+#saveRDS(homoData,file="homoOneStageData.rds")
 ```
 
 
@@ -73,7 +74,7 @@ saveRDS(homoData,file="homoOneStageData.rds")
 ```{r,warning=FALSE}
 set.seed(1)
 aa=lglasso(data=ddata,lambda = 0.01,trace=T)
-saveRDS(aa,file="homoOneStageResult.rds")
+#saveRDS(aa,file="homoOneStageResult.rds")
 ## estimated network 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 estimates
@@ -82,6 +83,7 @@ dd$network
 
 ## correlation parameter
 aa$tau
+aa$ll
 ```
 
 
@@ -106,11 +108,11 @@ aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T)
 saveRDS(aa,file="heterOneStageResult.rds")
 ## estimated network  
 
-estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+estimates=lapply(aa$wi$wiList,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
 estimates
 ##  true network
 dd$network
-
+aa$ll
 ## correlation parameter
  model <- lm(dd$tau ~ aa$tau)
 plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
@@ -150,7 +152,7 @@ estimates[[1]]
 
 ##  true post-treatment network
 dd$network$pre
-
+aa$ll
 
 ## post-treatment network estimate 
 estimates[[2]]
@@ -192,7 +194,7 @@ estimates[[1]]
 ##  true pre-treatment network
 dd$network$pre
 
-
+aa$ll
 ## post-treatment network estimate 
 estimates[[2]]
 

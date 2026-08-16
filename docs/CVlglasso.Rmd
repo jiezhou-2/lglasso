@@ -25,7 +25,7 @@ library(devtools)
 library(forcats)
 library(fake)
 library(CVglasso)
-load_all()
+load_all("/Users/f003r0s/Desktop/Anne_lab_projects/lglasso")
 source("../scripts/simulations.R")
 set.seed(3)
 ```
@@ -119,7 +119,7 @@ plot(bb)
 
 
 
-[1] Zhou J, Gui J, Viles WD, Chen H, Li S, Madan JC, Coker MO, Hoen AG. Identifying stationary microbial interaction networks based on irregularly spaced longitudinal 16S rRNA gene sequencing data. Front Microbiomes. 2024;3:1366948. doi: 10.3389/frmbi.2024.1366948. Epub 2024 Jun 2. PMID: 40687607; PMCID: PMC12276884.
 
-[2] Matt Galloway (2025),  CVglasso: Lasso Penalized Precision Matrix Estimation, version 1.0 
+
+[1] Matt Galloway (2025),  CVglasso: Lasso Penalized Precision Matrix Estimation, version 1.0 
 
