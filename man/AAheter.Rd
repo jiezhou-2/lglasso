@@ -4,7 +4,7 @@
 \alias{AAheter}
 \title{Estimate the phimatrix in heterogeneous model}
 \usage{
-AAheter(data, wi, alpha, group, l)
+AAheter(data, wi, alpha, group, l = 5000, expFix = 1, ...)
 }
 \arguments{
 \item{data}{longitudinal data set}

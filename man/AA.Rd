@@ -7,35 +7,33 @@
 AA(
   B,
   data,
-  type = c("expFixed"),
-  expFix,
+  expFix = 1,
   maxit = 30,
   tol = 10^(-4),
   lower = c(0.01, 0.1),
-  upper = c(10, 5),
-  ...
+  upper = c(10, 5)
 )
 }
 \arguments{
 \item{B}{a list of length 1 or 2.  If B is of length 1, then its entry is a
 p by p given precision matrix representing the whole data points.
-If B is of length 2, then they reprenst the before and after the vaccination network.}
+If B is of length 2, then they represent the pre- and post-treatment network.}
 
 \item{data}{a (p+2)-by-n data frame}
 
-\item{type}{specify how to model the covariance matrix}
-
 \item{expFix}{the parameter in variance function when the data are longitudinal}
 
-\item{maxit}{the maximum iteration number}
+\item{maxit}{the maximum of iteration number}
 
-\item{tol}{the minimum difference for the algorithm to be called converged}
+\item{tol}{the minimum difference of algorithm convergence}
 
 \item{lower}{vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix}
 
 \item{upper}{vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix}
 
-\item{...}{other unspecifed parameterss}
+\item{type}{specify the model for the covariance matrix}
+
+\item{...}{other unspecified parameters}
 }
 \value{
 a list of matrices

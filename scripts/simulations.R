@@ -1,15 +1,190 @@
 
 
 
-phifunction=function(t,tau){
+phifunction1=function(t,tau,expFix=1){
   n=length(t)
-  if (any(tau<=0)){stop("tau should be positive!")}
+  if (length(tau)>1){stop("Tau should be a scalar!")}
+  if (tau<=0){
+    stop("tau should be positive!")
+  }
   if (n==1) return(matrix(1,1,1))
-  d=abs(outer(t,t,"-"))
-  M=exp(-tau[1]*d)
+  d=(abs(outer(t,t,"-")))^{expFix}
+  M=exp(-tau*d)
   diag(M)=1
   M
 }
+
+sim_stru=function(p,m1,m2){
+  real_stru=matrix(0, nrow = p, ncol = p)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m1, replace = F)
+  real_stru[index[a,]]=1
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
+  real_stru1=real_stru+t(real_stru)+diag(p)
+
+
+  distrubance=matrix(0, nrow = p, ncol = p)
+  distrubance[lower.tri(distrubance,diag = TRUE)]=1
+  index=which(distrubance==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m2, replace = F)
+  distrubance[index[a,]]=1
+  distrubance[lower.tri(distrubance,diag = TRUE)]=0
+  distrubance=distrubance+t(distrubance)+diag(p)
+  real_stru2=(real_stru1+distrubance)%%2
+
+  theta = matrix(stats::rnorm(p^2,mean = 0,sd=0.01), ncol = p,nrow = p)
+  theta[lower.tri(theta, diag = TRUE)] = 0
+  theta = theta + t(theta) + diag(p)
+  theta1 = theta * real_stru1
+  theta2 = theta * real_stru2
+  theta1=MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  theta2=MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  sigma1=solve(theta1)
+  sigma2=solve(theta2)
+  return(list(precision1=theta1,precision2=theta2,covmat1=sigma1,covmat2=sigma2))
+}
+
+sim_timepoints=function(n,tt){
+  ## true structure
+  timepoint1=vector("list",n)
+  timepoint2=vector("list",n)
+  for (i in 1:n) {
+    m3=sample(x=1:tt[1],1,prob = rep(1,tt[1]))
+    m4=sample(x=1:tt[2],1,prob = rep(1,tt[2]))
+    t1=stats::rexp(m3,rate=10)
+    t2=stats::rexp(m4,rate=10)
+    timepoint1[[i]]=cumsum(t1)[1:m3]
+    timepoint2[[i]]=cumsum(t2)[1:m4]
+  }
+  return(list(timepoint1=timepoint1,timepoint2=timepoint2))
+}
+
+
+
+sim_phi=function(timepoints,tau,expFix=1){
+
+  if (length(tau)>2){
+    phi1=vector("list",length(tau))
+    phi2=vector("list",length(tau))
+    for (i in 1:length(tau)) {
+      phi1[[i]]=phifunction1(t=timepoints[[1]][[i]], tau=tau[i],expFix = expFix)
+      phi2[[i]]=phifunction1(t=timepoints[[2]][[i]], tau=tau[i],expFix = expFix)
+    }
+  }else{
+    if(length(tau)==2){
+      phi1=lapply(timepoints[[1]],phifunction1, tau=tau[1])
+      phi2=lapply(timepoints[[2]],phifunction1, tau=tau[2])
+    }
+  }
+  return(list(phi1=phi1,phi2=phi2))
+}
+sim_data_old=function(covmat,timepoints,tau,random=FALSE){
+  if (random==FALSE){
+    print("homo data are generated")
+    if (length(timepoints[[1]])!=length(timepoints[[2]])){
+      stop("pretreatment and posttreatment should have same length time points!")
+    }
+    p=ncol(covmat[[1]])
+    m=length(timepoints[[1]])
+    data1=vector("list",m)
+    data2=vector("list",m)
+    sqK1=chol(covmat[[1]])
+    sqK2=chol(covmat[[2]])
+    age1=timepoints[[1]]
+    age2=timepoints[[2]]
+    for (i in 1:m) {
+      n=length(age1[[i]])
+      a=matrix(ncol = p,nrow = n)
+      error1=matrix(rnorm(p*n),nrow = p)
+      error2=t(t(sqK1)%*%error1)
+      a[1,]=error2[1,]
+      if (n>1){
+        for (t in 2:n) {
+          coe=exp(-tau[1]*abs(age1[[i]][t]-age1[[i]][t-1]))
+          #coe=0
+          a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
+        }
+      }
+      #dd=cenfunction(a,zirate = zirate)
+      data1[[i]]=cbind(i,age1[[i]],a)
+      colnames(data1[[i]])[1:2]=c("subject","time")
+    }
+    dd1=as.data.frame(do.call(rbind,data1))
+
+    for (i in 1:m) {
+      n=length(age2[[i]])
+      a=matrix(ncol = p,nrow = n)
+      error1=matrix(rnorm(p*n),nrow = p)
+      error2=t(t(sqK2)%*%error1)
+      a[1,]=error2[1,]
+      if (n>1){
+        for (t in 2:n) {
+          coe=exp(-tau[2]*abs(age2[[i]][t]-age2[[i]][t-1]))
+          a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
+        }
+      }
+      #dd=cenfunction(a,zirate = zirate)
+      data2[[i]]=cbind(i,age2[[i]],a)
+      colnames(data2[[i]])[1:2]=c("subject","time")
+    }
+    dd2=as.data.frame(do.call(rbind,data2))
+  }
+
+  if (random==TRUE){
+    print("heter data are generated")
+    if (length(timepoints[[1]])!=length(timepoints[[2]])){
+      stop("pretreatment and posttreatment should have same length time points!")
+    }
+    p=ncol(covmat[[1]])
+    m=length(timepoints[[1]])
+    data1=vector("list",m)
+    data2=vector("list",m)
+    sqK1=chol(covmat[[1]])
+    sqK2=chol(covmat[[2]])
+    age1=timepoints[[1]]
+    age2=timepoints[[2]]
+    for (i in 1:m) {
+      n=length(age1[[i]])
+      a=matrix(ncol = p,nrow = n)
+      error1=matrix(rnorm(p*n),nrow = p)
+      error2=t(t(sqK1)%*%error1)
+      a[1,]=error2[1,]
+      if (n>1){
+        for (t in 2:n) {
+          coe=exp(-tau[i]*abs(age1[[i]][t]-age1[[i]][t-1]))
+          a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
+        }
+      }
+      #dd=cenfunction(a,zirate = zirate)
+      data1[[i]]=cbind(i,age1[[i]],a)
+      colnames(data1[[i]])[1:2]=c("subject","time")
+    }
+    dd1=as.data.frame(do.call(rbind,data1))
+
+    for (i in 1:m) {
+      n=length(age2[[i]])
+      a=matrix(ncol = p,nrow = n)
+      error1=matrix(rnorm(p*n),nrow = p)
+      error2=t(t(sqK2)%*%error1)
+      a[1,]=error2[1,]
+      if (n>1){
+        for (t in 2:n) {
+          coe=exp(-tau[i]*abs(age2[[i]][t]-age2[[i]][t-1]))
+          a[t,]=a[t-1,]*coe+error2[t,]*sqrt(1-coe^2)
+        }
+      }
+      #dd=cenfunction(a,zirate = zirate)
+      data2[[i]]=cbind(i,age2[[i]],a)
+      colnames(data2[[i]])[1:2]=c("subject","time")
+    }
+    dd2=as.data.frame(do.call(rbind,data2))
+
+  }
+
+  return(list(data=list(pre=dd1,post=dd2)))
+}
+
 
 simulate_general=function(n,p,m1,m2=0,m3,cc){
   ## true structure
@@ -132,9 +307,9 @@ simulate_long=function(n,p,m1,tt=5,m2=0,tau){
       timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
     }
   }
-  cc1=lapply(timepoint1,phifunction, tau=tau[1])
+  cc1=lapply(timepoint1,phifunction1, tau=tau[1])
   if (length(tau)==2){
-  cc2=lapply(timepoint2,phifunction, tau=tau[2])
+  cc2=lapply(timepoint2,phifunction1, tau=tau[2])
   }
   real_stru=matrix(0, nrow = p, ncol = p)
   real_stru[lower.tri(real_stru,diag = TRUE)]=1
@@ -209,10 +384,10 @@ rownames(real_stru2)=featureName1
     a2=rbind(a2,ai)
     }
     colnames(a2)[2]="time"
-    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2)))
+    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=tau))
   }
 
-  return(list(data=a1,network=real_stru1))
+  return(list(data=a1,network=real_stru1,tau=tau))
 }
 
 
@@ -228,13 +403,13 @@ trueTau=rexp(n=n,rate=alpha)
     if (group==1){
       t1=stats::rexp(m3)
       timepoint1[[i]]=cumsum(t1)[1:m3]
-      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
+      cc1[[i]]=phifunction1(t=timepoint1[[i]],tau=trueTau[i])
     }else{
       t1=stats::rexp(2*m3)
       timepoint1[[i]]=cumsum(t1)[1:m3]
       timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
-      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
-      cc2[[i]]=phifunction(t=timepoint2[[i]],tau=trueTau[i])
+      cc1[[i]]=phifunction1(t=timepoint1[[i]],tau=trueTau[i])
+      cc2[[i]]=phifunction1(t=timepoint2[[i]],tau=trueTau[i])
     }
   }
 
@@ -312,10 +487,10 @@ trueTau=rexp(n=n,rate=alpha)
       a2=rbind(a2,ai)
     }
     colnames(a2)[2]="time"
-    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=trueTau))
+    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=trueTau,alpha=alpha))
   }
 
-  return(list(data=list(pre=a1),network=list(pre=real_stru1),tau=trueTau))
+  return(list(data=list(pre=a1),network=list(pre=real_stru1),tau=trueTau,alpha=alpha))
 }
 
 
@@ -332,7 +507,7 @@ simulate_heter=function(n,p,m1,alpha){
     tau=c(tau,stats::rexp(1,rate=alpha))
   }
   for (j in 1:length(tau)) {
-    cc[[j]]=phifunction(t=timepoint[[j]],tau=c(tau[j],1))
+    cc[[j]]=phifunction1(t=timepoint[[j]],tau=c(tau[j],1))
   }
 
   real_stru=matrix(0, nrow = p, ncol = p)
@@ -377,17 +552,18 @@ simulate_heter=function(n,p,m1,alpha){
 
 
 
-Simulate=function(type=c("longihomo","longiheter"),n=20,p=20,m1=20,m2=1,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
+Simulate=function(type=c("longihomo","longiheter"),n=20,p=20,m1=20,
+                  m2=1,m3=3,tt=5,cc=diag(m3),tau=c(2,1),alpha=2,group){
+
   type=match.arg(type)
-
-
   if (type=="longihomo"){
     data=simulate_long(n=n,p=p,m1=m1,m2=m2,tau=tau,tt=tt)
   }
 
   if (type=="longiheter"){
 
-    data=simulate_randomTau(n=n, p=p,m1=m1,m2=m2,tt=tt, alpha=alpha,group = group)
+    data=simulate_randomTau(n=n, p=p,m1=m1,m2=m2,tt=tt,
+                            alpha=alpha,group = group)
   }
 
   return(data)

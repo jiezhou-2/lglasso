@@ -12,14 +12,13 @@ lglasso(
   expFix = 1,
   N = 100,
   maxit = 30,
-  tol = 10^(-1),
+  tol = 10^(-2),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
   start = c("cold", "warm"),
   w.init = NULL,
   wi.init = NULL,
   trace = FALSE,
-  type = c("expFixed"),
   ...
 )
 }
@@ -51,11 +50,11 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 
 \item{trace}{whether or not show the progress of the computation}
 
+\item{...}{other inputs}
+
 \item{type}{a string specifying which model need to be fitted. There are three models available,
 which are referred as \code{general}, \code{expFixed} respectively.
 Please see the details in the below for the meaning of each.}
-
-\item{...}{other inputs}
 }
 \value{
 list which include following components:

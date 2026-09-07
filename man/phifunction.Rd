@@ -4,7 +4,7 @@
 \alias{phifunction}
 \title{Title}
 \usage{
-phifunction(t, tau)
+phifunction(t, tau, expFix = 1)
 }
 \arguments{
 \item{t}{a vector specify the time points corresponding to the data}
@@ -12,7 +12,7 @@ phifunction(t, tau)
 \item{tau}{the damping rate parameter with length 1 or 2}
 }
 \value{
-a square matrix used to constrct the likelihood
+a square matrix used to construct the likelihood
 }
 \description{
 Title

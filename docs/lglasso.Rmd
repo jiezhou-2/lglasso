@@ -28,6 +28,7 @@ library(fake)
 library(igraph)
 library(Matrix)
 library(lglasso)
+#library(lglasso)
 #load_all()
 source("../scripts/simulations.R")
 ```
@@ -36,13 +37,13 @@ source("../scripts/simulations.R")
 
 ```{r, message=FALSE}
 # number of nodes
-p=10
+p=40
 # number of edge in general network
-m1=20
+m1=70
 # the difference between the number of edges in individual networks and general network
-m2=2
+m2=20
 # number of subjects
-n=20
+n=60
 
 
 ```
@@ -171,7 +172,7 @@ aa$tau
 
 ```{r,warning=FALSE}
 set.seed(1)
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=20,alpha=0.5,group=2)
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
 ddata=do.call(rbind,dd$data)
 subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))

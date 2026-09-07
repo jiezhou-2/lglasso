@@ -4,7 +4,7 @@
 \alias{BB}
 \title{Title}
 \usage{
-BB(A, data, lambda, type = c("expFixed"), diagonal = TRUE)
+BB(A, data, lambda, random = FALSE, tau)
 }
 \arguments{
 \item{A}{a list of length 1 or 2 corresponding to the number of phases. The each entry of A is a

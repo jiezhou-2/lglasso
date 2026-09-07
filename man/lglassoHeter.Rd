@@ -7,7 +7,6 @@
 lglassoHeter(
   data,
   lambda,
-  expFix,
   group,
   maxit,
   tol = 10^(-3),
@@ -15,7 +14,9 @@ lglassoHeter(
   start = c("warm", "cold"),
   w.init = NULL,
   wi.init = NULL,
-  N
+  N,
+  expFix = 1,
+  ...
 )
 }
 \arguments{

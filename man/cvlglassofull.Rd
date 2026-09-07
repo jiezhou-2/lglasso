@@ -14,7 +14,7 @@ cvlglassofull(
   K,
   expFix = 1,
   trace = FALSE,
-  NN = NN
+  NN
 )
 }
 \arguments{

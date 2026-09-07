@@ -4,7 +4,7 @@
 \alias{conDensityTau}
 \title{density function in EM algorithm}
 \usage{
-conDensityTau(tau, expFixed, datai, wi, alpha, groupi)
+conDensityTau(tau, expFix = 1, datai, wi, alpha, groupi)
 }
 \arguments{
 \item{tau}{the dampening rate}

@@ -27,6 +27,7 @@ The algorithm is pretty stable, as you can see it converges nicely for both the 
 ### Simulation
 
 [1. lglasso examples](lglasso.html)
+[1. lglasso examples]lglasso1.html
 
 [2. CVlglasso examples](CVlglasso.html)
 

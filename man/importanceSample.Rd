@@ -2,9 +2,9 @@
 % Please edit documentation in R/functionV1.R
 \name{importanceSample}
 \alias{importanceSample}
-\title{Function for generating the samples from posteior distribution in EM algorithm}
+\title{Function for generating the samples from posterior distribution in EM algorithm}
 \usage{
-importanceSample(n, datai, wi, alpha, groupi)
+importanceSample(n, datai, wi, alpha, groupi, expFix = 1)
 }
 \arguments{
 \item{n}{the number of random samples}
@@ -21,5 +21,5 @@ importanceSample(n, datai, wi, alpha, groupi)
 a data frame for samples and their weights
 }
 \description{
-Function for generating the samples from posteior distribution in EM algorithm
+Function for generating the samples from posterior distribution in EM algorithm
 }

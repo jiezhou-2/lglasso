@@ -187,22 +187,30 @@ if (m==1){
   colnames(S_est[[1]])=featureNames
   rownames(S_est[[1]])=featureNames
   likelihood=ifelse(!random,
-                    -extra/nrow(dd)+log(det(results$wi)-sum(diag(results$wi%*%(amatrix[[1]]/(nrow(dd)))))),
-    -extra/nrow(dd)+log(det(results$wi)-sum(diag(results$wi%*%(amatrix[[1]]/(nrow(dd))))))-2*nn*log(mean(tau))/nrow(dd)
+                    -extra/nrow(dd)+log(det(results$wi))-sum(diag(results$wi%*%amatrix[[1]]))/(nrow(dd)),
+    -extra/nrow(dd)+log(det(results$wi))-sum(diag(results$wi%*%amatrix[[1]]))/nrow(dd)-2*nn*log(mean(tau))/nrow(dd)
     )
+  #likelihood1=1
 }else{
     prob=Problem(Minimize(obj))
     result=CVXR::solve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
-    likelihood=-(result$value
-    -lambda[1]*(sum(abs(S_est[[1]])+abs(S_est[[2]])))
-    -lambda[2]*(sum(abs(S_est[[1]]-S_est[[2]]))))
+    likelihood=-(result$value-sum(abs(mask1*S_est[[1]])+abs(mask1*S_est[[2]]))-sum(mask2*abs(S_est[[1]]-S_est[[2]])))
+    # likelihood1=ifelse(!random,
+    #                   -extra/nrow(data[[1]])+log(det(S_est[[1]]))-sum(diag(S_est[[1]]%*%amatrix[[1]]))/nrow(data[[1]])
+    #                   -extra/nrow(data[[2]])+log(det(S_est[[2]]))-sum(diag(S_est[[2]]%*%amatrix[[2]]))/nrow(data[[2]])
+    #                   ,
+    #                   -extra/nrow(data[[1]])+log(det(S_est[[1]]))-sum(diag(S_est[[1]]%*%amatrix[[1]]))/nrow(data[[1]])
+    #                   -2*nn*log(mean(tau))/nrow(data[[1]])
+    #                   -extra/nrow(data[[2]])+log(det(S_est[[2]]))-sum(diag(S_est[[2]]%*%amatrix[[2]]))/nrow(data[[2]])
+    #                   -2*nn*log(mean(tau))/nrow(data[[2]])
+    #                   )
     for (i in 1:length(S_est)) {
       colnames(S_est[[i]])=featureNames
       rownames(S_est[[i]])=featureNames
     }
 }
-    return(list(wiList=S_est,ll=likelihood))
+    return(list(wiList=S_est,ll=likelihood/2))
 
 }
 
@@ -267,7 +275,7 @@ if (m==1){
 #'
 #'
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
-                 tol=10^(-1),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
+                 tol=10^(-2),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
 
   {
@@ -409,16 +417,16 @@ conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
 
   data=split(datai,f=factor(groupi,levels = unique(groupi)))
   nn=length(unique(groupi))
-  likelihood=1
+  likelihood=0
   p=nrow(wi[[1]])
   for (i in 1:nn) {
     timepoints=data[[i]][,2]
     phiMi=phifunction(t=timepoints,tau=tau,expFix=expFix)
     s=t(as.matrix(data[[i]][,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(data[[i]][,-c(1,2)])%*%wi[[i]]
-    a=det(phiMi)^(-p/2)*exp(-0.5*sum(diag(s)))
-    likelihood=a*likelihood
+    a=log(det(phiMi))*(-p/2)-0.5*sum(diag(s))
+    likelihood=a+likelihood
   }
-  likelihoodi=likelihood*exp(-alpha*tau)
+  likelihoodi=log(alpha)+likelihood-alpha*tau
   return(likelihoodi=likelihoodi)
 }
 
@@ -435,13 +443,14 @@ conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
 importanceSample=function(n,datai,wi,alpha,groupi,expFix=1){
   dd1=matrix(rexp(n=n,rate=alpha),ncol=1)
   likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
-  likelihood2=apply(dd1, 1, dexp,rate=alpha)
+  likelihood2=log(apply(dd1, 1, dexp,rate=alpha))
   index1=which(!is.nan(likelihood1))
   index2=which(!is.infinite(likelihood1))
 index=intersect(index1,index2)
 if (length(index)==0){stop("No valid samples are generated!")}
-  weights=likelihood1[index]/likelihood2[index]
-  norWeights=weights/sum(weights)
+  weights=likelihood1[index]-likelihood2[index]
+  weightNew=weights-(log(sum(exp(weights-max(weights))))+max(weights))
+  norWeights=exp(weightNew)
   aa=data.frame(sample=dd1[index],weight=norWeights)
   return(aa)
 }

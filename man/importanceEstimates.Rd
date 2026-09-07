@@ -4,7 +4,7 @@
 \alias{importanceEstimates}
 \title{Function for computing estimates in EM algorithm}
 \usage{
-importanceEstimates(importancesSample, datai, groupi)
+importanceEstimates(importancesSample, datai, groupi, expFix = 1)
 }
 \arguments{
 \item{importancesSample}{the random samples}
