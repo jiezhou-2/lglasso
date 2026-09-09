@@ -14,15 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-In this vignette, we show how to use **lglasso** package to estimate single-stage or double-stage networks from longitudinal data. 
+In this vignette, we show how to use **lglasso** package to estimate one-stage/ two-stage network model from longitudinal data. 
 
 In  section 1 and 2, we use simulated data to demonstrate how to use the two main function *lglasso()* and *CVlglasso()* respectively. 
 
-In section 3 and 4, we use the real antibody titer data from a large vaccine study  to show that the how the analysis can lead to meaningful biological interpretations. 
+In section 3 and 4, we apply the model to a real antibody titer data from a large vaccine study.
 
-The function *Simulate()* for generating the simulated data can be found in file *simulations.R* in folder *scripts* of this repo. You can use it to play around to test the main functions.  Unfortunately, the antibody real data is not publicly available. If you need these data for your research, please contact me at *chowstat@gmail.com* .   
 
-The algorithm is pretty stable, as you can see it converges nicely for both the simulated data and real data. However, based on my experience, the computational speed is not ideal yet. For the real data in which there are 83 features, it takes *lglasso* 2.2 minutes  to converge for single network estimation and 5.7 minutes for double network estimation (  the results are listed in section 3). For  function *CVlglasso*  which has employed parallel method such as *foreach* package to speed up the computation, it is advised to run it on HPC where more cores and memory could be allocated. 
 
 ### Simulation
 
