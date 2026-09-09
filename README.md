@@ -11,20 +11,27 @@ status](https://www.r-pkg.org/badges/version/lglasso)](https://CRAN.R-project.or
 
 <div style="text-align: justify">
 
-The previous version aimed to estimate a high-dimensional network from
-longitudinal data using Gaussian graphical models. This new update added
-two new features, which are
+The previous version aimed to estimate a one-stage high-dimensional
+network from longitudinal data using Gaussian graphical models. This
+version added two new features, which are
 
-1)  Heterogeneous networks. Jointly estimate two networks from
-    longitudinal data. Previous version assumed a stationary process
-    that underlies the longitudinal data. The new version extended this
-    assumption to include the cases where the longitudinal data cover
-    two stages, one for pre-treatment, one for post-treatment. Each
-    stage has its own correlation structure.
+1)  Estimate two-stage high-dimensional networks. Previous version
+    assumed a stationary process that underlies the longitudinal data.
+    The new version extended this assumption to include the scenarios
+    where the longitudinal data cover two stages, e.g., one for
+    pre-treatment, the other for post-treatment. Each stage has its own
+    network structure.
 
-2)  Cross validation. This version added cross validation method for
-    users to select tuning parameter. The cross validation is carried
-    out on the subject level instead of individual data point level.
+2)  Tuning parameter selection. This version added functions for the
+    selection of tuning parameters. First, the likelihood value is added
+    to the output of the main function *lglasso* so that users can used
+    it to compute AIC or BIC for the model selection. Second, cross
+    validation is added to the package which can be used to select the
+    tuning parameter as well. CV becomes very slow when the network is
+    too big. I personally recommend to use likelihood-based method to
+    select the tuning parameter. It should be pointed out that the cross
+    validation is performed on the subject level instead of individual
+    data point level.
 
 </div>
 
