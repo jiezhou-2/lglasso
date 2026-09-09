@@ -3,6 +3,7 @@
 #'
 #' @param t a vector specify the time points corresponding to the data
 #' @param tau the damping rate parameter with length 1 or 2
+#' @param expFix a scalar specifying the form of correlation function
 #'
 #' @returns a square matrix used to construct the likelihood
 #'
@@ -29,13 +30,11 @@ phifunction=function(t,tau,expFix=1){
 #'   p by p given precision matrix representing the whole data points.
 #'   If B is of length 2, then they represent the pre- and post-treatment network.
 #' @param data a (p+2)-by-n data frame
-#' @param type specify the model for the covariance matrix
 #' @param expFix the parameter in variance function when the data are longitudinal
 #' @param maxit the maximum of iteration number
 #' @param tol the minimum difference of algorithm convergence
 #' @param lower vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
 #' @param upper vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
-#' @param ... other unspecified parameters
 #' @returns a list of matrices
 
 AA=function(B,data,expFix=1,maxit=30,
@@ -98,7 +97,8 @@ if (is.data.frame(data)){
 #'  list representing all phi matrices before or after the treatment.
 #' @param data a list of (p+2)-by-ni data frame
 #' @param lambda given tuning parameter(s)
-#' @param type specify model type
+#' @param random logical variable indicating the type of the model
+#' @param tau scalar if *random* is FALSE and a vector if *random* is TRUE
 #' @returns a list with the same length as A
 BB=function(A,data,lambda,random=FALSE,tau){
   if (!is.list(data) | !is.list(A)){
@@ -229,9 +229,6 @@ if (m==1){
 #' the time point for longitudinal data or tissue ID.
 #' @param lambda   vector of length 1 or 2,  which
 #' is the tuning parameter for the identification of the networks. For details, see the explanations in the below.
-#' @param type a string specifying which model need to be fitted. There are three models available,
-#' which are referred as \code{general}, \code{expFixed} respectively.
-#'  Please see the details in the below for the meaning of each.
 #' @param expFix  numeric number used in the model specification
 #' @param group  vector  of length \code{n} if supplied which specify which data
 #'  points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.
@@ -243,6 +240,8 @@ if (m==1){
 #' @param w.init initial value for covariance matrix
 #' @param wi.init inital value for precision matrix
 #' @param trace whether or not show the progress of the computation
+#' @param N a integer specifying the number of sampling for heterogeneous model
+#' @param random a logical variable specifying the type of the model
 #' @param ... other inputs
 #' @import glasso CVXR
 #' @export
@@ -401,11 +400,9 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=
 #' @param wi the given precision matrices
 #' @param alpha the  rate in exponential distribution
 #' @param groupi the data point indices
-#'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @param expFix a scalar specifying the form of the correlation function
+#' @returns a numeric standing for the likelihood for a given subject
+
 conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
     if (length(groupi)!=nrow(datai)){
       stop("group should be the same length of the columns of data!")
@@ -437,7 +434,7 @@ conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
 #' @param wi the given precision matrix
 #' @param alpha the exponential distribution with rate alpha
 #' @param groupi specify how datai is grouped
-#'
+#' @param expFix a scalar specifying the form of the correlation function
 #' @returns a data frame for samples and their weights
 
 importanceSample=function(n,datai,wi,alpha,groupi,expFix=1){
@@ -460,6 +457,7 @@ if (length(index)==0){stop("No valid samples are generated!")}
 #' @param importancesSample the random samples
 #' @param datai the data for subject i
 #' @param groupi specify how datai is grouped
+#' @param expFix a scalar specifying the form of the correlation function
 #' @returns a list of estimated
 
 importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
@@ -480,6 +478,8 @@ importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
 #' @param alpha exponential distribution with rate alpha
 #' @param group specify how data is grouped
 #' @param l number of random samples in importance sampling
+#' @param expFix a scalar specifying the the form of the correlation function.
+#' @param ... other arguments used in the downstream analysis
 #' @returns a list for estimates of tau and AA
 AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
   subjects=unique(data[,1])
@@ -516,20 +516,23 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
 
 #' Title
 #'
-#' @param data
-#' @param lambda
-#' @param expFix
-#' @param group
-#' @param maxit
-#' @param tol
-#' @param trace
-#'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @param data a n by (p+2) data frame representing the longitudinal data
+#' @param lambda tuning parameters
+#' @param group vector indicating the membership of each data point.
+#' @param maxit the maximum number of the iterations
+#' @param tol the lower bound which determine when the algorithm is thought to reach  convergence.
+#' @param trace  a logical variable specifying how the output is displayed on the screen
+#' @param start a binary variable specifying how the initial value of the algorithm is chosen.
+#' @param w.init the initial value for the covariance matrix
+#' @param wi.init the initial value for the precision matrix
+#' @param N the number of sampling for heterogeneous model
+#' @param expFix a scalar specifying the form of the correlation function.
+#' @param ... other arguments
+#' @returns a list of length 4 representing the final outcome
+
 lglassoHeter=function(data,lambda,group,maxit,
-                      tol=10^(-3),trace=FALSE,start=c("warm","cold"), w.init=NULL, wi.init=NULL, N,expFix=1,...)
+                      tol=10^(-3),trace=FALSE,start=c("warm","cold"),
+                      w.init=NULL, wi.init=NULL, N,expFix=1,...)
 
 {
   p=ncol(data)-2
@@ -784,7 +787,6 @@ return(invisible(heat_plot))
 #' @title Cross validation for \code{lglasso}
 #' @description
 #' The function computes the cross validation errors for one of the three network models in \code{lglasso} command.
-#' @param type underlying model type, either \code{general}, \code{longihomo} or \code{longiheter}.
 #' @param data raw data
 #' @param group group variable
 #' @param lambda tuning parameter
@@ -793,8 +795,8 @@ return(invisible(heat_plot))
 #' @param K cv folds
 #' @param expFix given parameter
 #' @param trace whether show the process
-#' @param cores parallel computing
-#'
+#' @param NN the number of sampling
+#' @param random a logical variable indicating the type of the model
 #' @returns list of which the first component is the cross validation errors and the second component is the corresponding
 #' tuning parameters
 #' @export
@@ -813,7 +815,6 @@ CVlglasso=function(data,group=NULL,random=FALSE,
 
 #' Cross validation for lglasso
 #'
-#' @param type model type
 #' @param data raw data
 #' @param group group variable
 #' @param lambda tuning parameter
@@ -822,12 +823,14 @@ CVlglasso=function(data,group=NULL,random=FALSE,
 #' @param K cv folds
 #' @param expFix given parameter
 #' @param trace whether show the process
-#' @param cores parallel computing
+#' @param random a logical variable specifying the type of the model
+#' @param NN a integer specifying the number of the sampling
 #' @returns list
 #' @import parallel foreach doParallel
 
 cvlglassofull=function(data,group=NULL,
-                    lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE,NN){
+                    lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01,
+                    K, expFix=1,trace=FALSE,NN){
 
 if (!is.null(lambda)){
   if (is.null(group) && !is.vector(lambda))

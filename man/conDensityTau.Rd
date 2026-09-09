@@ -9,6 +9,8 @@ conDensityTau(tau, expFix = 1, datai, wi, alpha, groupi)
 \arguments{
 \item{tau}{the dampening rate}
 
+\item{expFix}{a scalar specifying the form of the correlation function}
+
 \item{datai}{the data set for subject i}
 
 \item{wi}{the given precision matrices}
@@ -16,6 +18,9 @@ conDensityTau(tau, expFix = 1, datai, wi, alpha, groupi)
 \item{alpha}{the  rate in exponential distribution}
 
 \item{groupi}{the data point indices}
+}
+\value{
+a numeric standing for the likelihood for a given subject
 }
 \description{
 density function in EM algorithm

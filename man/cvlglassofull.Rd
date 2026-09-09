@@ -24,6 +24,8 @@ cvlglassofull(
 
 \item{lambda}{tuning parameter}
 
+\item{random}{a logical variable specifying the type of the model}
+
 \item{nlam}{number of tuning parameter}
 
 \item{lam.min.ratio}{ratio of largest lambda vs smallest lambda}
@@ -34,9 +36,7 @@ cvlglassofull(
 
 \item{trace}{whether show the process}
 
-\item{type}{model type}
-
-\item{cores}{parallel computing}
+\item{NN}{a integer specifying the number of the sampling}
 }
 \value{
 list

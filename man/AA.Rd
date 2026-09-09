@@ -30,10 +30,6 @@ If B is of length 2, then they represent the pre- and post-treatment network.}
 \item{lower}{vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix}
 
 \item{upper}{vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix}
-
-\item{type}{specify the model for the covariance matrix}
-
-\item{...}{other unspecified parameters}
 }
 \value{
 a list of matrices

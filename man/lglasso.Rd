@@ -32,7 +32,11 @@ is the tuning parameter for the identification of the networks. For details, see
 \item{group}{vector  of length \code{n} if supplied which specify which data
 points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.}
 
+\item{random}{a logical variable specifying the type of the model}
+
 \item{expFix}{numeric number used in the model specification}
+
+\item{N}{a integer specifying the number of sampling for heterogeneous model}
 
 \item{maxit}{the maximum iterations for the estimation.}
 
@@ -51,10 +55,6 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 \item{trace}{whether or not show the progress of the computation}
 
 \item{...}{other inputs}
-
-\item{type}{a string specifying which model need to be fitted. There are three models available,
-which are referred as \code{general}, \code{expFixed} respectively.
-Please see the details in the below for the meaning of each.}
 }
 \value{
 list which include following components:

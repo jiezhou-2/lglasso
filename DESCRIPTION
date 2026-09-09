@@ -2,11 +2,16 @@ Package: lglasso
 Type: Package
 Title: Longitudinal Graphical Lasso
 Version: 2.0.0
-Description: For high-dimensional correlated observations, this package carries out the L_1 penalized maximum likelihood 
-            estimation of the precision matrix (network) and the correlation parameters. The correlated data can be 
-            longitudinal data (may be irregularly spaced) with dampening correlation or clustered data with uniform correlation.  
-            For the details of the algorithms, please see the paper Jie Zhou et al. Identifying Microbial Interaction Networks Based on Irregularly Spaced 
-            Longitudinal 16S rRNA sequence data <doi:10.1101/2021.11.26.470159>.
+Description: For high-dimensional longitudinal data (such as omics data in biology), 
+             the package *lglasso* implements the  $L_1$ penalized maximum likelihood 
+            estimation of the precision matrices and the corresponding correlation parameters. 
+            In practise, these sparse presicsion matrices are often named 
+            as networks which reflect the dependences between different nodes (features).
+            Currently, *lglasso* can  estimate a single network (i.e., one-stage model) 
+            or two networks (i.e., two-stage model). For the details of the algorithms, please refer to the paper Jie Zhou et al. 
+            Identifying Microbial Interaction Networks Based on Irregularly Spaced 
+            Longitudinal 16S rRNA Sequence Data 
+            <doi:10.1101/2021.11.26.470159>.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -26,23 +31,18 @@ Packaged: 2022-01-13 16:54:06 UTC; jie
 Author: Jie Zhou [aut, cre, cph],
   Jiang Gui [aut],
   Weston Viles [aut],
-  Anne Hoen [aut]
+  Anne G.Hoen [aut]
 Maintainer: Jie Zhou <chowstat@gmail.com>
 Repository: CRAN
 Date/Publication: 2026-09-09 11:46:00 UTC
 Imports: 
     CVXR,
-    igraph,
     doParallel,
-    fake,
-    Matrix,
     foreach,
     glasso,
-    MASS,
     parallel,
     pheatmap,
-    RColorBrewer,
-    pbapply
+    RColorBrewer
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggestions:

@@ -16,6 +16,10 @@ AAheter(data, wi, alpha, group, l = 5000, expFix = 1, ...)
 \item{group}{specify how data is grouped}
 
 \item{l}{number of random samples in importance sampling}
+
+\item{expFix}{a scalar specifying the the form of the correlation function.}
+
+\item{...}{other arguments used in the downstream analysis}
 }
 \value{
 a list for estimates of tau and AA

@@ -22,6 +22,8 @@ CVlglasso(
 
 \item{group}{group variable}
 
+\item{random}{a logical variable indicating the type of the model}
+
 \item{lambda}{tuning parameter}
 
 \item{nlam}{number of tuning parameter}
@@ -34,9 +36,7 @@ CVlglasso(
 
 \item{trace}{whether show the process}
 
-\item{type}{underlying model type, either \code{general}, \code{longihomo} or \code{longiheter}.}
-
-\item{cores}{parallel computing}
+\item{NN}{the number of sampling}
 }
 \value{
 list of which the first component is the cross validation errors and the second component is the corresponding

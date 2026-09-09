@@ -16,6 +16,8 @@ importanceSample(n, datai, wi, alpha, groupi, expFix = 1)
 \item{alpha}{the exponential distribution with rate alpha}
 
 \item{groupi}{specify how datai is grouped}
+
+\item{expFix}{a scalar specifying the form of the correlation function}
 }
 \value{
 a data frame for samples and their weights

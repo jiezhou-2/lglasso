@@ -10,6 +10,8 @@ phifunction(t, tau, expFix = 1)
 \item{t}{a vector specify the time points corresponding to the data}
 
 \item{tau}{the damping rate parameter with length 1 or 2}
+
+\item{expFix}{a scalar specifying the form of correlation function}
 }
 \value{
 a square matrix used to construct the likelihood

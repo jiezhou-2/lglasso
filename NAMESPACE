@@ -2,9 +2,7 @@
 
 S3method(plot,cvlglasso)
 export(CVlglasso)
-export(conDensityTau)
 export(lglasso)
-export(lglassoHeter)
 import(CVXR)
 import(doParallel)
 import(foreach)

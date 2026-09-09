@@ -20,7 +20,32 @@ lglassoHeter(
 )
 }
 \arguments{
-\item{trace}{}
+\item{data}{a n by (p+2) data frame representing the longitudinal data}
+
+\item{lambda}{tuning parameters}
+
+\item{group}{vector indicating the membership of each data point.}
+
+\item{maxit}{the maximum number of the iterations}
+
+\item{tol}{the lower bound which determine when the algorithm is thought to reach  convergence.}
+
+\item{trace}{a logical variable specifying how the output is displayed on the screen}
+
+\item{start}{a binary variable specifying how the initial value of the algorithm is chosen.}
+
+\item{w.init}{the initial value for the covariance matrix}
+
+\item{wi.init}{the initial value for the precision matrix}
+
+\item{N}{the number of sampling for heterogeneous model}
+
+\item{expFix}{a scalar specifying the form of the correlation function.}
+
+\item{...}{other arguments}
+}
+\value{
+a list of length 4 representing the final outcome
 }
 \description{
 Title

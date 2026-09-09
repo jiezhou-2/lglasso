@@ -12,6 +12,8 @@ importanceEstimates(importancesSample, datai, groupi, expFix = 1)
 \item{datai}{the data for subject i}
 
 \item{groupi}{specify how datai is grouped}
+
+\item{expFix}{a scalar specifying the form of the correlation function}
 }
 \value{
 a list of estimated

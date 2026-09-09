@@ -14,7 +14,9 @@ list representing all phi matrices before or after the treatment.}
 
 \item{lambda}{given tuning parameter(s)}
 
-\item{type}{specify model type}
+\item{random}{logical variable indicating the type of the model}
+
+\item{tau}{scalar if \emph{random} is FALSE and a vector if \emph{random} is TRUE}
 }
 \value{
 a list with the same length as A
