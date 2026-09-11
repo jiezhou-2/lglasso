@@ -99,6 +99,7 @@ if (is.data.frame(data)){
 #' @param lambda given tuning parameter(s)
 #' @param random logical variable indicating the type of the model
 #' @param tau scalar if *random* is FALSE and a vector if *random* is TRUE
+#' @importFrom CVXR solve
 #' @returns a list with the same length as A
 BB=function(A,data,lambda,random=FALSE,tau){
   if (!is.list(data) | !is.list(A)){
@@ -243,7 +244,7 @@ if (m==1){
 #' @param N a integer specifying the number of sampling for heterogeneous model
 #' @param random a logical variable specifying the type of the model
 #' @param ... other inputs
-#' @import glasso CVXR
+#' @import glasso glasso
 #' @export
 #' @return list which include following components:
 #'
@@ -800,7 +801,6 @@ return(invisible(heat_plot))
 #' @returns list of which the first component is the cross validation errors and the second component is the corresponding
 #' tuning parameters
 #' @export
-#' @import parallel foreach doParallel
 #'
 CVlglasso=function(data,group=NULL,random=FALSE,
                     lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE,NN=500){
