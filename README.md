@@ -13,27 +13,14 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 
 <div style="text-align: justify">
 
-The previous version aimed to estimate a one-stage high-dimensional
-network from longitudinal data using Gaussian graphical models. This
-version added two new features, which are
-
-1)  Estimate two-stage high-dimensional networks. Previous version
-    assumed a stationary process that underlies the longitudinal data.
-    The new version extended this assumption to include the scenarios
-    where the longitudinal data cover two stages, e.g., one for
-    pre-treatment, the other for post-treatment. Each stage has its own
-    network structure.
-
-2)  Tuning parameter selection. This version added functions for the
-    selection of tuning parameters. First, the likelihood value is added
-    to the output of the main function *lglasso* so that users can used
-    it to compute AIC or BIC for the model selection. Second, cross
-    validation is added to the package which can be used to select the
-    tuning parameter as well. CV becomes very slow when the network is
-    too big. I personally recommend to use likelihood-based method to
-    select the tuning parameter. It should be pointed out that the cross
-    validation is performed on the subject level instead of individual
-    data point level.
+The goal of *lglasso* package is to estimate networks from longitudinal
+high-dimensional data. It can be used to estimate either one-stage
+models where a single network is underlying all the longitudinal
+observations, or two-stage models where the networks before and after a
+treatment (exposure) are different from each other. The one(two)-stage
+model can further be classified to homogeneous model and heterogeneous
+models. For details of the definitions of these models, please check the
+refereces listed below.
 
 </div>
 
@@ -57,15 +44,7 @@ website](https://jiezhou-2.github.io/lglasso/).
 
 **Reference**
 
-\[1\] Friedman J et al (2019) Graphical Lasso: Estimation of Gaussian
-Graphical Models, Version: 1.11.
-
-\[2\] Danaher P et al. The joint graphical lasso for inverse covariance
-estimation across multiple classes. J R Stat Soc Series B Stat Methodol.
-2014 Mar;76(2):373-397. doi: 10.1111/rssb.12033. PMID: 24817823; PMCID:
-PMC4012833.
-
-\[3\] Zhou J et al. Identifying stationary microbial interaction
+\[1\] Zhou J et al. Identifying stationary microbial interaction
 networks based on irregularly spaced longitudinal 16S rRNA gene
 sequencing data. Front Microbiomes. 2024;3:1366948. doi:
 10.3389/frmbi.2024.1366948. Epub 2024 Jun 2. PMID: 40687607; PMCID:
