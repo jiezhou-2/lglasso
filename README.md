@@ -19,8 +19,8 @@ models where a single network is underlying all the longitudinal
 observations, or two-stage models where the networks before and after a
 treatment (exposure) are different from each other. The one(two)-stage
 model can further be classified to homogeneous model and heterogeneous
-models. For details of the definitions of these models, please check the
-refereces listed below.
+models. For details of the definitions and its usage, please check the
+reference and link below.
 
 </div>
 
