@@ -23,7 +23,9 @@ heterogeneous models. The difference between homogeneous and
 heterogeneous models is that heterogeneous models contain individual
 level random effects while homogeneous models treat all individuals as
 i.i.d samples. For details of the definitions and its usage, please
-check the reference and link below.
+check the reference and link below. If you have any questions, please
+email *<chowstat@gmail.com>*. I will get back to you at my earliest
+convenience.
 
 </div>
 

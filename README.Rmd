@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 <div style="text-align: justify"> 
 
- *lglasso* is designed to estimate networks from longitudinal high-dimensional data. It can be used to estimate either one-stage models where a single network is underlying all the longitudinal measurements, or two-stage models where the network before the treatment is different from the one after the treatment (exposure). The one(two)-stage model can further be classified to homogeneous model and heterogeneous models. The difference between homogeneous and heterogeneous models is that heterogeneous models contain individual level random effects while homogeneous models treat all individuals as i.i.d samples. For details of the definitions and its usage, please check the reference and link below. 
+ *lglasso* is designed to estimate networks from longitudinal high-dimensional data. It can be used to estimate either one-stage models where a single network is underlying all the longitudinal measurements, or two-stage models where the network before the treatment is different from the one after the treatment (exposure). The one(two)-stage model can further be classified to homogeneous model and heterogeneous models. The difference between homogeneous and heterogeneous models is that heterogeneous models contain individual level random effects while homogeneous models treat all individuals as i.i.d samples. For details of the definitions and its usage, please check the reference and link below. If you have any questions, please email *chowstat@gmail.com*.  I will get back to you at my earliest convenience.  
 
 
 </div>
