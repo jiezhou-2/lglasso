@@ -45,7 +45,9 @@ Then install *lglasso* :
 ## How to use
 
 Please click the following link to see some
-[examples](https://jiezhou-2.github.io/lglasso/).
+[examples](https://jiezhou-2.github.io/lglasso/). If you are interested
+in the underlying algorithms of *lglasso*, here is the
+[draft](https://jiezhou-2.github.io/lglasso/docs/lglassoTex.pdf)
 
 **Reference**
 
