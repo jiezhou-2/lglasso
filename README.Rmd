@@ -47,7 +47,7 @@ remotes::install_github("jiezhou-2/lglasso", ref ="main")
 
 ## How to use
 
- Please click the following link to see some [examples](https://jiezhou-2.github.io/lglasso/). If you are interested in the underlying algorithms of *lglasso*, here is the [draft](https://jiezhou-2.github.io/lglasso/docs/lglassoTex.pdf)
+Here are some [examples](https://jiezhou-2.github.io/lglasso/) for the usage of the package. If you are interested in the underlying statistical model of *lglasso*, you could check the our manuscript here  [draft](https://drive.google.com/file/d/1oCNOGJODGfQITZJNyGDkGVMoaIgNU5on/view?usp=sharing), which is an extension of the paper in the Reference.  
  
  
 **Reference** 
