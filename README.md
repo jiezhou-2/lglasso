@@ -13,7 +13,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 
 <div style="text-align: justify">
 
-*lglasso* is designed to estimate networks from longitudinal
+R package *lglasso* is designed to estimate networks from longitudinal
 high-dimensional data. It can be used to estimate either one-stage
 models where a single network is underlying all the longitudinal
 measurements, or two-stage models where the network before the treatment
@@ -31,14 +31,14 @@ convenience.
 
 ## Installation
 
-You can install the development version of lglasso from
+You can install the development version of lglasso in R from
 [GitHub](https://github.com/) with:
 
-First, install the package remotes:
+First, install R package *remotes*:
 
     install.packages("remotes")
 
-Then install lglasso :
+Then install *lglasso* :
 
     remotes::install_github("jiezhou-2/lglasso", ref ="main") 
 
