@@ -110,7 +110,7 @@ aa2$tau
 
 ### one-stage model (post vaccination data,2.2min)
 
-```{r}
+```{r, warning=FALSE,message=FALSE}
 load_all()
 aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T)
 aa1$wi[[1]][1:10,1:10]

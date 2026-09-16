@@ -7,7 +7,7 @@
 BB(A, data, lambda, random = FALSE, tau)
 }
 \arguments{
-\item{A}{a list of length 1 or 2 corresponding to the number of phases. The each entry of A is a
+\item{A}{a list of length 1 or 2 corresponding to the number of stages. The each entry of A is a
 list representing all phi matrices before or after the treatment.}
 
 \item{data}{a list of (p+2)-by-ni data frame}

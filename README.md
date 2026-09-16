@@ -13,14 +13,17 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 
 <div style="text-align: justify">
 
-The goal of *lglasso* package is to estimate networks from longitudinal
+*lglasso* is designed to estimate networks from longitudinal
 high-dimensional data. It can be used to estimate either one-stage
 models where a single network is underlying all the longitudinal
-observations, or two-stage models where the networks before and after a
-treatment (exposure) are different from each other. The one(two)-stage
-model can further be classified to homogeneous model and heterogeneous
-models. For details of the definitions and its usage, please check the
-reference and link below.
+measurements, or two-stage models where the network before the treatment
+is different from the one after the treatment (exposure). The
+one(two)-stage model can further be classified to homogeneous model and
+heterogeneous models. The difference between homogeneous and
+heterogeneous models is that heterogeneous models contain individual
+level random effects while homogeneous models treat all individuals as
+i.i.d samples. For details of the definitions and its usage, please
+check the reference and link below.
 
 </div>
 
@@ -39,8 +42,8 @@ Then install lglasso :
 
 ## How to use
 
-Please click the following link for details [package
-website](https://jiezhou-2.github.io/lglasso/).
+Please click the following link to see some
+[examples](https://jiezhou-2.github.io/lglasso/).
 
 **Reference**
 
