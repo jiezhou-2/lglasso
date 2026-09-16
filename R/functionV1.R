@@ -93,7 +93,7 @@ if (is.data.frame(data)){
 
 #' Title
 #'
-#' @param A a list of length 1 or 2 corresponding to the number of phases. The each entry of A is a
+#' @param A a list of length 1 or 2 corresponding to the number of stages. The each entry of A is a
 #'  list representing all phi matrices before or after the treatment.
 #' @param data a list of (p+2)-by-ni data frame
 #' @param lambda given tuning parameter(s)
@@ -115,19 +115,22 @@ BB=function(A,data,lambda,random=FALSE,tau){
   # if (length(A)!=length(tau)){
   #   stop(" List A should have same length as tau!")
   # }
+  glev=names(A)
 
     m= length(A)
-    for (i in 1:length(A)){
+    for (i in 1:m){
       Ai=A[[i]]
       datai=data[[i]]
-      if (length(Ai)!=length(unique(datai[,1]))){
-        stop("The format of A does not match the format of data!")
-      }
+      # if (length(Ai)!=length(unique(datai[,1]))){
+      #   stop("The format of A does not match the format of data!")
+      # }
       subjects=unique(datai[,1])
-      for (j in 1:length(Ai)) {
-        Aij=Ai[[j]]
+      for (j in 1:length(subjects)) {
+        Aij=Ai[[subjects[j]]]
+        if (is.null(Aij)){next}
         index=which(datai[,1]==subjects[j])
         dataij=datai[index,]
+        #browser()
         if (nrow(Aij)!= nrow(dataij))
         {stop("The format of A does not match the format of data!!")}
       }
@@ -137,6 +140,7 @@ BB=function(A,data,lambda,random=FALSE,tau){
 
 
     B=vector("list",m)
+    names(B)=glev
     likeli=0
     aa=0
     bb=0
@@ -161,6 +165,7 @@ BB=function(A,data,lambda,random=FALSE,tau){
       for (j in 1:nn) {
         xx=as.matrix(data_sub[[j]])
         yy=solve(as.matrix(Ai[[j]]))
+        if (is.null(yy)){next}
         amatrix[[i]]=t(xx)%*%yy%*%xx+amatrix[[i]]
         extra=extra+p*log(det(as.matrix(Ai[[j]])))
       }
@@ -211,6 +216,7 @@ if (m==1){
       rownames(S_est[[i]])=featureNames
     }
 }
+    names(S_est)=glev
     return(list(wiList=S_est,ll=likelihood/2))
 
 }
@@ -282,11 +288,11 @@ lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
   p=ncol(data)-2
   X_bar = apply(data[,-c(1,2)], 2, mean)
   data[,-c(1,2)] = scale(data[,-c(1,2)], center = X_bar, scale = FALSE)
-
+data[,1]=as.character(data[,1])
   if (random==FALSE){
 
     if (!is.null(group))  {
-
+group=as.character(group)
       if (length(group)!=nrow(data)){
         stop("group should be equal to number of the rows of data!")
       }
@@ -300,12 +306,13 @@ lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
     }
 
 if (is.null(group))  {
-  group=rep(1,nrow(data))
+  group=as.character(rep(1,nrow(data)))
    data=list(data)
  if (length(lambda)!=1){
   stop("Arguments (group, lambda) do not match!!")
  }
 }
+    glev=unique(group)
 
   if (!all(lambda>0)){
     stop("Tuning parameter lambda must be positive!")
@@ -320,15 +327,21 @@ if (is.null(group))  {
       stop("Argument expFix is not correctly specified!")
     }
     A=vector("list",length(data))
+    names(A)=glev
     B=vector("list",length((data)))
-
+names(B)=glev
     for (i in 1:length(A)) {
       dd=data[[i]]
       subjects=unique(dd[,1])
       A[[i]]=vector("list",length(subjects))
+      names(A[[i]])=subjects
       for (j in 1:length(A[[i]])) {
         index=which(dd[,1]==subjects[j])
+        # if (length(index)==0){
+        #   A[[i]][[j]]=NULL
+        # }else{
         A[[i]][[j]]=diag(length(index))
+        #}
       }
       B[[i]]=diag(p)
     }
@@ -408,21 +421,29 @@ conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
     if (length(groupi)!=nrow(datai)){
       stop("group should be the same length of the columns of data!")
     }
-
-    if (length(unique(groupi))!= length(wi)){
-      stop("the format of groupi does not match that of sigmaM!")
-    }
-
-  data=split(datai,f=factor(groupi,levels = unique(groupi)))
-  nn=length(unique(groupi))
-  likelihood=0
+  # if (!all(is.numeric(groupi))){
+  #   stop("groupi need to be numeric!" )
+  # }
+  #browser()
+  groupi=as.character(groupi)
+  glev=unique(groupi)
   p=nrow(wi[[1]])
-  for (i in 1:nn) {
+  #browser()
+  if (length(glev)==1){
+    timepoints=datai[,2]
+    phiMi=phifunction(t=timepoints,tau=tau,expFix=expFix)
+    s=t(as.matrix(datai[,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(datai[,-c(1,2)])%*%wi[[glev]]
+    likelihood=log(det(phiMi))*(-p/2)-0.5*sum(diag(s))
+  }else{
+    likelihood=0
+  data=split(datai,f=factor(groupi,levels = glev))
+  for (i in glev) {
     timepoints=data[[i]][,2]
     phiMi=phifunction(t=timepoints,tau=tau,expFix=expFix)
     s=t(as.matrix(data[[i]][,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(data[[i]][,-c(1,2)])%*%wi[[i]]
     a=log(det(phiMi))*(-p/2)-0.5*sum(diag(s))
     likelihood=a+likelihood
+  }
   }
   likelihoodi=log(alpha)+likelihood-alpha*tau
   return(likelihoodi=likelihoodi)
@@ -462,12 +483,21 @@ if (length(index)==0){stop("No valid samples are generated!")}
 #' @returns a list of estimated
 
 importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
-  data=split(datai,f=factor(groupi,levels = unique(groupi)))
-  tt=split(datai[,2],f=factor(groupi,levels = unique(groupi)))
+  lev=as.character(unique(groupi))
+  # if (length(lev)==1){
+  #   estimatePhi=vector("list",1)
+  #   tt=datai[,2]
+  #   sample0=importancesSample[,1]
+  #   weightTau=importancesSample[,2]
+  #   estimateTau=sum(sample0*weightTau)
+  #   estimatePhi[[1]]=phifunction(t=tt,tau=estimateTau, expFix=expFix)
+  # }else{
+  tt=split(datai[,2],f=factor(groupi,levels = lev))
   sample0=importancesSample[,1]
   weightTau=importancesSample[,2]
   estimateTau=sum(sample0*weightTau)
   estimatePhi=lapply(tt, phifunction,tau=estimateTau, expFix=expFix)
+  names(estimatePhi)=names(tt)
   estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
   return(estimates)
 }
@@ -483,10 +513,15 @@ importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
 #' @param ... other arguments used in the downstream analysis
 #' @returns a list for estimates of tau and AA
 AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
+  data[,1]=as.character(data[,1])
   subjects=unique(data[,1])
-  nn=length(unique(group))
+  group=as.character(group)
+  glev=unique(group)
+  nn=length(glev)
   A=vector("list",length(subjects))
+  names(A)=subjects
   Tau=matrix(nrow=length(subjects),ncol=1)
+  rownames(Tau)=subjects
   simTau=matrix(rexp(n=l,rate=alpha),ncol=1)
   dataList=split(data,f=factor(data[,1],levels=subjects))
   groupList=split(group,f=factor(data[,1],levels=subjects))
@@ -501,15 +536,27 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
       Tau[i,1]=imporResults$estimateTau
       A[[i]]=imporResults$estimatePhi
   }
+
   AA=vector("list",nn)
-
-  for (i in 1:nn) {
-    AA[[i]]=vector("list",length(subjects))
+  names(AA)=glev
+#if (nn==1){AA[[1]]=A}
+  for(i in 1:nn) {
+    index=which(group==glev[i])
+    subjects=unique(data[index,1])
+    AA[[glev[i]]]=vector("list",length(subjects))
+    names(AA[[glev[i]]])=subjects
     for (j in 1:length(subjects)) {
-      AA[[i]][[j]]=A[[j]][[i]]
+      if (is.null(A[[subjects[j]]][[glev[i]]])){next}
+        else{
+      AA[[glev[i]]][[subjects[j]]]=A[[subjects[j]]][[glev[i]]]
+      }
     }
-  }
-
+  # for (i in 1:nn) {
+  #   for (j in 1:length(subjects)) {
+  #     AA[[i]][[j]]=A[[j]][[i]]
+  #   }
+  # }
+}
   return(list(Tau=Tau,AA=AA))
 }
 
@@ -538,21 +585,22 @@ lglassoHeter=function(data,lambda,group,maxit,
 {
   p=ncol(data)-2
   m=length(unique(data[,1]))
-
-  if (is.null(group))  {
-         group=rep(1,nrow(data))
+  if (!is.null(group)){
+    group=as.character(group)
+  }else{
+         group=as.character(rep(1,nrow(data)))
          if (length(lambda)!=1){
              stop("Arguments (group, lambda) do not match!")
            }
        }
-
+data[,1]=as.character(data[,1])
          dataList=split(data,f=factor(group,levels = unique(group)))
 
          if (length(lambda)!= length(unique(group))){
              stop("Arguments (group, lambda) do not match!")
            }
 
-nn=length(unique(group))
+glev=unique(group)
 
   if (!all(lambda>0)){
     stop("lambda must be positive!")
@@ -567,9 +615,9 @@ nn=length(unique(group))
     stop("Argument expFix is not correctly specified!")
   }
 
-  B=vector("list",nn)
-
-  for (i in 1:length(B)) {
+  B=vector("list",length(glev))
+names(B)=glev
+  for (i in 1:length(glev)) {
     B[[i]]=diag(p)
   }
   k=0
