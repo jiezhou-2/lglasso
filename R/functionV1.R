@@ -198,7 +198,7 @@ if (m==1){
     )
   #likelihood1=1
 }else{
-    prob=Problem(Minimize(obj))
+    prob=CVXR::Problem(Minimize(obj))
     result=CVXR::psolve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
     likelihood=-(result$value-sum(abs(mask1*S_est[[1]])+abs(mask1*S_est[[2]]))-sum(mask2*abs(S_est[[1]]-S_est[[2]])))
