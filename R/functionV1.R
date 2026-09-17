@@ -99,8 +99,8 @@ if (is.data.frame(data)){
 #' @param lambda given tuning parameter(s)
 #' @param random logical variable indicating the type of the model
 #' @param tau scalar if *random* is FALSE and a vector if *random* is TRUE
-#' @importFrom CVXR psolve
 #' @returns a list with the same length as A
+
 BB=function(A,data,lambda,random=FALSE,tau){
   if (!is.list(data) | !is.list(A)){
     stop("A and data must be lists!")
@@ -199,7 +199,7 @@ if (m==1){
   #likelihood1=1
 }else{
     prob=Problem(Minimize(obj))
-    result=psolve(prob)
+    result=CVXR::psolve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
     likelihood=-(result$value-sum(abs(mask1*S_est[[1]])+abs(mask1*S_est[[2]]))-sum(mask2*abs(S_est[[1]]-S_est[[2]])))
     # likelihood1=ifelse(!random,
