@@ -153,7 +153,7 @@ BB=function(A,data,lambda,random=FALSE,tau){
       nn=length(unique(dd[,1]))
       p=ncol(dd)-2
       data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
-      B[[i]]=Variable(p,p,PSD=TRUE)
+      B[[i]]=CVXR::Variable(p,p,PSD=TRUE)
       if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
       amatrix[[i]]=0
       # Create a mask matrix
@@ -170,9 +170,9 @@ BB=function(A,data,lambda,random=FALSE,tau){
         extra=extra+p*log(det(as.matrix(Ai[[j]])))
       }
       if (!random){
-      likeli=-extra/nrow(dd)+log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)+likeli
+      likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)+likeli
     }else{
-      likeli=-extra/nrow(dd)+log_det(B[[i]])-matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)
+      likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)
       -2*nn*log(mean(tau))/nrow(dd)+likeli
     }
       aa=aa+ sum(abs(B[[i]])*mask1)
