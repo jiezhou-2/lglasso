@@ -102,12 +102,8 @@ saveRDS(edgeListHomo1,file="edgeListHomo1.rds")
 
 ### two-stage model (full data)
 
-```{r,eval=FALSE,echo=FALSE}
+```{r}
 group=ifelse(fulldata$visit_name==2,1,2)
-data=fulldata[,-c(3:7)]
-index=which(group==2)
-dd=data[index,]
-tt=split(dd[,2],f=dd[,1])
 aa2=lglasso(data=fulldata[,-c(3:7)],lambda = c(0.005,1),group = group,random = FALSE,trace = T,tol=0.01)
 aa2$wi[[1]][1:10,1:10]
 aa2$wi[[2]][1:10,1:10]

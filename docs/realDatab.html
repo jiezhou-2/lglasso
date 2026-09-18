@@ -484,6 +484,96 @@ aa1=lglasso(data=postdata[,-c(3:7)],lambda = 0.004961126,random = FALSE,trace = 
 </div>
 <div id="two-stage-model-full-data" class="section level3">
 <h3>two-stage model (full data)</h3>
+<pre class="r"><code>group=ifelse(fulldata$visit_name==2,1,2)
+aa2=lglasso(data=fulldata[,-c(3:7)],lambda = c(0.005,1),group = group,random = FALSE,trace = T,tol=0.01)</code></pre>
+<pre><code>## [1] &quot;iteration 1 precision difference: 19.829 /correlation tau difference: 0.5&quot;
+## [1] &quot;iteration 2 precision difference: 8.005 /correlation tau difference: 0.341&quot;
+## [1] &quot;iteration 3 precision difference: 5.967 /correlation tau difference: 0.293&quot;
+## [1] &quot;iteration 4 precision difference: 4.67 /correlation tau difference: 0.24&quot;
+## [1] &quot;iteration 5 precision difference: 4.092 /correlation tau difference: 0.169&quot;
+## [1] &quot;iteration 6 precision difference: 2.807 /correlation tau difference: 0.155&quot;
+## [1] &quot;iteration 7 precision difference: 2.633 /correlation tau difference: 0.083&quot;
+## [1] &quot;iteration 8 precision difference: 1.208 /correlation tau difference: 0.079&quot;
+## [1] &quot;iteration 9 precision difference: 1.154 /correlation tau difference: 0.033&quot;
+## [1] &quot;iteration 10 precision difference: 0.465 /correlation tau difference: 0.032&quot;
+## [1] &quot;iteration 11 precision difference: 0.448 /correlation tau difference: 0.011&quot;
+## [1] &quot;iteration 12 precision difference: 0.156 /correlation tau difference: 0.011&quot;
+## [1] &quot;iteration 13 precision difference: 0.151 /correlation tau difference: 0.004&quot;
+## [1] &quot;iteration 14 precision difference: 0.051 /correlation tau difference: 0.004&quot;
+## [1] &quot;iteration 15 precision difference: 0.049 /correlation tau difference: 0.001&quot;
+## [1] &quot;iteration 16 precision difference: 0.016 /correlation tau difference: 0.001&quot;
+## [1] &quot;iteration 17 precision difference: 0.016 /correlation tau difference: 0&quot;
+## [1] &quot;iteration 18 precision difference: 0.005 /correlation tau difference: 0&quot;</code></pre>
+<pre class="r"><code>aa2$wi[[1]][1:10,1:10]</code></pre>
+<pre><code>##                FIM_IgG4       TT_IgG3     IPV1_IgG3    ACT_FcgR2a       TT_ADNP
+## FIM_IgG4   1.007546e+02  1.229315e-07  4.128663e-02  1.745111e-07  4.280685e-07
+## TT_IgG3    1.229315e-07  5.173662e+01  2.543937e-07  7.907831e-01  3.668577e-08
+## IPV1_IgG3  4.128663e-02  2.543937e-07  1.401138e+01  4.033629e-01 -3.442706e-07
+## ACT_FcgR2a 1.745111e-07  7.907831e-01  4.033629e-01  2.297366e+01 -7.732632e-03
+## TT_ADNP    4.280685e-07  3.668577e-08 -3.442706e-07 -7.732632e-03  1.588269e+01
+## FHA_IgG    3.338709e-07 -8.513626e-07 -3.400847e-07 -2.892042e-01 -2.735581e-07
+## PRN_FcgR2a 1.338550e-07 -3.503186e-06 -1.808238e-06 -2.507985e+00 -1.998638e-06
+## IPV3_ADCD  4.650136e-07 -3.138948e-07 -5.601078e-07  9.116221e-02  5.771827e-07
+## IPV1_IgG4  1.029374e-07  1.044185e-07 -4.111559e+00 -1.275640e-07  2.606958e-07
+## PT_FcgR2a  9.892497e-07 -7.064961e-07 -2.533138e-06 -6.343054e-01 -1.009572e-06
+##                  FHA_IgG    PRN_FcgR2a     IPV3_ADCD     IPV1_IgG4
+## FIM_IgG4    3.338709e-07  1.338550e-07  4.650136e-07  1.029374e-07
+## TT_IgG3    -8.513626e-07 -3.503186e-06 -3.138948e-07  1.044185e-07
+## IPV1_IgG3  -3.400847e-07 -1.808238e-06 -5.601078e-07 -4.111559e+00
+## ACT_FcgR2a -2.892042e-01 -2.507985e+00  9.116221e-02 -1.275640e-07
+## TT_ADNP    -2.735581e-07 -1.998638e-06  5.771827e-07  2.606958e-07
+## FHA_IgG     1.943579e+01  1.309555e+00 -7.839938e-07 -1.439773e-07
+## PRN_FcgR2a  1.309555e+00  1.556376e+01 -1.017384e-06 -2.680163e-07
+## IPV3_ADCD  -7.839938e-07 -1.017384e-06  4.607789e+01 -1.044907e-07
+## IPV1_IgG4  -1.439773e-07 -2.680163e-07 -1.044907e-07  3.666643e+01
+## PT_FcgR2a   7.124889e-01 -2.031405e+00 -1.374396e-06  1.630617e-07
+##                PT_FcgR2a
+## FIM_IgG4    9.892497e-07
+## TT_IgG3    -7.064961e-07
+## IPV1_IgG3  -2.533138e-06
+## ACT_FcgR2a -6.343054e-01
+## TT_ADNP    -1.009572e-06
+## FHA_IgG     7.124889e-01
+## PRN_FcgR2a -2.031405e+00
+## IPV3_ADCD  -1.374396e-06
+## IPV1_IgG4   1.630617e-07
+## PT_FcgR2a   2.009150e+01</code></pre>
+<pre class="r"><code>aa2$wi[[2]][1:10,1:10]</code></pre>
+<pre><code>##                 FIM_IgG4       TT_IgG3     IPV1_IgG3    ACT_FcgR2a
+## FIM_IgG4    5.112330e+00  2.984016e-07  4.128619e-02 -4.873955e-07
+## TT_IgG3     2.984016e-07  1.645221e+01 -2.375751e-07  7.907838e-01
+## IPV1_IgG3   4.128619e-02 -2.375751e-07  1.126530e+01  4.033620e-01
+## ACT_FcgR2a -4.873955e-07  7.907838e-01  4.033620e-01  2.447643e+01
+## TT_ADNP     3.350161e-07  2.362075e-07  1.160022e-07 -7.730768e-03
+## FHA_IgG    -8.406183e-07  1.203921e-06  6.787359e-07 -2.892040e-01
+## PRN_FcgR2a -1.111019e-06  5.345304e-07 -2.958204e-07 -2.507987e+00
+## IPV3_ADCD   2.643014e-07  1.595908e-07 -1.242703e-07  9.116300e-02
+## IPV1_IgG4   6.862804e-08 -1.151256e-08 -4.111559e+00 -3.381629e-07
+## PT_FcgR2a  -3.831452e-07  1.871901e-07 -4.291535e-07 -6.343093e-01
+##                  TT_ADNP       FHA_IgG    PRN_FcgR2a     IPV3_ADCD
+## FIM_IgG4    3.350161e-07 -8.406183e-07 -1.111019e-06  2.643014e-07
+## TT_IgG3     2.362075e-07  1.203921e-06  5.345304e-07  1.595908e-07
+## IPV1_IgG3   1.160022e-07  6.787359e-07 -2.958204e-07 -1.242703e-07
+## ACT_FcgR2a -7.730768e-03 -2.892040e-01 -2.507987e+00  9.116300e-02
+## TT_ADNP     1.570548e+01  6.671404e-07  1.530315e-06 -6.941247e-08
+## FHA_IgG     6.671404e-07  1.840750e+01  1.309559e+00  1.949179e-07
+## PRN_FcgR2a  1.530315e-06  1.309559e+00  1.688483e+01  4.001331e-07
+## IPV3_ADCD  -6.941247e-08  1.949179e-07  4.001331e-07  4.527576e+01
+## IPV1_IgG4   3.091279e-07 -1.864766e-07 -4.641266e-07  8.330216e-09
+## PT_FcgR2a   4.202898e-07  7.124888e-01 -2.031401e+00  1.012007e-06
+##                IPV1_IgG4     PT_FcgR2a
+## FIM_IgG4    6.862804e-08 -3.831452e-07
+## TT_IgG3    -1.151256e-08  1.871901e-07
+## IPV1_IgG3  -4.111559e+00 -4.291535e-07
+## ACT_FcgR2a -3.381629e-07 -6.343093e-01
+## TT_ADNP     3.091279e-07  4.202898e-07
+## FHA_IgG    -1.864766e-07  7.124888e-01
+## PRN_FcgR2a -4.641266e-07 -2.031401e+00
+## IPV3_ADCD   8.330216e-09  1.012007e-06
+## IPV1_IgG4   1.480405e+01  5.730146e-08
+## PT_FcgR2a   5.730146e-08  2.167326e+01</code></pre>
+<pre class="r"><code>aa2$tau</code></pre>
+<pre><code>## [1] 1.0000000 0.3244909</code></pre>
 </div>
 </div>
 <div id="heterogeneous-subjects" class="section level2">
@@ -493,93 +583,133 @@ aa1=lglasso(data=postdata[,-c(3:7)],lambda = 0.004961126,random = FALSE,trace = 
 <pre class="r"><code>load_all()
 aa1=lglasso(data=postdata[,-c(3:7)],lambda = 0.005670864,random = TRUE,trace = T)</code></pre>
 <pre><code>## [1] &quot;alpha estimate: 1&quot;
-## [1] &quot;iteration 1 precision difference: 12.628 /correlation alpha difference: 14.051&quot;
-## [1] &quot;alpha estimate: 15.051201861239&quot;
-## [1] &quot;iteration 2 precision difference: 2.213 /correlation alpha difference: 1.777&quot;
-## [1] &quot;alpha estimate: 13.2739103818436&quot;
-## [1] &quot;iteration 3 precision difference: 1.419 /correlation alpha difference: 3.437&quot;
-## [1] &quot;alpha estimate: 9.83729504575252&quot;
-## [1] &quot;iteration 4 precision difference: 0.87 /correlation alpha difference: 2.511&quot;
-## [1] &quot;alpha estimate: 7.3266095328824&quot;
-## [1] &quot;iteration 5 precision difference: 0.657 /correlation alpha difference: 1.484&quot;
-## [1] &quot;alpha estimate: 5.84290709868853&quot;
-## [1] &quot;iteration 6 precision difference: 0.421 /correlation alpha difference: 0.828&quot;
-## [1] &quot;alpha estimate: 5.01481463104218&quot;
-## [1] &quot;iteration 7 precision difference: 0.286 /correlation alpha difference: 0.624&quot;
-## [1] &quot;alpha estimate: 4.39052127059415&quot;
-## [1] &quot;iteration 8 precision difference: 0.191 /correlation alpha difference: 0.225&quot;
-## [1] &quot;alpha estimate: 4.16586544143655&quot;
-## [1] &quot;iteration 9 precision difference: 0.128 /correlation alpha difference: 0.274&quot;
-## [1] &quot;alpha estimate: 3.89216432967499&quot;
-## [1] &quot;iteration 10 precision difference: 0.104 /correlation alpha difference: 0.035&quot;
-## [1] &quot;alpha estimate: 3.85766351841487&quot;
-## [1] &quot;iteration 11 precision difference: 0.115 /correlation alpha difference: 0.037&quot;
-## [1] &quot;alpha estimate: 3.82059673885407&quot;
-## [1] &quot;iteration 12 precision difference: 0.081 /correlation alpha difference: 0.017&quot;
-## [1] &quot;alpha estimate: 3.80380858576514&quot;
-## [1] &quot;iteration 13 precision difference: 0.068 /correlation alpha difference: 0.061&quot;
-## [1] &quot;alpha estimate: 3.74260523454913&quot;
-## [1] &quot;iteration 14 precision difference: 0.102 /correlation alpha difference: 0.053&quot;
-## [1] &quot;alpha estimate: 3.68988566002198&quot;
-## [1] &quot;iteration 15 precision difference: 0.096 /correlation alpha difference: 0.01&quot;
-## [1] &quot;alpha estimate: 3.69968274545171&quot;
-## [1] &quot;iteration 16 precision difference: 0.091 /correlation alpha difference: 0.081&quot;
-## [1] &quot;alpha estimate: 3.7802787760018&quot;
-## [1] &quot;iteration 17 precision difference: 0.06 /correlation alpha difference: 0.068&quot;
-## [1] &quot;alpha estimate: 3.71204827259044&quot;
-## [1] &quot;iteration 18 precision difference: 0.057 /correlation alpha difference: 0.043&quot;
-## [1] &quot;alpha estimate: 3.75507288248661&quot;
-## [1] &quot;iteration 19 precision difference: 0.054 /correlation alpha difference: 0.084&quot;
-## [1] &quot;alpha estimate: 3.67121246855338&quot;
-## [1] &quot;iteration 20 precision difference: 0.052 /correlation alpha difference: 0.04&quot;
-## [1] &quot;alpha estimate: 3.71157685153147&quot;
-## [1] &quot;iteration 21 precision difference: 0.067 /correlation alpha difference: 0.037&quot;
-## [1] &quot;alpha estimate: 3.7489064598488&quot;
-## [1] &quot;iteration 22 precision difference: 0.065 /correlation alpha difference: 0.083&quot;
-## [1] &quot;alpha estimate: 3.66595123759729&quot;
-## [1] &quot;iteration 23 precision difference: 0.078 /correlation alpha difference: 0.026&quot;
-## [1] &quot;alpha estimate: 3.69217954496128&quot;
-## [1] &quot;iteration 24 precision difference: 0.1 /correlation alpha difference: 0.058&quot;
-## [1] &quot;alpha estimate: 3.75042326255784&quot;
-## [1] &quot;iteration 25 precision difference: 0.063 /correlation alpha difference: 0.048&quot;
-## [1] &quot;alpha estimate: 3.70218383924641&quot;
-## [1] &quot;iteration 26 precision difference: 0.078 /correlation alpha difference: 0.005&quot;
-## [1] &quot;alpha estimate: 3.6967049517413&quot;
-## [1] &quot;iteration 27 precision difference: 0.066 /correlation alpha difference: 0.026&quot;
-## [1] &quot;alpha estimate: 3.67080015774086&quot;
-## [1] &quot;iteration 28 precision difference: 0.113 /correlation alpha difference: 0.033&quot;
-## [1] &quot;alpha estimate: 3.70375181789358&quot;
-## [1] &quot;iteration 29 precision difference: 0.132 /correlation alpha difference: 0.038&quot;
-## [1] &quot;alpha estimate: 3.74154432106983&quot;
-## [1] &quot;iteration 30 precision difference: 0.085 /correlation alpha difference: 0.014&quot;</code></pre>
+## [1] &quot;iteration 1 precision difference: 12.456 /correlation alpha difference: 14.237&quot;
+## [1] &quot;alpha estimate: 15.2366058476506&quot;
+## [1] &quot;iteration 2 precision difference: 2.113 /correlation alpha difference: 1.577&quot;
+## [1] &quot;alpha estimate: 13.659501253231&quot;
+## [1] &quot;iteration 3 precision difference: 1.343 /correlation alpha difference: 3.821&quot;
+## [1] &quot;alpha estimate: 9.83891152159217&quot;
+## [1] &quot;iteration 4 precision difference: 0.933 /correlation alpha difference: 2.459&quot;
+## [1] &quot;alpha estimate: 7.37987396806094&quot;
+## [1] &quot;iteration 5 precision difference: 0.639 /correlation alpha difference: 1.497&quot;
+## [1] &quot;alpha estimate: 5.88306494987901&quot;
+## [1] &quot;iteration 6 precision difference: 0.436 /correlation alpha difference: 0.942&quot;
+## [1] &quot;alpha estimate: 4.94064946004515&quot;
+## [1] &quot;iteration 7 precision difference: 0.275 /correlation alpha difference: 0.557&quot;
+## [1] &quot;alpha estimate: 4.38315248628732&quot;
+## [1] &quot;iteration 8 precision difference: 0.175 /correlation alpha difference: 0.334&quot;
+## [1] &quot;alpha estimate: 4.04931705764203&quot;
+## [1] &quot;iteration 9 precision difference: 0.111 /correlation alpha difference: 0.192&quot;
+## [1] &quot;alpha estimate: 3.8575540516576&quot;
+## [1] &quot;iteration 10 precision difference: 0.047 /correlation alpha difference: 0.072&quot;
+## [1] &quot;alpha estimate: 3.78571216756166&quot;
+## [1] &quot;iteration 11 precision difference: 0.032 /correlation alpha difference: 0.046&quot;
+## [1] &quot;alpha estimate: 3.73931431784788&quot;
+## [1] &quot;iteration 12 precision difference: 0.021 /correlation alpha difference: 0.007&quot;
+## [1] &quot;alpha estimate: 3.73209829113406&quot;
+## [1] &quot;iteration 13 precision difference: 0.029 /correlation alpha difference: 0.052&quot;
+## [1] &quot;alpha estimate: 3.68008866255484&quot;
+## [1] &quot;iteration 14 precision difference: 0.017 /correlation alpha difference: 0.006&quot;
+## [1] &quot;alpha estimate: 3.68565672522816&quot;
+## [1] &quot;iteration 15 precision difference: 0.021 /correlation alpha difference: 0.012&quot;
+## [1] &quot;alpha estimate: 3.6972243675083&quot;
+## [1] &quot;iteration 16 precision difference: 0.019 /correlation alpha difference: 0.045&quot;
+## [1] &quot;alpha estimate: 3.65177240455281&quot;
+## [1] &quot;iteration 17 precision difference: 0.026 /correlation alpha difference: 0.047&quot;
+## [1] &quot;alpha estimate: 3.69890090519963&quot;
+## [1] &quot;iteration 18 precision difference: 0.015 /correlation alpha difference: 0.003&quot;
+## [1] &quot;alpha estimate: 3.69564995059322&quot;
+## [1] &quot;iteration 19 precision difference: 0.026 /correlation alpha difference: 0.006&quot;
+## [1] &quot;alpha estimate: 3.70142767690586&quot;
+## [1] &quot;iteration 20 precision difference: 0.017 /correlation alpha difference: 0.031&quot;
+## [1] &quot;alpha estimate: 3.67080811562833&quot;
+## [1] &quot;iteration 21 precision difference: 0.022 /correlation alpha difference: 0.002&quot;
+## [1] &quot;alpha estimate: 3.67281260883516&quot;
+## [1] &quot;iteration 22 precision difference: 0.023 /correlation alpha difference: 0.022&quot;
+## [1] &quot;alpha estimate: 3.6949441216093&quot;
+## [1] &quot;iteration 23 precision difference: 0.028 /correlation alpha difference: 0.021&quot;
+## [1] &quot;alpha estimate: 3.67401960002521&quot;
+## [1] &quot;iteration 24 precision difference: 0.018 /correlation alpha difference: 0.005&quot;
+## [1] &quot;alpha estimate: 3.66944967776481&quot;
+## [1] &quot;iteration 25 precision difference: 0.019 /correlation alpha difference: 0.014&quot;
+## [1] &quot;alpha estimate: 3.68295029489368&quot;
+## [1] &quot;iteration 26 precision difference: 0.014 /correlation alpha difference: 0.01&quot;
+## [1] &quot;alpha estimate: 3.67288128732771&quot;
+## [1] &quot;iteration 27 precision difference: 0.019 /correlation alpha difference: 0.005&quot;
+## [1] &quot;alpha estimate: 3.67746108995554&quot;
+## [1] &quot;iteration 28 precision difference: 0.019 /correlation alpha difference: 0.024&quot;
+## [1] &quot;alpha estimate: 3.70137986495313&quot;
+## [1] &quot;iteration 29 precision difference: 0.02 /correlation alpha difference: 0.021&quot;
+## [1] &quot;alpha estimate: 3.68078237365358&quot;
+## [1] &quot;iteration 30 precision difference: 0.026 /correlation alpha difference: 0.015&quot;
+## [1] &quot;alpha estimate: 3.66570101386701&quot;
+## [1] &quot;iteration 31 precision difference: 0.024 /correlation alpha difference: 0.001&quot;
+## [1] &quot;alpha estimate: 3.66458341693314&quot;
+## [1] &quot;iteration 32 precision difference: 0.024 /correlation alpha difference: 0.009&quot;
+## [1] &quot;alpha estimate: 3.65605660568442&quot;
+## [1] &quot;iteration 33 precision difference: 0.028 /correlation alpha difference: 0.042&quot;
+## [1] &quot;alpha estimate: 3.69770660296636&quot;
+## [1] &quot;iteration 34 precision difference: 0.025 /correlation alpha difference: 0.039&quot;
+## [1] &quot;alpha estimate: 3.65849007498859&quot;
+## [1] &quot;iteration 35 precision difference: 0.021 /correlation alpha difference: 0.022&quot;
+## [1] &quot;alpha estimate: 3.6800110825538&quot;
+## [1] &quot;iteration 36 precision difference: 0.021 /correlation alpha difference: 0.006&quot;
+## [1] &quot;alpha estimate: 3.68624157544422&quot;
+## [1] &quot;iteration 37 precision difference: 0.021 /correlation alpha difference: 0.007&quot;
+## [1] &quot;alpha estimate: 3.69325670913684&quot;
+## [1] &quot;iteration 38 precision difference: 0.015 /correlation alpha difference: 0.012&quot;
+## [1] &quot;alpha estimate: 3.68123437124349&quot;
+## [1] &quot;iteration 39 precision difference: 0.032 /correlation alpha difference: 0.017&quot;
+## [1] &quot;alpha estimate: 3.66447670617924&quot;
+## [1] &quot;iteration 40 precision difference: 0.019 /correlation alpha difference: 0.019&quot;
+## [1] &quot;alpha estimate: 3.64543536112124&quot;
+## [1] &quot;iteration 41 precision difference: 0.019 /correlation alpha difference: 0.014&quot;
+## [1] &quot;alpha estimate: 3.65945254118928&quot;
+## [1] &quot;iteration 42 precision difference: 0.015 /correlation alpha difference: 0.009&quot;
+## [1] &quot;alpha estimate: 3.66887107507018&quot;
+## [1] &quot;iteration 43 precision difference: 0.018 /correlation alpha difference: 0.001&quot;
+## [1] &quot;alpha estimate: 3.66746326868013&quot;
+## [1] &quot;iteration 44 precision difference: 0.034 /correlation alpha difference: 0.004&quot;
+## [1] &quot;alpha estimate: 3.66362913108147&quot;
+## [1] &quot;iteration 45 precision difference: 0.023 /correlation alpha difference: 0.006&quot;
+## [1] &quot;alpha estimate: 3.66924957918666&quot;
+## [1] &quot;iteration 46 precision difference: 0.021 /correlation alpha difference: 0.022&quot;
+## [1] &quot;alpha estimate: 3.69101796625809&quot;
+## [1] &quot;iteration 47 precision difference: 0.02 /correlation alpha difference: 0.031&quot;
+## [1] &quot;alpha estimate: 3.66007504010084&quot;
+## [1] &quot;iteration 48 precision difference: 0.027 /correlation alpha difference: 0.017&quot;
+## [1] &quot;alpha estimate: 3.67753644732354&quot;
+## [1] &quot;iteration 49 precision difference: 0.022 /correlation alpha difference: 0.025&quot;
+## [1] &quot;alpha estimate: 3.65213298650585&quot;
+## [1] &quot;iteration 50 precision difference: 0.026 /correlation alpha difference: 0.024&quot;</code></pre>
 <pre class="r"><code>aa1$wi[[1]][1:10,1:10]</code></pre>
-<pre><code>##             FIM_IgG4     TT_IgG3   IPV1_IgG3 ACT_FcgR2a     TT_ADNP    FHA_IgG
-## FIM_IgG4   6.2986398  0.00000000  0.12823915  0.0000000  0.00000000  0.0000000
-## TT_IgG3    0.0000000 12.41175682  0.00000000  0.7040714  0.00000000  0.0000000
-## IPV1_IgG3  0.1282654  0.00000000  9.20876950  0.1763605  0.00000000  0.0000000
-## ACT_FcgR2a 0.0000000  0.70403268  0.17642732 18.4588104 -0.23239857 -0.6820403
-## TT_ADNP    0.0000000  0.00000000  0.00000000 -0.2323969 10.94366056  0.0000000
-## FHA_IgG    0.0000000  0.00000000  0.00000000 -0.6820629  0.00000000 13.2995330
-## PRN_FcgR2a 0.0000000 -0.05610085  0.00000000  0.0000000  0.00000000  1.2925136
-## IPV3_ADCD  0.0000000  0.00000000  0.00000000  0.4059801  0.00000000  0.0000000
-## IPV1_IgG4  0.0000000  0.00000000 -2.88600265  0.0000000  0.00000000  0.0000000
-## PT_FcgR2a  0.0000000  0.00000000 -0.06232853  0.0000000  0.07958827  0.7106559
+<pre><code>##             FIM_IgG4    TT_IgG3   IPV1_IgG3 ACT_FcgR2a     TT_ADNP    FHA_IgG
+## FIM_IgG4   6.2565544  0.0000000  0.12749464  0.0000000  0.00000000  0.0000000
+## TT_IgG3    0.0000000 12.4105855  0.00000000  0.6846650  0.00000000  0.0000000
+## IPV1_IgG3  0.1275145  0.0000000  9.22639576  0.1760310  0.00000000  0.0000000
+## ACT_FcgR2a 0.0000000  0.6846331  0.17607965 18.4344935 -0.23022416 -0.6928468
+## TT_ADNP    0.0000000  0.0000000  0.00000000 -0.2302592 10.94509005  0.0000000
+## FHA_IgG    0.0000000  0.0000000  0.00000000 -0.6928431  0.00000000 13.3112853
+## PRN_FcgR2a 0.0000000 -0.0561069  0.00000000  0.0000000  0.00000000  1.2822795
+## IPV3_ADCD  0.0000000  0.0000000  0.00000000  0.4012922  0.00000000  0.0000000
+## IPV1_IgG4  0.0000000  0.0000000 -2.88427537  0.0000000  0.00000000  0.0000000
+## PT_FcgR2a  0.0000000  0.0000000 -0.05682635  0.0000000  0.07480288  0.7159501
 ##             PRN_FcgR2a  IPV3_ADCD IPV1_IgG4   PT_FcgR2a
 ## FIM_IgG4    0.00000000  0.0000000  0.000000  0.00000000
-## TT_IgG3    -0.05613294  0.0000000  0.000000  0.00000000
-## IPV1_IgG3   0.00000000  0.0000000 -2.886004 -0.06231395
-## ACT_FcgR2a  0.00000000  0.4062094  0.000000  0.00000000
-## TT_ADNP     0.00000000  0.0000000  0.000000  0.07957511
-## FHA_IgG     1.29246967  0.0000000  0.000000  0.71058322
-## PRN_FcgR2a 16.62577076  0.0000000  0.000000 -0.56467147
-## IPV3_ADCD   0.00000000 34.7645459  0.000000  0.00000000
-## IPV1_IgG4   0.00000000  0.0000000 13.180532  0.00000000
-## PT_FcgR2a  -0.56463311  0.0000000  0.000000 16.71854687</code></pre>
+## TT_IgG3    -0.05615853  0.0000000  0.000000  0.00000000
+## IPV1_IgG3   0.00000000  0.0000000 -2.884274 -0.05681739
+## ACT_FcgR2a  0.00000000  0.4015036  0.000000  0.00000000
+## TT_ADNP     0.00000000  0.0000000  0.000000  0.07478360
+## FHA_IgG     1.28227152  0.0000000  0.000000  0.71592996
+## PRN_FcgR2a 16.62623461  0.0000000  0.000000 -0.57484320
+## IPV3_ADCD   0.00000000 34.7480584  0.000000  0.00000000
+## IPV1_IgG4   0.00000000  0.0000000 13.148067  0.00000000
+## PT_FcgR2a  -0.57480667  0.0000000  0.000000 16.69151318</code></pre>
 <pre class="r"><code>aa1$tau[1:10]</code></pre>
-<pre><code>##  [1] 0.3386961 0.4245570 0.2355792 0.3267782 0.6177683 0.1823917 0.2042031
-##  [8] 0.2150070 0.2033332 0.1377283</code></pre>
+<pre><code>##  [1] 0.3231685 0.4139326 0.2373428 0.3373676 0.6534112 0.1792057 0.1965513
+##  [8] 0.2177835 0.2122885 0.1365866</code></pre>
 <pre class="r"><code>aa1$alpha</code></pre>
-<pre><code>## [1] 3.727098</code></pre>
+<pre><code>## [1] 3.675895</code></pre>
 <pre class="r"><code>dd=unique(postdata[,c(1,3:7)])
 summary(lm(aa1$tau~infant_arm+delivery_mode+maternal_arm+infant_sex+gestational_age_vaccination,data=dd))</code></pre>
 <pre><code>## 
@@ -589,156 +719,196 @@ summary(lm(aa1$tau~infant_arm+delivery_mode+maternal_arm+infant_sex+gestational_
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.27114 -0.13556 -0.07776  0.04830  1.18276 
+## -0.27722 -0.13749 -0.07891  0.04709  1.36647 
 ## 
 ## Coefficients:
-##                                 Estimate Std. Error t value Pr(&gt;|t|)   
-## (Intercept)                    0.1164794  0.3115883   0.374   0.7089   
-## infant_armwP                   0.0933083  0.0314292   2.969   0.0033 **
-## delivery_modeVaginal Delivery  0.0932940  0.0693179   1.346   0.1796   
-## maternal_armTT                -0.0078597  0.0312447  -0.252   0.8016   
-## infant_sexMale                 0.0009237  0.0313402   0.029   0.9765   
-## gestational_age_vaccination    0.0006574  0.0100213   0.066   0.9478   
+##                                Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)                    0.093010   0.332206   0.280  0.77974   
+## infant_armwP                   0.098324   0.033509   2.934  0.00368 **
+## delivery_modeVaginal Delivery  0.101103   0.073905   1.368  0.17262   
+## maternal_armTT                -0.002435   0.033312  -0.073  0.94178   
+## infant_sexMale                 0.000314   0.033414   0.009  0.99251   
+## gestational_age_vaccination    0.001154   0.010684   0.108  0.91408   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.24 on 233 degrees of freedom
-## Multiple R-squared:  0.04149,    Adjusted R-squared:  0.02092 
-## F-statistic: 2.017 on 5 and 233 DF,  p-value: 0.07705</code></pre>
+## Residual standard error: 0.2559 on 233 degrees of freedom
+## Multiple R-squared:  0.04024,    Adjusted R-squared:  0.01964 
+## F-statistic: 1.954 on 5 and 233 DF,  p-value: 0.08641</code></pre>
 </div>
 <div id="two-stage-model-full-data5.7min" class="section level3">
 <h3>two-stage model (full data,5.7min)</h3>
 <pre class="r"><code>group=ifelse(fulldata$visit_name==2,1,2)
 aa2=lglasso(data=fulldata[,-c(3:7)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T,tol = 0.01)</code></pre>
 <pre><code>## [1] &quot;alpha estimate: 1&quot;
-## [1] &quot;iteration 1 precision difference: 5.17 /correlation alpha difference: 14.31&quot;
-## [1] &quot;alpha estimate: 15.3102953505411&quot;
-## [1] &quot;iteration 2 precision difference: 1.803 /correlation alpha difference: 2.104&quot;
-## [1] &quot;alpha estimate: 13.2064640377532&quot;
-## [1] &quot;iteration 3 precision difference: 1.464 /correlation alpha difference: 3.562&quot;
-## [1] &quot;alpha estimate: 9.64449806335532&quot;
-## [1] &quot;iteration 4 precision difference: 1.809 /correlation alpha difference: 2.29&quot;
-## [1] &quot;alpha estimate: 7.35461026112166&quot;
-## [1] &quot;iteration 5 precision difference: 1.512 /correlation alpha difference: 1.55&quot;
-## [1] &quot;alpha estimate: 5.80452880469237&quot;
-## [1] &quot;iteration 6 precision difference: 0.23 /correlation alpha difference: 0.754&quot;
-## [1] &quot;alpha estimate: 5.05026691507201&quot;
-## [1] &quot;iteration 7 precision difference: 1.074 /correlation alpha difference: 0.597&quot;
-## [1] &quot;alpha estimate: 4.45323875331193&quot;
-## [1] &quot;iteration 8 precision difference: 0.353 /correlation alpha difference: 0.264&quot;
-## [1] &quot;alpha estimate: 4.18966696854048&quot;
-## [1] &quot;iteration 9 precision difference: 0.089 /correlation alpha difference: 0.112&quot;
-## [1] &quot;alpha estimate: 4.07718400865915&quot;
-## [1] &quot;iteration 10 precision difference: 0.448 /correlation alpha difference: 0.086&quot;
-## [1] &quot;alpha estimate: 3.99085335437157&quot;
-## [1] &quot;iteration 11 precision difference: 0.292 /correlation alpha difference: 0.024&quot;
-## [1] &quot;alpha estimate: 4.01488805425101&quot;
-## [1] &quot;iteration 12 precision difference: 0.207 /correlation alpha difference: 0.087&quot;
-## [1] &quot;alpha estimate: 3.92820607476219&quot;
-## [1] &quot;iteration 13 precision difference: 0.444 /correlation alpha difference: 0.028&quot;
-## [1] &quot;alpha estimate: 3.95657827109514&quot;
-## [1] &quot;iteration 14 precision difference: 0.334 /correlation alpha difference: 0.03&quot;
-## [1] &quot;alpha estimate: 3.926849742272&quot;
-## [1] &quot;iteration 15 precision difference: 0.233 /correlation alpha difference: 0.114&quot;
-## [1] &quot;alpha estimate: 3.81325183970861&quot;
-## [1] &quot;iteration 16 precision difference: 0.252 /correlation alpha difference: 0.051&quot;
-## [1] &quot;alpha estimate: 3.86404179588842&quot;
-## [1] &quot;iteration 17 precision difference: 0.495 /correlation alpha difference: 0.021&quot;
-## [1] &quot;alpha estimate: 3.84317254623502&quot;
-## [1] &quot;iteration 18 precision difference: 0.058 /correlation alpha difference: 0.078&quot;
-## [1] &quot;alpha estimate: 3.92150995967987&quot;
-## [1] &quot;iteration 19 precision difference: 0.07 /correlation alpha difference: 0.011&quot;
-## [1] &quot;alpha estimate: 3.91045104340296&quot;
-## [1] &quot;iteration 20 precision difference: 0.13 /correlation alpha difference: 0.002&quot;
-## [1] &quot;alpha estimate: 3.91203230696126&quot;
-## [1] &quot;iteration 21 precision difference: 0.342 /correlation alpha difference: 0.061&quot;
-## [1] &quot;alpha estimate: 3.85100690568429&quot;
-## [1] &quot;iteration 22 precision difference: 0.319 /correlation alpha difference: 0.038&quot;
-## [1] &quot;alpha estimate: 3.88850948208845&quot;
-## [1] &quot;iteration 23 precision difference: 0.197 /correlation alpha difference: 0.01&quot;
-## [1] &quot;alpha estimate: 3.89889418755705&quot;
-## [1] &quot;iteration 24 precision difference: 0.218 /correlation alpha difference: 0.002&quot;
-## [1] &quot;alpha estimate: 3.9008256568788&quot;
-## [1] &quot;iteration 25 precision difference: 0.216 /correlation alpha difference: 0.002&quot;
-## [1] &quot;alpha estimate: 3.9027201019631&quot;
-## [1] &quot;iteration 26 precision difference: 0.086 /correlation alpha difference: 0.073&quot;
-## [1] &quot;alpha estimate: 3.83017815518616&quot;
-## [1] &quot;iteration 27 precision difference: 0.076 /correlation alpha difference: 0.034&quot;
-## [1] &quot;alpha estimate: 3.86445361587074&quot;
-## [1] &quot;iteration 28 precision difference: 0.104 /correlation alpha difference: 0.051&quot;
-## [1] &quot;alpha estimate: 3.91517841112389&quot;
-## [1] &quot;iteration 29 precision difference: 0.402 /correlation alpha difference: 0.074&quot;
-## [1] &quot;alpha estimate: 3.84120729831067&quot;
-## [1] &quot;iteration 30 precision difference: 0.82 /correlation alpha difference: 0.1&quot;</code></pre>
+## [1] &quot;iteration 1 precision difference: 4.751 /correlation alpha difference: 14.195&quot;
+## [1] &quot;alpha estimate: 15.1952691533872&quot;
+## [1] &quot;iteration 2 precision difference: 1.982 /correlation alpha difference: 1.497&quot;
+## [1] &quot;alpha estimate: 13.6986449849443&quot;
+## [1] &quot;iteration 3 precision difference: 1.785 /correlation alpha difference: 3.753&quot;
+## [1] &quot;alpha estimate: 9.94535833772415&quot;
+## [1] &quot;iteration 4 precision difference: 1.627 /correlation alpha difference: 2.608&quot;
+## [1] &quot;alpha estimate: 7.33701134160076&quot;
+## [1] &quot;iteration 5 precision difference: 1.188 /correlation alpha difference: 1.542&quot;
+## [1] &quot;alpha estimate: 5.79473423950862&quot;
+## [1] &quot;iteration 6 precision difference: 1.07 /correlation alpha difference: 1.005&quot;
+## [1] &quot;alpha estimate: 4.78990367659353&quot;
+## [1] &quot;iteration 7 precision difference: 0.236 /correlation alpha difference: 0.485&quot;
+## [1] &quot;alpha estimate: 4.30500735602387&quot;
+## [1] &quot;iteration 8 precision difference: 0.359 /correlation alpha difference: 0.308&quot;
+## [1] &quot;alpha estimate: 3.99745255765001&quot;
+## [1] &quot;iteration 9 precision difference: 0.049 /correlation alpha difference: 0.087&quot;
+## [1] &quot;alpha estimate: 3.91089256220265&quot;
+## [1] &quot;iteration 10 precision difference: 0.104 /correlation alpha difference: 0.114&quot;
+## [1] &quot;alpha estimate: 3.79718451182665&quot;
+## [1] &quot;iteration 11 precision difference: 0.131 /correlation alpha difference: 0.002&quot;
+## [1] &quot;alpha estimate: 3.79488169534295&quot;
+## [1] &quot;iteration 12 precision difference: 0.126 /correlation alpha difference: 0.048&quot;
+## [1] &quot;alpha estimate: 3.74737590929418&quot;
+## [1] &quot;iteration 13 precision difference: 0.116 /correlation alpha difference: 0.065&quot;
+## [1] &quot;alpha estimate: 3.68247410598723&quot;
+## [1] &quot;iteration 14 precision difference: 0.012 /correlation alpha difference: 0.007&quot;
+## [1] &quot;alpha estimate: 3.6897574747969&quot;
+## [1] &quot;iteration 15 precision difference: 0.062 /correlation alpha difference: 0.019&quot;
+## [1] &quot;alpha estimate: 3.67109595016845&quot;
+## [1] &quot;iteration 16 precision difference: 0.022 /correlation alpha difference: 0.034&quot;
+## [1] &quot;alpha estimate: 3.70527784684272&quot;
+## [1] &quot;iteration 17 precision difference: 0.017 /correlation alpha difference: 0.004&quot;
+## [1] &quot;alpha estimate: 3.70087311799013&quot;
+## [1] &quot;iteration 18 precision difference: 0.021 /correlation alpha difference: 0.005&quot;
+## [1] &quot;alpha estimate: 3.69601326616634&quot;
+## [1] &quot;iteration 19 precision difference: 0.063 /correlation alpha difference: 0.018&quot;
+## [1] &quot;alpha estimate: 3.71377045590858&quot;
+## [1] &quot;iteration 20 precision difference: 0.035 /correlation alpha difference: 0.021&quot;
+## [1] &quot;alpha estimate: 3.73434807807087&quot;
+## [1] &quot;iteration 21 precision difference: 0.022 /correlation alpha difference: 0.015&quot;
+## [1] &quot;alpha estimate: 3.74976288250573&quot;
+## [1] &quot;iteration 22 precision difference: 0.053 /correlation alpha difference: 0.002&quot;
+## [1] &quot;alpha estimate: 3.75226163709488&quot;
+## [1] &quot;iteration 23 precision difference: 0.118 /correlation alpha difference: 0.035&quot;
+## [1] &quot;alpha estimate: 3.71677177424177&quot;
+## [1] &quot;iteration 24 precision difference: 0.141 /correlation alpha difference: 0.035&quot;
+## [1] &quot;alpha estimate: 3.75132542633706&quot;
+## [1] &quot;iteration 25 precision difference: 0.087 /correlation alpha difference: 0.047&quot;
+## [1] &quot;alpha estimate: 3.70421986427124&quot;
+## [1] &quot;iteration 26 precision difference: 0.096 /correlation alpha difference: 0.034&quot;
+## [1] &quot;alpha estimate: 3.73785946181939&quot;
+## [1] &quot;iteration 27 precision difference: 0.081 /correlation alpha difference: 0.025&quot;
+## [1] &quot;alpha estimate: 3.76299958362618&quot;
+## [1] &quot;iteration 28 precision difference: 0.053 /correlation alpha difference: 0.007&quot;
+## [1] &quot;alpha estimate: 3.75600532083105&quot;
+## [1] &quot;iteration 29 precision difference: 0.108 /correlation alpha difference: 0.001&quot;
+## [1] &quot;alpha estimate: 3.75468846014916&quot;
+## [1] &quot;iteration 30 precision difference: 0.129 /correlation alpha difference: 0.002&quot;
+## [1] &quot;alpha estimate: 3.75698235817218&quot;
+## [1] &quot;iteration 31 precision difference: 0.066 /correlation alpha difference: 0.014&quot;
+## [1] &quot;alpha estimate: 3.74314554838055&quot;
+## [1] &quot;iteration 32 precision difference: 0.028 /correlation alpha difference: 0.004&quot;
+## [1] &quot;alpha estimate: 3.74701579722171&quot;
+## [1] &quot;iteration 33 precision difference: 0.058 /correlation alpha difference: 0.016&quot;
+## [1] &quot;alpha estimate: 3.76267181260061&quot;
+## [1] &quot;iteration 34 precision difference: 0.066 /correlation alpha difference: 0.02&quot;
+## [1] &quot;alpha estimate: 3.7429967187214&quot;
+## [1] &quot;iteration 35 precision difference: 0.095 /correlation alpha difference: 0.021&quot;
+## [1] &quot;alpha estimate: 3.76445784145604&quot;
+## [1] &quot;iteration 36 precision difference: 0.048 /correlation alpha difference: 0.004&quot;
+## [1] &quot;alpha estimate: 3.76092270782839&quot;
+## [1] &quot;iteration 37 precision difference: 0.023 /correlation alpha difference: 0.001&quot;
+## [1] &quot;alpha estimate: 3.75991345555033&quot;
+## [1] &quot;iteration 38 precision difference: 0.052 /correlation alpha difference: 0.06&quot;
+## [1] &quot;alpha estimate: 3.70033016977441&quot;
+## [1] &quot;iteration 39 precision difference: 0.022 /correlation alpha difference: 0.011&quot;
+## [1] &quot;alpha estimate: 3.68970385755024&quot;
+## [1] &quot;iteration 40 precision difference: 0.067 /correlation alpha difference: 0.061&quot;
+## [1] &quot;alpha estimate: 3.75120123251233&quot;
+## [1] &quot;iteration 41 precision difference: 0.099 /correlation alpha difference: 0.037&quot;
+## [1] &quot;alpha estimate: 3.71418121128183&quot;
+## [1] &quot;iteration 42 precision difference: 0.048 /correlation alpha difference: 0.013&quot;
+## [1] &quot;alpha estimate: 3.72676404183343&quot;
+## [1] &quot;iteration 43 precision difference: 0.121 /correlation alpha difference: 0.011&quot;
+## [1] &quot;alpha estimate: 3.71590047675555&quot;
+## [1] &quot;iteration 44 precision difference: 0.016 /correlation alpha difference: 0&quot;
+## [1] &quot;alpha estimate: 3.71569676518786&quot;
+## [1] &quot;iteration 45 precision difference: 0.025 /correlation alpha difference: 0.067&quot;
+## [1] &quot;alpha estimate: 3.64841014605577&quot;
+## [1] &quot;iteration 46 precision difference: 0.023 /correlation alpha difference: 0.068&quot;
+## [1] &quot;alpha estimate: 3.71666339367364&quot;
+## [1] &quot;iteration 47 precision difference: 0.06 /correlation alpha difference: 0.033&quot;
+## [1] &quot;alpha estimate: 3.6837608447376&quot;
+## [1] &quot;iteration 48 precision difference: 0.027 /correlation alpha difference: 0.027&quot;
+## [1] &quot;alpha estimate: 3.7110447226755&quot;
+## [1] &quot;iteration 49 precision difference: 0.027 /correlation alpha difference: 0.042&quot;
+## [1] &quot;alpha estimate: 3.66907187111342&quot;
+## [1] &quot;iteration 50 precision difference: 0.101 /correlation alpha difference: 0.086&quot;</code></pre>
 <pre><code>## Algorithm reached the maximum iteration!</code></pre>
 <pre class="r"><code>aa2$wi[[1]][1:10,1:10]</code></pre>
 <pre><code>##                 FIM_IgG4       TT_IgG3     IPV1_IgG3    ACT_FcgR2a
-## FIM_IgG4    2.957570e+00  2.349417e-07 -3.095196e-07  1.565161e-07
-## TT_IgG3     2.349417e-07  5.121059e+00  2.459530e-07 -3.937963e-07
-## IPV1_IgG3  -3.095196e-07  2.459530e-07  5.058770e+00 -4.899656e-07
-## ACT_FcgR2a  1.565161e-07 -3.937963e-07 -4.899656e-07  1.186546e+01
-## TT_ADNP     1.168740e-07  4.296008e-08 -1.558199e-08  2.919711e-07
-## FHA_IgG     1.916082e-08 -3.235888e-07 -4.218777e-07 -6.448771e-01
-## PRN_FcgR2a -8.147831e-08 -2.614589e-07  1.216634e-07  2.047727e-07
-## IPV3_ADCD   9.229969e-09  4.134445e-08  1.376406e-07 -1.937910e-07
-## IPV1_IgG4   4.032759e-08  9.100172e-08 -1.482657e+00  1.290543e-08
-## PT_FcgR2a  -2.738460e-07  1.579276e-07  3.608829e-07 -1.815537e-06
+## FIM_IgG4    2.966563e+00  2.425334e-07 -3.057734e-07  1.599857e-07
+## TT_IgG3     2.425334e-07  5.132588e+00  2.547690e-07 -3.899195e-07
+## IPV1_IgG3  -3.057734e-07  2.547690e-07  5.056072e+00 -4.960995e-07
+## ACT_FcgR2a  1.599857e-07 -3.899195e-07 -4.960995e-07  1.185567e+01
+## TT_ADNP     1.177736e-07  5.533664e-08 -1.458263e-08  2.792553e-07
+## FHA_IgG     1.707390e-08 -3.319619e-07 -4.235797e-07 -6.716993e-01
+## PRN_FcgR2a -7.803854e-08 -2.687526e-07  1.307071e-07  2.054828e-07
+## IPV3_ADCD   8.355367e-09  4.100539e-08  1.401845e-07 -1.919501e-07
+## IPV1_IgG4   4.221268e-08  9.331930e-08 -1.474165e+00  1.450687e-08
+## PT_FcgR2a  -2.720403e-07  1.689919e-07  3.761277e-07 -1.872140e-06
 ##                  TT_ADNP       FHA_IgG    PRN_FcgR2a     IPV3_ADCD
-## FIM_IgG4    1.168740e-07  1.916082e-08 -8.147831e-08  9.229969e-09
-## TT_IgG3     4.296008e-08 -3.235888e-07 -2.614589e-07  4.134445e-08
-## IPV1_IgG3  -1.558199e-08 -4.218777e-07  1.216634e-07  1.376406e-07
-## ACT_FcgR2a  2.919711e-07 -6.448771e-01  2.047727e-07 -1.937910e-07
-## TT_ADNP     4.063478e+00 -1.205681e-07  2.563484e-07 -1.472603e-07
-## FHA_IgG    -1.205681e-07  1.314912e+01 -2.823682e-07  1.119422e-07
-## PRN_FcgR2a  2.563484e-07 -2.823682e-07  1.175386e+01  2.427605e-07
-## IPV3_ADCD  -1.472603e-07  1.119422e-07  2.427605e-07  1.005155e+01
-## IPV1_IgG4   6.740167e-09 -5.745677e-08 -9.367616e-08  9.268438e-09
-## PT_FcgR2a  -4.607394e-08 -3.011728e-07 -1.453740e-01  3.513088e-07
+## FIM_IgG4    1.177736e-07  1.707390e-08 -7.803854e-08  8.355367e-09
+## TT_IgG3     5.533664e-08 -3.319619e-07 -2.687526e-07  4.100539e-08
+## IPV1_IgG3  -1.458263e-08 -4.235797e-07  1.307071e-07  1.401845e-07
+## ACT_FcgR2a  2.792553e-07 -6.716993e-01  2.054828e-07 -1.919501e-07
+## TT_ADNP     4.089367e+00 -1.253950e-07  2.536710e-07 -1.488419e-07
+## FHA_IgG    -1.253950e-07  1.320135e+01 -2.849235e-07  1.112026e-07
+## PRN_FcgR2a  2.536710e-07 -2.849235e-07  1.179713e+01  2.435849e-07
+## IPV3_ADCD  -1.488419e-07  1.112026e-07  2.435849e-07  1.005620e+01
+## IPV1_IgG4   8.491537e-09 -5.655005e-08 -9.108865e-08  9.125220e-09
+## PT_FcgR2a  -5.300880e-08 -3.088666e-07 -1.468597e-01  3.577539e-07
 ##                IPV1_IgG4     PT_FcgR2a
-## FIM_IgG4    4.032759e-08 -2.738460e-07
-## TT_IgG3     9.100172e-08  1.579276e-07
-## IPV1_IgG3  -1.482657e+00  3.608829e-07
-## ACT_FcgR2a  1.290543e-08 -1.815537e-06
-## TT_ADNP     6.740167e-09 -4.607394e-08
-## FHA_IgG    -5.745677e-08 -3.011728e-07
-## PRN_FcgR2a -9.367616e-08 -1.453740e-01
-## IPV3_ADCD   9.268438e-09  3.513088e-07
-## IPV1_IgG4   5.203245e+00  9.558106e-08
-## PT_FcgR2a   9.558106e-08  1.444637e+01</code></pre>
+## FIM_IgG4    4.221268e-08 -2.720403e-07
+## TT_IgG3     9.331930e-08  1.689919e-07
+## IPV1_IgG3  -1.474165e+00  3.761277e-07
+## ACT_FcgR2a  1.450687e-08 -1.872140e-06
+## TT_ADNP     8.491537e-09 -5.300880e-08
+## FHA_IgG    -5.655005e-08 -3.088666e-07
+## PRN_FcgR2a -9.108865e-08 -1.468597e-01
+## IPV3_ADCD   9.125220e-09  3.577539e-07
+## IPV1_IgG4   5.185009e+00  9.642129e-08
+## PT_FcgR2a   9.642129e-08  1.448478e+01</code></pre>
 <pre class="r"><code>aa2$wi[[2]][1:10,1:10]</code></pre>
 <pre><code>##                 FIM_IgG4       TT_IgG3     IPV1_IgG3    ACT_FcgR2a
-## FIM_IgG4    5.618402e+00  5.143364e-07 -6.775908e-07  3.426492e-07
-## TT_IgG3     5.143364e-07  1.034988e+01  5.384456e-07 -8.621050e-07
-## IPV1_IgG3  -6.775908e-07  5.384456e-07  8.025583e+00 -1.072621e-06
-## ACT_FcgR2a  3.426492e-07 -8.621050e-07 -1.072621e-06  1.364259e+01
-## TT_ADNP     2.558625e-07  9.404346e-08 -3.411979e-08  6.392024e-07
-## FHA_IgG     4.195205e-08 -7.083892e-07 -9.235830e-07 -6.448760e-01
-## PRN_FcgR2a -1.783637e-07  8.712618e-07  2.663498e-07  4.483083e-07
-## IPV3_ADCD   2.021982e-08  9.051716e-08  3.013290e-07 -4.242551e-07
-## IPV1_IgG4   8.830087e-08  1.992214e-07 -1.482656e+00  2.826583e-08
-## PT_FcgR2a  -5.995027e-07  3.457370e-07  7.900392e-07 -6.828356e-07
+## FIM_IgG4    5.652520e+00  5.309597e-07 -6.694077e-07  3.502366e-07
+## TT_IgG3     5.309597e-07  1.038711e+01  5.577358e-07 -8.536158e-07
+## IPV1_IgG3  -6.694077e-07  5.577358e-07  8.007410e+00 -1.086057e-06
+## ACT_FcgR2a  3.502366e-07 -8.536158e-07 -1.086057e-06  1.366720e+01
+## TT_ADNP     2.578329e-07  1.211544e-07 -3.192421e-08  6.113419e-07
+## FHA_IgG     3.738747e-08 -7.267205e-07 -9.273104e-07 -6.716982e-01
+## PRN_FcgR2a -1.708457e-07  8.830231e-07  2.861313e-07  4.498522e-07
+## IPV3_ADCD   1.828331e-08  8.977705e-08  3.068817e-07 -4.202172e-07
+## IPV1_IgG4   9.241237e-08  2.042886e-07 -1.474164e+00  3.175573e-08
+## PT_FcgR2a  -5.955609e-07  3.699555e-07  8.234008e-07 -7.203772e-07
 ##                  TT_ADNP       FHA_IgG    PRN_FcgR2a     IPV3_ADCD
-## FIM_IgG4    2.558625e-07  4.195205e-08 -1.783637e-07  2.021982e-08
-## TT_IgG3     9.404346e-08 -7.083892e-07  8.712618e-07  9.051716e-08
-## IPV1_IgG3  -3.411979e-08 -9.235830e-07  2.663498e-07  3.013290e-07
-## ACT_FcgR2a  6.392024e-07 -6.448760e-01  4.483083e-07 -4.242551e-07
-## TT_ADNP     9.396040e+00 -2.639404e-07  5.612023e-07 -3.223799e-07
-## FHA_IgG    -2.639404e-07  9.046664e+00 -6.181640e-07  2.450723e-07
-## PRN_FcgR2a  5.612023e-07 -6.181640e-07  1.170103e+01  5.314506e-07
-## IPV3_ADCD  -3.223799e-07  2.450723e-07  5.314506e-07  2.480581e+01
-## IPV1_IgG4   1.476515e-08 -1.257908e-07 -2.050692e-07  2.029335e-08
-## PT_FcgR2a  -1.008688e-07 -6.593249e-07 -1.453729e-01  7.691003e-07
+## FIM_IgG4    2.578329e-07  3.738747e-08 -1.708457e-07  1.828331e-08
+## TT_IgG3     1.211544e-07 -7.267205e-07  8.830231e-07  8.977705e-08
+## IPV1_IgG3  -3.192421e-08 -9.273104e-07  2.861313e-07  3.068817e-07
+## ACT_FcgR2a  6.113419e-07 -6.716982e-01  4.498522e-07 -4.202172e-07
+## TT_ADNP     9.458140e+00 -2.745160e-07  5.553315e-07 -3.258570e-07
+## FHA_IgG    -2.745160e-07  9.091968e+00 -6.237646e-07  2.434403e-07
+## PRN_FcgR2a  5.553315e-07 -6.237646e-07  1.174624e+01  5.332568e-07
+## IPV3_ADCD  -3.258570e-07  2.434403e-07  5.332568e-07  2.480984e+01
+## IPV1_IgG4   1.857775e-08 -1.237914e-07 -1.994279e-07  1.997738e-08
+## PT_FcgR2a  -1.160432e-07 -6.761811e-07 -1.468585e-01  7.832004e-07
 ##                IPV1_IgG4     PT_FcgR2a
-## FIM_IgG4    8.830087e-08 -5.995027e-07
-## TT_IgG3     1.992214e-07  3.457370e-07
-## IPV1_IgG3  -1.482656e+00  7.900392e-07
-## ACT_FcgR2a  2.826583e-08 -6.828356e-07
-## TT_ADNP     1.476515e-08 -1.008688e-07
-## FHA_IgG    -1.257908e-07 -6.593249e-07
-## PRN_FcgR2a -2.050692e-07 -1.453729e-01
-## IPV3_ADCD   2.029335e-08  7.691003e-07
-## IPV1_IgG4   1.243253e+01  2.092527e-07
-## PT_FcgR2a   2.092527e-07  1.205254e+01</code></pre>
+## FIM_IgG4    9.241237e-08 -5.955609e-07
+## TT_IgG3     2.042886e-07  3.699555e-07
+## IPV1_IgG3  -1.474164e+00  8.234008e-07
+## ACT_FcgR2a  3.175573e-08 -7.203772e-07
+## TT_ADNP     1.857775e-08 -1.160432e-07
+## FHA_IgG    -1.237914e-07 -6.761811e-07
+## PRN_FcgR2a -1.994279e-07 -1.468585e-01
+## IPV3_ADCD   1.997738e-08  7.832004e-07
+## IPV1_IgG4   1.238411e+01  2.110805e-07
+## PT_FcgR2a   2.110805e-07  1.208432e+01</code></pre>
 <pre class="r"><code>dd=unique(fulldata[,c(1,3:7)])
 summary(lm(aa2$tau~infant_arm+delivery_mode+maternal_arm+infant_sex+gestational_age_vaccination,data=dd))</code></pre>
 <pre><code>## 
@@ -748,22 +918,22 @@ summary(lm(aa2$tau~infant_arm+delivery_mode+maternal_arm+infant_sex+gestational_
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.27676 -0.14469 -0.09128  0.02554  2.00233 
+## -0.27861 -0.14388 -0.08709  0.02962  1.48940 
 ## 
 ## Coefficients:
 ##                                Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)                   -0.051300   0.388697  -0.132   0.8951  
-## infant_armwP                   0.068989   0.039207   1.760   0.0798 .
-## delivery_modeVaginal Delivery  0.108275   0.086472   1.252   0.2118  
-## maternal_armTT                 0.011313   0.038977   0.290   0.7719  
-## infant_sexMale                -0.013659   0.039096  -0.349   0.7271  
-## gestational_age_vaccination    0.006102   0.012501   0.488   0.6259  
+## (Intercept)                    0.033864   0.363570   0.093   0.9259  
+## infant_armwP                   0.080689   0.036673   2.200   0.0288 *
+## delivery_modeVaginal Delivery  0.109350   0.080882   1.352   0.1777  
+## maternal_armTT                 0.010095   0.036457   0.277   0.7821  
+## infant_sexMale                -0.016918   0.036569  -0.463   0.6441  
+## gestational_age_vaccination    0.003043   0.011693   0.260   0.7949  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.2994 on 233 degrees of freedom
-## Multiple R-squared:  0.01863,    Adjusted R-squared:  -0.002434 
-## F-statistic: 0.8844 on 5 and 233 DF,  p-value: 0.4922</code></pre>
+## Residual standard error: 0.28 on 233 degrees of freedom
+## Multiple R-squared:  0.02588,    Adjusted R-squared:  0.004981 
+## F-statistic: 1.238 on 5 and 233 DF,  p-value: 0.2919</code></pre>
 </div>
 </div>
 

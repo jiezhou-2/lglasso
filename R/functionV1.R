@@ -280,7 +280,7 @@ if (m==1){
 #'    from different tissues or contents, model \code{general} should be adopted.
 #'
 #'
-lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=30,
+lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=1000,maxit=50,
                  tol=10^(-2),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
 
@@ -578,7 +578,7 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
 #' @param ... other arguments
 #' @returns a list of length 4 representing the final outcome
 
-lglassoHeter=function(data,lambda,group,maxit,
+lglassoHeter=function(data,lambda,group,maxit=50,
                       tol=10^(-3),trace=FALSE,start=c("warm","cold"),
                       w.init=NULL, wi.init=NULL, N,expFix=1,...)
 
