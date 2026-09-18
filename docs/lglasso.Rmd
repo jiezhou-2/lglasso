@@ -20,16 +20,13 @@ knitr::opts_chunk$set(
 
 
 
-```{r setup, message=FALSE,warning=FALSE,echo=FALSE}
-#library(lglasso)
+```{r setup, message=FALSE}
 library(devtools)
 library(forcats)
 library(fake)
 library(igraph)
 library(Matrix)
 library(lglasso)
-#library(lglasso)
-#load_all()
 source("../scripts/simulations.R")
 ```
 
@@ -37,15 +34,15 @@ source("../scripts/simulations.R")
 
 ```{r, message=FALSE}
 # number of nodes
-p=40
+p=20
 # number of edge in general network
-m1=70
+m1=100
 # the difference between the number of edges in individual networks and general network
 m2=20
 # number of subjects
 n=60
 
-
+set.seed(1)
 ```
 
 
@@ -54,71 +51,65 @@ n=60
 
 ### Estimate the network based on homogeneous one-stage model
 
-#### Generate data 
+#### data 
 
 
 ```{r,warning=FALSE}
 
-set.seed(1)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
 ddata=dd$data
-subjects=fct_inorder(ddata$subject)
-group=rep(0,nrow(ddata))
-homoData=list(data=ddata)
-#saveRDS(homoData,file="homoOneStageData.rds")
+dim(ddata)
+ddata[1:2,1:5]
 ```
+
 
 
 
 #### Estimation
 
 ```{r,warning=FALSE}
-set.seed(1)
 aa=lglasso(data=ddata,lambda = 0.01,trace=T)
-#saveRDS(aa,file="homoOneStageResult.rds")
 ## estimated network 
-estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+## estimated network
 estimates
 ## true network 
 dd$network
 
 ## correlation parameter
 aa$tau
+## likelihood
 aa$ll
 ```
 
 
 ### Estimate the network based on heterogeneous one-stage model
 
-#### Generate data 
+#### data 
 
 ```{r,warning=FALSE}
-set.seed(1)
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group=1)
+dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
 ddata=dd$data$pre
-subjects=fct_inorder(ddata$subject)
-heterData=list(data=ddata)
-saveRDS(heterData,file="heterOneStageData.rds")
+dim(ddata)
+ddata[1:2,1:5]
 ```
+
 
 #### Estimation
 
 ```{r,warning=FALSE}
-set.seed(1)
-aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T)
-saveRDS(aa,file="heterOneStageResult.rds")
-## estimated network  
-
-estimates=lapply(aa$wi$wiList,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T,N=100)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+## estimated network
 estimates
 ##  true network
 dd$network
+## likelihood
 aa$ll
 ## correlation parameter
  model <- lm(dd$tau ~ aa$tau)
 plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
 abline(model, col = "red", lwd = 2)
-summary(model)
 ```
 
 
@@ -131,37 +122,37 @@ summary(model)
 #### Generate data 
 
 ```{r,warning=FALSE}
-set.seed(1)
 dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=2)
 ddata=do.call(rbind,dd$data)
-subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
-homoTwoStageData=list(data=ddata,group=group)
-saveRDS(homoTwoStageData,file="homoTwoStageData.rds")
+dim(ddata)
+ddata[1:2,1:5]
 ```
+
 
 #### Estimation
 
 ```{r,warning=FALSE}
-set.seed(1)
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),group = group,trace=T)
-saveRDS(aa,file="homoTwoStageResult.rds")
-estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=T)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 
-## pre-treatment network estimate 
+## estimated pre-treatment  network  
 estimates[[1]]
 
-##  true post-treatment network
+##  true pre-treatment network
 dd$network$pre
-aa$ll
 
-## post-treatment network estimate 
+
+## estimated post-treatment  network 
 estimates[[2]]
 
 ##  true post-treatment network
 dd$network$post
 ## correlation parameters
 aa$tau
+
+## likelihood
+aa$ll
 ```
 
 
@@ -171,42 +162,40 @@ aa$tau
 #### Generate data 
 
 ```{r,warning=FALSE}
-set.seed(1)
 dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
 ddata=do.call(rbind,dd$data)
-subjects=fct_inorder(ddata$subject)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
-heterTwoStageData=list(data=ddata,group=group)
-saveRDS(heterTwoStageData,file="heterTwoStageData.rds")
+dim(ddata)
+ddata[1:2,1:5]
 ```
 
 
 #### Estimation
 
 ```{r,warning=FALSE}
-set.seed(1)
-aa=lglasso(data=ddata,lambda = c(0.1,0.1),random=T,group = group,trace=T)
-saveRDS(aa,file="heterTwoStageResult.rds")
-estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-3),1,0)})
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=T,group = group,trace=T,N=100)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 
-## pre-treatment network estimate 
+## estimated pre-treatment network  
 estimates[[1]]
 
 ##  true pre-treatment network
 dd$network$pre
 
-aa$ll
-## post-treatment network estimate 
+
+## estimated post-treatment network  
 estimates[[2]]
 
 ##  true post-treatment network
 dd$network$post
 
+## likelihood
+aa$ll
+
 ## correlation parameters
  model <- lm(dd$tau ~ aa$tau)
 plot(aa$tau,dd$tau,xlab = "estimated tau",ylab="true tau")
 abline(model, col = "red", lwd = 2)
-summary(model)$coef
 ```
 
 

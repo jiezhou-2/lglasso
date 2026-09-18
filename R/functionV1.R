@@ -280,10 +280,9 @@ if (m==1){
 #'    from different tissues or contents, model \code{general} should be adopted.
 #'
 #'
-lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=1000,maxit=50,
+lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=50,
                  tol=10^(-2),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
-
   {
   p=ncol(data)-2
   X_bar = apply(data[,-c(1,2)], 2, mean)

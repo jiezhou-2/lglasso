@@ -5,7 +5,7 @@ date: "2025-07-10"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE,echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(matrixcalc)
 library(RCy3)
@@ -15,7 +15,6 @@ library(tidyr)
 library(devtools)
 load_all()
 load("/Users/f003r0s/Desktop/Anne_lab_projects/lglassoProject/data/b_set.Rdata")
-#load("/Users/f003r0s/Desktop/Anne_lab_projects/lglassoProject/data/a_set.Rdata")
 variables=c("subject_accession","visit_name","feature","value_reported","infant_arm","delivery_mode","arm_name")
 data=data_extra[,variables]
 set.seed(1)
@@ -24,7 +23,7 @@ set.seed(1)
 ## data
 
 
-```{r}
+```{r,echo=FALSE}
  wideData=reshape(data=data,idvar =  c("subject_accession","visit_name","infant_arm","delivery_mode","arm_name"),
                   timevar = "feature", direction = "wide")
 
