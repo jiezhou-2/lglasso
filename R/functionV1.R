@@ -4,7 +4,7 @@
 #' @param t a vector specify the time points corresponding to the data
 #' @param tau the damping rate parameter with length 1 or 2
 #' @param expFix a scalar specifying the form of correlation function
-#'
+#' @noRd
 #' @returns a square matrix used to construct the likelihood
 #'
 
@@ -35,9 +35,10 @@ phifunction=function(t,tau,expFix=1){
 #' @param tol the minimum difference of algorithm convergence
 #' @param lower vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
 #' @param upper vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
+#' @noRd
 #' @returns a list of matrices
 
-AA=function(B,data,expFix=1,maxit=30,
+AA=function(B,data,expFix=1,maxit=50,
             tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5)){
   ### clustered data
 if (!is.list(B)){
@@ -95,10 +96,11 @@ if (is.data.frame(data)){
 #'
 #' @param A a list of length 1 or 2 corresponding to the number of stages. The each entry of A is a
 #'  list representing all phi matrices before or after the treatment.
-#' @param data a list of (p+2)-by-ni data frame
+#' @param data a list of (p+2)-by-n_i data frame
 #' @param lambda given tuning parameter(s)
 #' @param random logical variable indicating the type of the model
 #' @param tau scalar if *random* is FALSE and a vector if *random* is TRUE
+#' @noRd
 #' @returns a list with the same length as A
 
 BB=function(A,data,lambda,random=FALSE,tau){
@@ -414,6 +416,7 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=
 #' @param alpha the  rate in exponential distribution
 #' @param groupi the data point indices
 #' @param expFix a scalar specifying the form of the correlation function
+#' @noRd
 #' @returns a numeric standing for the likelihood for a given subject
 
 conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
@@ -456,6 +459,7 @@ conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
 #' @param alpha the exponential distribution with rate alpha
 #' @param groupi specify how datai is grouped
 #' @param expFix a scalar specifying the form of the correlation function
+#' @noRd
 #' @returns a data frame for samples and their weights
 
 importanceSample=function(n,datai,wi,alpha,groupi,expFix=1){
@@ -479,6 +483,7 @@ if (length(index)==0){stop("No valid samples are generated!")}
 #' @param datai the data for subject i
 #' @param groupi specify how datai is grouped
 #' @param expFix a scalar specifying the form of the correlation function
+#' @noRd
 #' @returns a list of estimated
 
 importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
@@ -510,6 +515,7 @@ importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
 #' @param l number of random samples in importance sampling
 #' @param expFix a scalar specifying the the form of the correlation function.
 #' @param ... other arguments used in the downstream analysis
+#' @noRd
 #' @returns a list for estimates of tau and AA
 AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
   data[,1]=as.character(data[,1])
@@ -575,6 +581,7 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
 #' @param N the number of sampling for heterogeneous model
 #' @param expFix a scalar specifying the form of the correlation function.
 #' @param ... other arguments
+#' @noRd
 #' @returns a list of length 4 representing the final outcome
 
 lglassoHeter=function(data,lambda,group,maxit=50,
@@ -656,7 +663,7 @@ names(B)=glev
 }
 
 
-
+#' @noRd
 cvErrorji=function(data.train,data.valid,bi){
   if (any(! bi %in% c(0,1,2))) {stop("entries of vector bi should be 0,  1 or 2!")}
   i=which(bi==2)
@@ -688,6 +695,7 @@ cvErrorji=function(data.train,data.valid,bi){
 
 }
 
+#' @noRd
 cvErrorj=function(data.train,data.valid,B){
     a= mean(apply(B, 2, function(bi) cvErrorji(data.train=data.train,data.valid=data.valid,bi=bi)))
 }
@@ -702,7 +710,7 @@ cvErrorj=function(data.train,data.valid,B){
 #' @param B given network (or network list)
 #' @param group.train group in training data
 #' @param group.valid group in testing data
-#'
+#' @noRd
 #' @returns a matrix
 #'
 cvError=function(data.train,data.valid,B,group.train=NULL,group.valid=NULL){
@@ -873,6 +881,7 @@ CVlglasso=function(data,group=NULL,random=FALSE,
 #' @param random a logical variable specifying the type of the model
 #' @param NN a integer specifying the number of the sampling
 #' @returns list
+#' @noRd
 #' @import parallel foreach doParallel
 
 cvlglassofull=function(data,group=NULL,

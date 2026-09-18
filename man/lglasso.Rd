@@ -11,7 +11,7 @@ lglasso(
   random = FALSE,
   expFix = 1,
   N = 100,
-  maxit = 30,
+  maxit = 50,
   tol = 10^(-2),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
