@@ -22,14 +22,14 @@ In section 3 and 4, we apply the model to a real antibody titer data from a larg
 
 
 
-### Simulation
+### Simulation examples
 
 [1. lglasso examples](lglasso.html)
 
 
 [2. CVlglasso examples](CVlglasso.html)
 
-### Real data
+### A Real data example
 
 [3.lglasso examples](realDatab.html)
 
