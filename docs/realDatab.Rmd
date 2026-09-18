@@ -5,7 +5,7 @@ date: "2025-07-10"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE,echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(matrixcalc)
 library(RCy3)
@@ -17,7 +17,7 @@ library(devtools)
 library(igraph)
 load_all()
 load("/Users/f003r0s/Desktop/Anne_lab_projects/lglassoProject/data/b_set.Rdata")
-variables=c("subject_accession","visit_name","feature","value_reported","infant_arm","delivery_mode","arm_name")
+variables=c("subject_accession","visit_name","feature","value_reported","infant_arm","delivery_mode","maternal_arm","gestational_age_vaccination","infant_sex")
 data=data_extra[,variables]
 set.seed(1)
 ```
@@ -25,8 +25,8 @@ set.seed(1)
 ## data
 
 
-```{r}
- wideData=reshape(data=data,idvar =  c("subject_accession","visit_name","infant_arm","delivery_mode","arm_name"),
+```{r,echo=FALSE}
+ wideData=reshape(data=data,idvar =  c("subject_accession","visit_name","infant_arm","delivery_mode","maternal_arm","infant_sex","gestational_age_vaccination"),
                   timevar = "feature", direction = "wide")
 
 #wideData=wideData[,-c(3:5)]
@@ -39,15 +39,17 @@ wideData=wideData[order(wideData$subject_accession,wideData$visit_name),]
 index=which(is.na(wideData),arr.ind = T)
 aa=as.numeric(names(which(table(index[,2])>0.1*nrow(wideData))))
 fulldata=wideData[,-aa]
-fulldata[78,4]="Vaginal Delivery"
-fulldata[is.na(fulldata)]<- 0
+dd=fulldata[,-c(1:7)]
+dd[is.na(dd)]<-0
+fulldata[,-c(1:7)]=dd
+fulldata=fulldata[-78,]
 index1=which(fulldata$visit_name==2)
 index2=which(fulldata$visit_name!=2)
-abundancePre=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index1,-c(1:5)], 2, mean))
-abundancePost=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index2,-c(1:5)], 2, mean))
-write.csv(abundancePre,file = "abundancePre.CSV")
-write.csv(abundancePost,file = "abundancePost.CSV")
-fulldata[,-c(1:5)]=log10(1+fulldata[,-c(1:5)])
+# abundancePre=data.frame(antibody=substr(colnames(fulldata),                         16,length(colnames(fulldata)))[-c(1:7)],abundance=apply(fulldata[index1,-c(1:5)], 2, mean))
+# abundancePost=data.frame(antibody=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)],abundance=apply(fulldata[index2,-c(1:7)], 2, mean))
+# write.csv(abundancePre,file = "abundancePre.CSV")
+# write.csv(abundancePost,file = "abundancePost.CSV")
+fulldata[,-c(1:7)]=log10(1+fulldata[,-c(1:7)])
  # index=which(fulldata$subject_accession==23)
  # fulldata=fulldata[-index,]
 
@@ -55,13 +57,20 @@ ddd=c()
 for (i in c(2,4,5,9)) {
   index=which(fulldata$visit_name==i)
   dd=fulldata[index,]
-  dd[,-c(1:5)]=scale(dd[,-c(1:5)],center = TRUE,scale = FALSE)
+  dd[,-c(1:7)]=scale(dd[,-c(1:7)],center = TRUE,scale = FALSE)
   ddd=rbind(ddd,dd)
 }
 fulldata=ddd[order(ddd$subject_accession,ddd$visit_name),]
-antibodyName=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:5)]
-colnames(fulldata)[-c(1:5)]=antibodyName
+antibodyName=substr(colnames(fulldata),16,length(colnames(fulldata)))[-c(1:7)]
+colnames(fulldata)[-c(1:7)]=antibodyName
 ```
+
+```{r}
+dim(fulldata)
+fulldata[1:5,1:8]
+colnames(fulldata)
+```
+
 
 ## homogeneous subjects
 
@@ -70,13 +79,13 @@ colnames(fulldata)[-c(1:5)]=antibodyName
 ```{r}
 index=which(fulldata$visit_name==2)
 postdata=fulldata[-index,]
-aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.004961126,random = FALSE,trace = T,tol = 0.01)
+aa1=lglasso(data=postdata[,-c(3:7)],lambda = 0.004961126,random = FALSE,trace = T,tol = 0.01)
 aa1$wi[[1]][1:10,1:10]
 aa1$tau
 
 ```
 
-```{r}
+```{r,echo=FALSE}
 adjMatrix=ifelse(abs(aa1$wi[[1]])<10^(-5),0,1)
 gg=graph_from_adjacency_matrix(
 adjmatrix =  adjMatrix,
@@ -95,11 +104,11 @@ saveRDS(edgeListHomo1,file="edgeListHomo1.rds")
 
 ```{r,eval=FALSE,echo=FALSE}
 group=ifelse(fulldata$visit_name==2,1,2)
-data=fulldata[,-c(3:5)]
+data=fulldata[,-c(3:7)]
 index=which(group==2)
 dd=data[index,]
 tt=split(dd[,2],f=dd[,1])
-aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.005,1),group = group,random = FALSE,trace = T,tol=0.01)
+aa2=lglasso(data=fulldata[,-c(3:7)],lambda = c(0.005,1),group = group,random = FALSE,trace = T,tol=0.01)
 aa2$wi[[1]][1:10,1:10]
 aa2$wi[[2]][1:10,1:10]
 aa2$tau
@@ -112,23 +121,19 @@ aa2$tau
 
 ```{r, warning=FALSE,message=FALSE}
 load_all()
-aa1=lglasso(data=postdata[,-c(3:5)],lambda = 0.005670864,random = TRUE,trace = T)
+aa1=lglasso(data=postdata[,-c(3:7)],lambda = 0.005670864,random = TRUE,trace = T)
 aa1$wi[[1]][1:10,1:10]
-aa1$tau
+aa1$tau[1:10]
 aa1$alpha
 ```
 
 ```{r}
-dd=unique(postdata[,c(1,3:5)])
-boxplot(aa1$tau~dd$infant_arm)
-summary(lm(aa1$tau~dd$infant_arm))
-boxplot(aa1$tau~dd$delivery_mode)
-summary(lm(aa1$tau~dd$delivery_mode))
-boxplot(aa1$tau~dd$arm_name)
-summary(lm(aa1$tau~dd$arm_name))
+dd=unique(postdata[,c(1,3:7)])
+summary(lm(aa1$tau~infant_arm+delivery_mode+maternal_arm+infant_sex+gestational_age_vaccination,data=dd))
+
 ```
 
-```{r}
+```{r,echo=FALSE}
 adjMatrix=ifelse(abs(aa1$wi[[1]])<10^(-5),0,1)
 gg=graph_from_adjacency_matrix(
 adjmatrix =  adjMatrix,
@@ -147,21 +152,18 @@ saveRDS(edgeListHeter1,file="edgeListHeter1.rds")
 
 ```{r}
 group=ifelse(fulldata$visit_name==2,1,2)
-aa2=lglasso(data=fulldata[,-c(3:5)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T,tol = 0.01)
+aa2=lglasso(data=fulldata[,-c(3:7)],lambda = c(0.01174363,0.329193),group = group,random = TRUE,trace = T,tol = 0.01)
 aa2$wi[[1]][1:10,1:10]
 aa2$wi[[2]][1:10,1:10]
 ```
 
 ```{r}
-dd=unique(fulldata[,c(1,3:5)])
-boxplot(aa2$tau~dd$infant_arm)
-summary(lm(aa2$tau~dd$infant_arm))
-boxplot(aa2$tau~dd$delivery_mode)
-summary(lm(aa2$tau~dd$delivery_mode))
-boxplot(aa2$tau~dd$arm_name)
-summary(lm(aa2$tau~dd$arm_name))
+dd=unique(fulldata[,c(1,3:7)])
+summary(lm(aa2$tau~infant_arm+delivery_mode+maternal_arm+infant_sex+gestational_age_vaccination,data=dd))
 ```
-```{r}
+
+
+```{r,echo=FALSE}
 adjMatrix1=ifelse(abs(aa2$wi[[1]])<10^(-5),0,1)
 adjMatrix2=ifelse(abs(aa2$wi[[2]])<10^(-5),0,1)
 write.csv(adjMatrix1,file = "adjMatrixPre.CSV")
