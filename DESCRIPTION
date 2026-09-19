@@ -2,12 +2,10 @@ Package: lglasso
 Type: Package
 Title: Longitudinal Graphical Lasso
 Version: 2.0.0
-Description: For high-dimensional longitudinal data (such as omics data in biology), 
-             the package *lglasso* implements the  $L_1$ penalized maximum likelihood 
+Description: Based on high-dimensional longitudinal data, 
+             *lglasso* implements the  $L_1$ penalized maximum likelihood 
             estimation of the precision matrices and the corresponding correlation parameters. 
-            In practise, these sparse presicsion matrices are often named 
-            as networks which reflect the dependences between different nodes (features).
-            Currently, *lglasso* can  estimate a single network (i.e., one-stage model) 
+            *lglasso* can  estimate a single network (i.e., one-stage model) 
             or two networks (i.e., two-stage model). For the details of the algorithms, please refer to the paper Jie Zhou et al. 
             Identifying Microbial Interaction Networks Based on Irregularly Spaced 
             Longitudinal 16S rRNA Sequence Data 
