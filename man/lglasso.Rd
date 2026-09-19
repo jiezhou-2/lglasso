@@ -15,7 +15,6 @@ lglasso(
   tol = 10^(-2),
   lower = c(0.01, 0.1),
   upper = c(10, 5),
-  start = c("cold", "warm"),
   w.init = NULL,
   wi.init = NULL,
   trace = FALSE,
@@ -45,8 +44,6 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 \item{lower}{vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix}
 
 \item{upper}{vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix}
-
-\item{start}{how to start the initial values for lglasso algorithm}
 
 \item{w.init}{initial value for covariance matrix}
 
@@ -80,10 +77,14 @@ e.g, metabolites in different tissues of a same subject.  .
 or more broadly, clustered data for given tuning parameters.
 }
 \details{
-This function implements three statistical models for  network inference,
-according to how the correlations is specified between time points (or tissues or
-contents in some clinical studies). These three models are referred as
-\code{general}, \code{expFixed}.Let's say we have
+This function is the main function of the package. It is
+designed to identify networks from longitudinal data.
+It implements two network identification models, \emph{i.e.,} one-stage (two-stage) model.
+One-stage model assume a common network underlying
+the longitudinal data for all the subjects. Consequently,
+\emph{lglasso} only outputs a single network as the estimate.
+Two-stage model assume a change time point \emph{t_i} that occurs for subject \emph{i(1<= i <= m)}.
+The networks before and after \emph{t_i} are different.  Let's say we have
 two time points,t_i,t_j, then in model \code{general}, the correlation is
 tau_ij, while in model \emph{expFixed}, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
 with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},

@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 
 
-```{r setup, message=FALSE}
+```{r setup, message=FALSE,echo=FALSE}
 library(devtools)
 library(forcats)
 library(fake)
@@ -40,7 +40,7 @@ m1=100
 # the difference between the number of edges in individual networks and general network
 m2=20
 # number of subjects
-n=60
+n=100
 
 set.seed(1)
 ```
@@ -122,7 +122,7 @@ abline(model, col = "red", lwd = 2)
 #### Generate data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=2)
+dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
 ddata=do.call(rbind,dd$data)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)

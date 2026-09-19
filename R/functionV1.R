@@ -245,7 +245,6 @@ if (m==1){
 #' @param tol the minimum value for  convergence criterion
 #' @param lower  vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
 #' @param upper  vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
-#' @param start how to start the initial values for lglasso algorithm
 #' @param w.init initial value for covariance matrix
 #' @param wi.init inital value for precision matrix
 #' @param trace whether or not show the progress of the computation
@@ -270,10 +269,14 @@ if (m==1){
 #'
 #' \code{tauhat} the correlation parameters for longitudinal data
 #'
-#' @details This function implements three statistical models for  network inference,
-#' according to how the correlations is specified between time points (or tissues or
-#' contents in some clinical studies). These three models are referred as
-#'  \code{general}, \code{expFixed}.Let's say we have
+#' @details This function is the main function of the package. It is
+#' designed to identify networks from longitudinal data.
+#' It implements two network identification models, *i.e.,* one-stage (two-stage) model.
+#'  One-stage model assume a common network underlying
+#'   the longitudinal data for all the subjects. Consequently,
+#'   *lglasso* only outputs a single network as the estimate.
+#'   Two-stage model assume a change time point *t_i* that occurs for subject *i(1<= i <= m)*.
+#'   The networks before and after *t_i* are different.  Let's say we have
 #'  two time points,t_i,t_j, then in model \code{general}, the correlation is
 #'   tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
 #'   with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
@@ -283,7 +286,7 @@ if (m==1){
 #'
 #'
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=50,
-                 tol=10^(-2),lower=c(0.01,0.1),upper=c(10,5), start=c("cold","warm"),
+                 tol=10^(-2),lower=c(0.01,0.1),upper=c(10,5),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
   {
   p=ncol(data)-2
@@ -319,7 +322,7 @@ if (is.null(group))  {
     stop("Tuning parameter lambda must be positive!")
   }
 
-  start=match.arg(start)
+
   # Create a mask matrix
   mask <- matrix(1, p, p)
   diag(mask) <- 0
@@ -402,8 +405,8 @@ if (k>=maxit){
       stop("lambda must be positive!")
     }
 
-output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,N=N,group=group,maxit=maxit,
-                   tol=tol,trace=trace)
+output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,
+                    N=N,group=group,maxit=maxit,trace=trace)
   }
   return(output)
 }
@@ -575,7 +578,6 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
 #' @param maxit the maximum number of the iterations
 #' @param tol the lower bound which determine when the algorithm is thought to reach  convergence.
 #' @param trace  a logical variable specifying how the output is displayed on the screen
-#' @param start a binary variable specifying how the initial value of the algorithm is chosen.
 #' @param w.init the initial value for the covariance matrix
 #' @param wi.init the initial value for the precision matrix
 #' @param N the number of sampling for heterogeneous model
@@ -585,7 +587,7 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
 #' @returns a list of length 4 representing the final outcome
 
 lglassoHeter=function(data,lambda,group,maxit=50,
-                      tol=10^(-3),trace=FALSE,start=c("warm","cold"),
+                      tol=5*10^(-2),trace=FALSE,
                       w.init=NULL, wi.init=NULL, N,expFix=1,...)
 
 {
@@ -932,7 +934,6 @@ N=ifelse(is.vector(lambda),K*length(lambda),K*nrow(lambda))
 
   S = (nrow(X) - 1)/nrow(X) * stats::cov(X)
   # crit.cv = match.arg(crit.cv)
-  # start = match.arg(start)
 
   Sminus = S
   diag(Sminus) = 0
