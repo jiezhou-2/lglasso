@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# lglasso: graphical lasso for longitudonal data
+# lglasso: graphical lasso for longitudinal data
 
 <!-- badges: start -->
 

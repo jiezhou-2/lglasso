@@ -234,28 +234,33 @@ if (m==1){
 #'  or more broadly, clustered data for given tuning parameters.
 #'
 #'
-#' @param data a \code{n} by \code{(p+2)} data frame in which the first column is subject ID, the second column is
-#' the time point for longitudinal data or tissue ID.
-#' @param lambda   vector of length 1 or 2,  which
-#' is the tuning parameter for the identification of the networks. For details, see the explanations in the below.
-#' @param expFix  numeric number used in the model specification
-#' @param group  vector  of length \code{n} if supplied which specify which data
-#'  points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.
-#' @param maxit the maximum iterations for the estimation.
-#' @param tol the minimum value for  convergence criterion
-#' @param lower  vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
-#' @param upper  vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
+#' @param data \code{n} by \code{(p+2)} data frame in which the first column is for subject IDs, the second column is
+#' for the time points of longitudinal data.
+#' @param lambda   numerical vector of tuning parameters,controlling the
+#' sparsity of the networks. For one-stage model, *lambda* is a scalar. For two-stage model,
+#' *lambda* is a vector of length 2.  For details, see the explanations in the below.
+#' @param group  factor  of length \code{n} if supplied. It indicates each data
+#'  point either before or after the treatment (exposure). Default is a single-level factor,
+#'  which corresponds to the one-stage model. For two-stage model, *group* is a two-level factor.
+#'  where the two levels correspond to the two stage.
+#' @param random a logical variable. If TRUE, then a heterogeneous model is estimated.
+#' Otherwise, a homogeneous model is estimated.
+#' @param expFix  numerical number to specify the form of the covariance function of the longitudinal data.
+#' @param maxit integer of  the maximum iterations for the algorithms.
+#' @param tol  value for determining if the algorithms have converged.
+#' @param lower  vector of length 1 or 2 which specifies the lower bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix
+#' @param upper  vector of length 1 or 2 which specifies the upper bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix
 #' @param w.init initial value for covariance matrix
 #' @param wi.init inital value for precision matrix
 #' @param trace whether or not show the progress of the computation
 #' @param N a integer specifying the number of sampling for heterogeneous model
-#' @param random a logical variable specifying the type of the model
+
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
 #' @return list which include following components:
 #'
-#' \code{w} the general covariance matrix estimate;
+#' \code{w} the estimates of covariance matrices
 #'
 #' \code{wList} list representing the individual covariance matrix estimate;
 #'

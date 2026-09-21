@@ -22,11 +22,12 @@ lglasso(
 )
 }
 \arguments{
-\item{data}{a \code{n} by \code{(p+2)} data frame in which the first column is subject ID, the second column is
-the time point for longitudinal data or tissue ID.}
+\item{data}{\code{n} by \code{(p+2)} data frame in which the first column is for subject IDs, the second column is
+for the time points of longitudinal data.}
 
-\item{lambda}{vector of length 1 or 2,  which
-is the tuning parameter for the identification of the networks. For details, see the explanations in the below.}
+\item{lambda}{numerical vector of tuning parameters,controlling the
+sparsity of the networks. For one-stage model, \emph{lambda} is a scalar. For two-stage model,
+\emph{lambda} is a vector of length 2.  For details, see the explanations in the below.}
 
 \item{group}{vector  of length \code{n} if supplied which specify which data
 points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.}
