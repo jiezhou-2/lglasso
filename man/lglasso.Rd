@@ -13,8 +13,8 @@ lglasso(
   N = 100,
   maxit = 50,
   tol = 10^(-2),
-  lower = c(0.01, 0.1),
-  upper = c(10, 5),
+  lower = c(0.01, 0.01),
+  upper = c(10, 10),
   w.init = NULL,
   wi.init = NULL,
   trace = FALSE,
@@ -29,22 +29,25 @@ for the time points of longitudinal data.}
 sparsity of the networks. For one-stage model, \emph{lambda} is a scalar. For two-stage model,
 \emph{lambda} is a vector of length 2.  For details, see the explanations in the below.}
 
-\item{group}{vector  of length \code{n} if supplied which specify which data
-points need to be grouped together to infer the heterogeneous networks for, e.g, pre/post vaccination.}
+\item{group}{factor  of length \code{n} if supplied. It indicates each data
+point either before or after the treatment (exposure). Default is a single-level factor,
+which corresponds to the one-stage model. For two-stage model, \emph{group} is a two-level factor.
+where the two levels correspond to the two stage.}
 
-\item{random}{a logical variable specifying the type of the model}
+\item{random}{a logical variable. If TRUE, then a heterogeneous model is estimated.
+Otherwise, a homogeneous model is estimated.}
 
-\item{expFix}{numeric number used in the model specification}
+\item{expFix}{numerical number to specify the form of the covariance function of the longitudinal data.}
 
 \item{N}{a integer specifying the number of sampling for heterogeneous model}
 
-\item{maxit}{the maximum iterations for the estimation.}
+\item{maxit}{integer of  the maximum iterations for the algorithms.}
 
-\item{tol}{the minimum value for  convergence criterion}
+\item{tol}{value for determining if the algorithms have converged.}
 
-\item{lower}{vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix}
+\item{lower}{vector of length 1 or 2 which specifies the lower bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix}
 
-\item{upper}{vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix}
+\item{upper}{vector of length 1 or 2 which specifies the upper bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix}
 
 \item{w.init}{initial value for covariance matrix}
 
@@ -57,39 +60,134 @@ points need to be grouped together to infer the heterogeneous networks for, e.g,
 \value{
 list which include following components:
 
-\code{w} the general covariance matrix estimate;
+\code{w} the list of the estimates for covariance matrices
 
-\code{wList} list representing the individual covariance matrix estimate;
+\code{wi} the list of the estimates for precision matrices
 
-\code{wi} the general precision matrix estimate;
+\code{tau} the estimate of dampening rate \emph{tau}
 
-\code{wiList} list representing the individual precision matrix estimate;
+\code{alpha} the parameter in exponential distribution of \emph{tau} for heterogeneous models
 
-\code{v} the correlation matrix between specified classes;
-
-\code{vList} list representing the individual correlation matrix;
-
-\code{tauhat} the correlation parameters for longitudinal data
+\code{ll} the likelihood for current parameter estimates
 }
 \description{
-This is the main function of the package, which identifies the underlying  network model from clustered data. Here
-clustered data include longitudinal data, or spatially correlated data,
-e.g, metabolites in different tissues of a same subject.  .
-or more broadly, clustered data for given tuning parameters.
+This is the main function of the package which estimates the underlying precision matrices(networks) from longitudinal
+high-dimensional data under normality assumption.
 }
 \details{
-This function is the main function of the package. It is
-designed to identify networks from longitudinal data.
-It implements two network identification models, \emph{i.e.,} one-stage (two-stage) model.
+\emph{lglasso} is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
+It is based on the models in Zhou \emph{et al} (2024).
+Currently, it contains two network identification models,
+\emph{i.e.,} one-stage  and two-stage model.
 One-stage model assume a common network underlying
 the longitudinal data for all the subjects. Consequently,
 \emph{lglasso} only outputs a single network as the estimate.
-Two-stage model assume a change time point \emph{t_i} that occurs for subject \emph{i(1<= i <= m)}.
-The networks before and after \emph{t_i} are different.  Let's say we have
-two time points,t_i,t_j, then in model \code{general}, the correlation is
-tau_ij, while in model \emph{expFixed}, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
-with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
-both alpha_1 and alpha_2 is unknown and need to be inferred from the data.
-For longitudinal data, model \code{expFixed} is recommended while for omics data
-from different tissues or contents, model \code{general} should be adopted.
+Two-stage model allows that a treatment occurred at time point \emph{t_i}  for subject \emph{i(1<= i <= m)}.
+Therefore, there are two networks, i.e., pre- and post-treatment networks,  that need to be estimated.
+The core idea behind the models in \emph{lglasso} is that the models decompose the covariance matrix
+of longitudinal data into
+temporal and cross-section part, where the model for the temporal part has the form of
+\emph{exp(-|t_1-t_2|^(-tau))}. For details, please check the  paper in the reference.
+}
+\examples{
+library(lglasso)
+library(fake)
+# number of nodes
+p=20
+# number of edge in general network
+m1=100
+# the difference between the number of edges in individual networks and general network
+m2=20
+# number of subjects
+n=100
+set.seed(1)
+## One-stage model
+### Estimate the network based on homogeneous one-stage model
+####simulate data
+dd=lglasso:::Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
+ddata=dd$data
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = 0.01,trace=T)
+#### estimated network
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated network
+estimates
+#### true network
+dd$network
+#### correlation parameter
+aa$tau
+#### likelihood
+aa$ll
+
+
+
+### Estimate the network based on heterogeneous one-stage model
+####simulate data
+dd=lglasso:::Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
+ddata=dd$data$pre
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T,N=100)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated network
+estimates
+####  true network
+dd$network
+#### likelihood
+aa$ll
+
+
+
+## Two-stage model
+### Estimate the networks based on homogeneous two-stage model
+####simulte data
+dd=lglasso:::Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
+ddata=do.call(rbind,dd$data)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=T)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated pre-treatment  network
+estimates[[1]]
+####  true pre-treatment network
+dd$network$pre
+#### estimated post-treatment  network
+estimates[[2]]
+####  true post-treatment network
+dd$network$post
+#### correlation parameters
+aa$tau
+#### likelihood
+aa$ll
+
+
+### Estimate the networks based on hetergeneous two-stage model
+####simulate data
+dd=lglasso:::Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
+ddata=do.call(rbind,dd$data)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=T,group = group,trace=T,N=100)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated pre-treatment network
+estimates[[1]]
+#### true pre-treatment network
+dd$network$pre
+#### estimated post-treatment network
+estimates[[2]]
+####  true post-treatment network
+dd$network$post
+#### likelihood
+aa$ll
+
+
+
+
 }

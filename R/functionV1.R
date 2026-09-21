@@ -198,28 +198,22 @@ if (m==1){
                     -extra/nrow(dd)+log(det(results$wi))-sum(diag(results$wi%*%amatrix[[1]]))/(nrow(dd)),
     -extra/nrow(dd)+log(det(results$wi))-sum(diag(results$wi%*%amatrix[[1]]))/nrow(dd)-2*nn*log(mean(tau))/nrow(dd)
     )
-  #likelihood1=1
 }else{
     prob=CVXR::Problem(CVXR::Minimize(obj))
     result=CVXR::psolve(prob)
     S_est= lapply(B, function(x) result$getValue(x))
     likelihood=-(result$value-sum(abs(mask1*S_est[[1]])+abs(mask1*S_est[[2]]))-sum(mask2*abs(S_est[[1]]-S_est[[2]])))
-    # likelihood1=ifelse(!random,
-    #                   -extra/nrow(data[[1]])+log(det(S_est[[1]]))-sum(diag(S_est[[1]]%*%amatrix[[1]]))/nrow(data[[1]])
-    #                   -extra/nrow(data[[2]])+log(det(S_est[[2]]))-sum(diag(S_est[[2]]%*%amatrix[[2]]))/nrow(data[[2]])
-    #                   ,
-    #                   -extra/nrow(data[[1]])+log(det(S_est[[1]]))-sum(diag(S_est[[1]]%*%amatrix[[1]]))/nrow(data[[1]])
-    #                   -2*nn*log(mean(tau))/nrow(data[[1]])
-    #                   -extra/nrow(data[[2]])+log(det(S_est[[2]]))-sum(diag(S_est[[2]]%*%amatrix[[2]]))/nrow(data[[2]])
-    #                   -2*nn*log(mean(tau))/nrow(data[[2]])
-    #                   )
     for (i in 1:length(S_est)) {
       colnames(S_est[[i]])=featureNames
       rownames(S_est[[i]])=featureNames
     }
 }
     names(S_est)=glev
-    return(list(wiList=S_est,ll=likelihood/2))
+    w=vector("list",length(S_est))
+    for (i in 1:length(w)) {
+      w[[i]]=solve(S_est[[i]])
+    }
+    return(list(wi=S_est,w=w,ll=likelihood/2))
 
 }
 
@@ -228,11 +222,8 @@ if (m==1){
 
 #' @title Longitudinal graphical lasso
 #' @description
-#'  This is the main function of the package, which identifies the underlying  network model from clustered data. Here
-#'  clustered data include longitudinal data, or spatially correlated data,
-#'  e.g, metabolites in different tissues of a same subject.  .
-#'  or more broadly, clustered data for given tuning parameters.
-#'
+#'  This is the main function of the package which estimates the underlying precision matrices(networks) from longitudinal
+#'  high-dimensional data under normality assumption.
 #'
 #' @param data \code{n} by \code{(p+2)} data frame in which the first column is for subject IDs, the second column is
 #' for the time points of longitudinal data.
@@ -258,40 +249,35 @@ if (m==1){
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
+#' @example inst/examples.R
 #' @return list which include following components:
 #'
-#' \code{w} the estimates of covariance matrices
+#' \code{w} the list of the estimates for covariance matrices
 #'
-#' \code{wList} list representing the individual covariance matrix estimate;
+#' \code{wi} the list of the estimates for precision matrices
 #'
-#' \code{wi} the general precision matrix estimate;
+#' \code{tau} the estimate of dampening rate *tau*
 #'
-#' \code{wiList} list representing the individual precision matrix estimate;
+#' \code{alpha} the parameter in exponential distribution of *tau* for heterogeneous models
 #'
-#' \code{v} the correlation matrix between specified classes;
+#'\code{ll} the likelihood for current parameter estimates
 #'
-#' \code{vList} list representing the individual correlation matrix;
-#'
-#' \code{tauhat} the correlation parameters for longitudinal data
-#'
-#' @details This function is the main function of the package. It is
-#' designed to identify networks from longitudinal data.
-#' It implements two network identification models, *i.e.,* one-stage (two-stage) model.
+#' @details *lglasso* is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
+#'  It is based on the models in Zhou *et al* (2024).
+#'  Currently, it contains two network identification models,
+#'   *i.e.,* one-stage  and two-stage model.
 #'  One-stage model assume a common network underlying
 #'   the longitudinal data for all the subjects. Consequently,
 #'   *lglasso* only outputs a single network as the estimate.
-#'   Two-stage model assume a change time point *t_i* that occurs for subject *i(1<= i <= m)*.
-#'   The networks before and after *t_i* are different.  Let's say we have
-#'  two time points,t_i,t_j, then in model \code{general}, the correlation is
-#'   tau_ij, while in model *expFixed*, we have  tau=exp(-alpha_1|t_1-t_2|^(-alpha_2))
-#'   with alpha_2 need to be pre-specified (default is alpha_2=1). In model \code{twoPara},
-#'   both alpha_1 and alpha_2 is unknown and need to be inferred from the data.
-#'    For longitudinal data, model \code{expFixed} is recommended while for omics data
-#'    from different tissues or contents, model \code{general} should be adopted.
-#'
-#'
+#'   Two-stage model allows that a treatment occurred at time point *t_i*  for subject *i(1<= i <= m)*.
+#'  Therefore, there are two networks, i.e., pre- and post-treatment networks,  that need to be estimated.
+
+#'  The core idea behind the models in *lglasso* is that the models decompose the covariance matrix
+#'  of longitudinal data into
+#'  temporal and cross-section part, where the model for the temporal part has the form of
+#'    *exp(-|t_1-t_2|^(-tau))*. For details, please check the  paper in the reference.
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=50,
-                 tol=10^(-2),lower=c(0.01,0.1),upper=c(10,5),
+                 tol=10^(-2),lower=c(0.01,0.01),upper=c(10,10),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
   {
   p=ncol(data)-2
@@ -346,11 +332,7 @@ names(B)=glev
       names(A[[i]])=subjects
       for (j in 1:length(A[[i]])) {
         index=which(dd[,1]==subjects[j])
-        # if (length(index)==0){
-        #   A[[i]][[j]]=NULL
-        # }else{
         A[[i]][[j]]=diag(length(index))
-        #}
       }
       B[[i]]=diag(p)
     }
@@ -364,7 +346,7 @@ B1=BB(data=data,A=A,lambda = lambda,tau=A1$tau)
 d1=c()
 d2=c()
 for (i in 1:length(B1[[1]])) {
-    d1=c(d1,round(max(mask*abs(B[[i]]-B1$wiList[[i]])),3))
+    d1=c(d1,round(max(mask*abs(B[[i]]-B1$wi[[i]])),3))
     d2=c(d2,round(abs(tau0-A1$tau),3))
   }
 if (trace){
@@ -372,17 +354,17 @@ if (trace){
 }
 
 if (max(d1)<=tol && max(d2)<= tol ){
-    output=structure(list(wi=B1$wiList, v=A1$corMatrix, tau=A1$tau,ll=B1$ll), class="lglasso")
+    output=structure(list(wi=B1$wi,w=B1$w, tau=A1$tau,alpha=NA,ll=B1$ll), class="lglasso")
   break
 }else{
   A=A1$corMatrix
-  B=B1$wiList
+  B=B1$wi
   tau0=A1$tau
 }
 
 if (k>=maxit){
   message("Algorithm reached the maximum iteration!")
-  output=structure(list(wi=B1$wiList, v=A1$corMatrix, tau=tau0,ll=B1$ll), class="lglasso")
+  output=structure(list(wi=B1$wi, w=B1$w, tau=tau0,alpha=NA,ll=B1$ll), class="lglasso")
   break
 }
 
@@ -592,7 +574,7 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
 #' @returns a list of length 4 representing the final outcome
 
 lglassoHeter=function(data,lambda,group,maxit=50,
-                      tol=5*10^(-2),trace=FALSE,
+                      tol=10^(-1),trace=FALSE,
                       w.init=NULL, wi.init=NULL, N,expFix=1,...)
 
 {
@@ -643,7 +625,7 @@ names(B)=glev
     d1=c()
     d2=round(abs(alpha0-1/mean(A1$Tau)),3)
     for (i in 1:length(B1[[1]])) {
-      d1=c(d1,round(max(mask*abs(B[[i]]-B1$wiList[[i]])),3))
+      d1=c(d1,round(max(mask*abs(B[[i]]-B1$wi[[i]])),3))
     }
     if (trace){
       print(paste0("alpha estimate: ", alpha0))
@@ -651,18 +633,18 @@ names(B)=glev
     }
 
     if (max(d1)<=tol && d2<= tol ){
-      output=structure(list(wi=B1$wiList, tau=A1$Tau,alpha=1/mean(A1$Tau),ll=B1$ll), class="lglasso")
+      output=structure(list(wi=B1$wi,w=B1$w, tau=A1$Tau,alpha=1/mean(A1$Tau),ll=B1$ll), class="lglasso")
       break
     }else{
       A=A1$AA
-      B=B1$wiList
+      B=B1$wi
       tau0=A1$Tau
       alpha0=1/mean(tau0)
     }
 
     if (k>=maxit){
       message("Algorithm reached the maximum iteration!")
-      output=structure(list(wi=B1$wiList, tau=tau0,alpha=alpha0,ll=B1$ll), class="lglasso")
+      output=structure(list(wi=B1$wi,w=B1$w, tau=tau0,alpha=alpha0,ll=B1$ll), class="lglasso")
       break
     }
   }
@@ -1068,3 +1050,262 @@ crossDataLambda=vector("list",N)
   return(output)
 }
 
+
+
+#' Title
+#'
+#' @param type which type of data you are generating
+#' @param n the number of subjects
+#' @param p the dimension of the normal distribution
+#' @param m1 the number of edges
+#' @param m2 the difference between two networks
+#' @param tt the average length of data for each subject
+#' @param tau the dampening rate in homogeneous models
+#' @param alpha the parameter in exponential distribution
+#' @param group the scalar indicating the number of group
+#' @noRd
+#' @returns a data list
+
+Simulate=function(type=c("longihomo","longiheter"),n=20,p=20,m1=20,
+                  m2=1,tt=5,tau=c(2,1),alpha=2,group){
+
+  type=match.arg(type)
+  if (type=="longihomo"){
+    data=simulate_long(n=n,p=p,m1=m1,m2=m2,tau=tau,tt=tt)
+  }
+
+  if (type=="longiheter"){
+
+    data=simulate_randomTau(n=n, p=p,m1=m1,m2=m2,tt=tt,
+                            alpha=alpha,group = group)
+  }
+
+  return(data)
+}
+
+
+#' Title
+#'
+#' @param n the number of subjects
+#' @param p the dimension of the normal distribution
+#' @param m1 the number of edges
+#' @param tt the average length of data for each subject
+#' @param m2 the average of difference between two networks
+#' @param tau the dampening rate
+#' @noRd
+#' @returns a data frame
+
+simulate_long=function(n,p,m1,tt=5,m2=0,tau){
+  ## true structure
+  timepoint1=vector("list",n)
+  timepoint2=vector("list",n)
+
+  for (i in 1:n) {
+    m3=sample(x=1:tt,1,prob = rep(1,1,tt))
+    if (length(tau)==1){
+      t1=stats::rexp(m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+    }else{
+      t1=stats::rexp(2*m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+      timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
+    }
+  }
+  cc1=lapply(timepoint1,phifunction, tau=tau[1])
+  if (length(tau)==2){
+    cc2=lapply(timepoint2,phifunction, tau=tau[2])
+  }
+  real_stru=matrix(0, nrow = p, ncol = p)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m1, replace = F)
+  real_stru[index[a,]]=1
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
+  real_stru1=real_stru+t(real_stru)+diag(p)
+
+
+  distrubance=matrix(0, nrow = p, ncol = p)
+  distrubance[lower.tri(distrubance,diag = TRUE)]=1
+  index=which(distrubance==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m2, replace = F)
+  distrubance[index[a,]]=1
+  distrubance[lower.tri(distrubance,diag = TRUE)]=0
+  distrubance=distrubance+t(distrubance)+diag(p)
+  real_stru2=(real_stru1+distrubance)%%2
+
+
+  Precision=list()
+  Sigma=list()
+  mmlist=list()
+  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+  theta[lower.tri(theta, diag = TRUE)] = 0
+  theta = theta + t(theta) + diag(p)
+  theta1 = theta * real_stru1
+  theta2 = theta * real_stru2
+  theta1=fake::MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  theta2=fake::MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  #colnames(theta)=paste0("metabolite",1:p)
+  #rownames(theta)=paste0("metabolite",1:p)
+  sigma1=solve(theta1)
+  sigma2=solve(theta2)
+  fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
+  if (length(tau)==2){
+    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma2)
+  }
+  fulldata=c()
+  a1=c()
+  a2=c()
+  for (i in 1:n) {
+    ai=c()
+    m3=nrow(fullCovariance1[[i]])
+    mu=rep(0,m3)
+    data1=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance1[[i]])
+    for (j in 1:(m3/p)) {
+      ai=as.data.frame(rbind(ai,data1[c(((j-1)*p+1) :(j*p))]))
+    }
+    subject=paste0("subject",i)
+    ai=cbind(subject,timepoint1[[i]],ai)
+    a1=rbind(a1,ai)
+  }
+  colnames(a1)[2]="time"
+  featureName1=colnames(a1)[-c(1,2)]
+  colnames(real_stru1)=featureName1
+  rownames(real_stru1)=featureName1
+  colnames(real_stru2)=featureName1
+  rownames(real_stru2)=featureName1
+  if (length(tau)==2){
+    for (i in 1:n) {
+      ai=c()
+      m3=nrow(fullCovariance2[[i]])
+      mu=rep(0,m3)
+      data2=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance2[[i]])
+      for (j in 1:(m3/p)) {
+        ai=as.data.frame(rbind(ai,data2[c(((j-1)*p+1) :(j*p))]))
+      }
+
+      subject=paste0("subject",i)
+      ai=cbind(subject,timepoint2[[i]],ai)
+      a2=rbind(a2,ai)
+    }
+    colnames(a2)[2]="time"
+    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=tau))
+  }
+
+  return(list(data=a1,network=real_stru1,tau=tau))
+}
+
+
+
+#' Title
+#'
+#' @param n the number of subjects
+#' @param p the dimension of the normal distribution
+#' @param m1 the number of edges
+#' @param tt the average length of data for each subject
+#' @param m2 the number of differences between two networks
+#' @param alpha the parameter in the exponential distribution
+#' @param group indicator vector
+#' @noRd
+#' @returns a data frame
+
+simulate_randomTau=function(n,p,m1,tt,m2,alpha,group){
+  ## true structure
+  timepoint1=vector("list",n)
+  timepoint2=vector("list",n)
+  cc1=vector("list",n)
+  cc2=vector("list",n)
+  trueTau=rexp(n=n,rate=alpha)
+  for (i in 1:n) {
+    m3=sample(x=1:tt,1,prob = rep(1,1,tt))
+    if (group==1){
+      t1=stats::rexp(m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
+    }else{
+      t1=stats::rexp(2*m3)
+      timepoint1[[i]]=cumsum(t1)[1:m3]
+      timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
+      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
+      cc2[[i]]=phifunction(t=timepoint2[[i]],tau=trueTau[i])
+    }
+  }
+
+
+
+  real_stru=matrix(0, nrow = p, ncol = p)
+  real_stru[lower.tri(real_stru,diag = TRUE)]=1
+  index=which(real_stru==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m1, replace = F)
+  real_stru[index[a,]]=1
+  real_stru[lower.tri(real_stru,diag = TRUE)]=0
+  real_stru1=real_stru+t(real_stru)+diag(p)
+
+
+  distrubance=matrix(0, nrow = p, ncol = p)
+  distrubance[lower.tri(distrubance,diag = TRUE)]=1
+  index=which(distrubance==0,arr.ind = TRUE)
+  a=sample(1:nrow(index),m2, replace = F)
+  distrubance[index[a,]]=1
+  distrubance[lower.tri(distrubance,diag = TRUE)]=0
+  distrubance=distrubance+t(distrubance)+diag(p)
+  real_stru2=(real_stru1+distrubance)%%2
+
+
+  Precision=list()
+  Sigma=list()
+
+
+
+  mmlist=list()
+  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
+  theta[lower.tri(theta, diag = TRUE)] = 0
+  theta = theta + t(theta) + diag(p)
+  theta1 = theta * real_stru1
+  theta2 = theta * real_stru2
+  theta1=fake::MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  theta2=fake::MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
+  #colnames(theta)=paste0("metabolite",1:p)
+  #rownames(theta)=paste0("metabolite",1:p)
+  sigma1=solve(theta1)
+  sigma2=solve(theta2)
+  fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
+  if (group==2){
+    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma2)
+  }
+  fulldata=c()
+  a1=c()
+  a2=c()
+  for (i in 1:n) {
+    ai=c()
+    m3=nrow(fullCovariance1[[i]])
+    mu=rep(0,m3)
+    data1=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance1[[i]])
+    for (j in 1:(m3/p)) {
+      ai=as.data.frame(rbind(ai,data1[c(((j-1)*p+1) :(j*p))]))
+    }
+    subject=paste0("subject",i)
+    ai=cbind(subject,timepoint1[[i]],ai)
+    a1=rbind(a1,ai)
+  }
+  colnames(a1)[2]="time"
+
+  if (group==2){
+    for (i in 1:n) {
+      ai=c()
+      m3=nrow(fullCovariance2[[i]])
+      mu=rep(0,m3)
+      data2=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance2[[i]])
+      for (j in 1:(m3/p)) {
+        ai=as.data.frame(rbind(ai,data2[c(((j-1)*p+1) :(j*p))]))
+      }
+
+      subject=paste0("subject",i)
+      ai=cbind(subject,timepoint2[[i]],ai)
+      a2=rbind(a2,ai)
+    }
+    colnames(a2)[2]="time"
+    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=trueTau,alpha=alpha))
+  }
+
+  return(list(data=list(pre=a1),network=list(pre=real_stru1),tau=trueTau,alpha=alpha))
+}
