@@ -13,20 +13,20 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 
 <div style="text-align: justify">
 
-R package *lglasso* is designed to estimate networks from longitudinal
-high-dimensional data. It can be used to estimate either one-stage
-models where a single network is underlying all the longitudinal
-measurements, or two-stage models where the network before the treatment
-is different from the one after the treatment (exposure). The
-one(two)-stage model can further be classified to homogeneous model and
-heterogeneous models. The difference between homogeneous and
-heterogeneous models is that heterogeneous models contain individual
-level random effects while homogeneous models treat all individuals as
-i.i.d samples. For details of the definitions and its usage, please
-check the reference and link below. The package is under constant
-optimization. So if you have any questions/suggestions, please email
-*<chowstat@gmail.com>* without hesitation. I will get back to you at my
-earliest convenience.
+R package *lglasso* is designed to estimate precision matrix (*i.e.*,
+network) from longitudinal high-dimensional data under normal
+distribution. It can be used to estimate either one-stage models where a
+single network is underlying all the longitudinal measurements, or
+two-stage models where the network before the treatment is different
+from the one after the treatment (exposure). The one(two)-stage model
+can further be classified to homogeneous model and heterogeneous models.
+The difference between homogeneous and heterogeneous models is that
+heterogeneous models contain individual level random effects while
+homogeneous models treat all individuals as i.i.d samples. For details
+of the definitions and its usage, please check the reference and link
+below. The package is under constant optimization. So if you have any
+questions/suggestions, please email *<chowstat@gmail.com>* without
+hesitation. I will get back to you at my earliest convenience.
 
 </div>
 
