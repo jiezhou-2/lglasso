@@ -1,8 +1,8 @@
 ---
-title: " Identify networks from longitudinal data: homogeneous vs heterogeneous model"
+title: "Identify networks from longitudinal data: homogeneous vs heterogeneous model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction_of_lglasso_package}
+  %\VignetteIndexEntry{Identify networks from longitudinal data: homogeneous vs heterogeneous model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,7 +27,6 @@ library(fake)
 library(igraph)
 library(Matrix)
 library(lglasso)
-source("../scripts/simulations.R")
 ```
 
 
@@ -56,7 +55,7 @@ set.seed(1)
 
 ```{r,warning=FALSE}
 
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
+dd=lglasso:::Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
 ddata=dd$data
 dim(ddata)
 ddata[1:2,1:5]
@@ -68,7 +67,7 @@ ddata[1:2,1:5]
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01,trace=T)
+aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
 ## estimated network 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 ## estimated network
@@ -88,7 +87,7 @@ aa$ll
 #### data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
+dd=lglasso:::Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
 ddata=dd$data$pre
 dim(ddata)
 ddata[1:2,1:5]
@@ -98,7 +97,7 @@ ddata[1:2,1:5]
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T,N=100)
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=TRUE,N=100)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 ## estimated network
 estimates
@@ -122,7 +121,7 @@ abline(model, col = "red", lwd = 2)
 #### Generate data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
+dd=lglasso:::Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
 ddata=do.call(rbind,dd$data)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)
@@ -133,7 +132,7 @@ ddata[1:2,1:5]
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=T)
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=TRUE)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 
 ## estimated pre-treatment  network  
@@ -162,7 +161,7 @@ aa$ll
 #### Generate data 
 
 ```{r,warning=FALSE}
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
+dd=lglasso:::Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
 ddata=do.call(rbind,dd$data)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)
@@ -173,7 +172,7 @@ ddata[1:2,1:5]
 #### Estimation
 
 ```{r,warning=FALSE}
-aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=T,group = group,trace=T,N=100)
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=TRUE,group = group,trace=TRUE,N=100)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 
 ## estimated pre-treatment network  
