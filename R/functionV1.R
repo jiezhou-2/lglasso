@@ -247,7 +247,6 @@ if (m==1){
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
-#' @example inst/examples.R
 #' @return list which include following components:
 #'
 #' \code{w} the list of the estimates for covariance matrices
