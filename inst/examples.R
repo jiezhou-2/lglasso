@@ -1,12 +1,12 @@
 library(lglasso)
 # number of nodes
-p=20
+p=15
 # number of edge in general network
-m1=100
+m1=20
 # the difference between the number of edges in individual networks and general network
-m2=20
+m2=5
 # number of subjects
-n=100
+n=30
 set.seed(1)
 ## One-stage model
 ### Estimate the network based on homogeneous one-stage model
