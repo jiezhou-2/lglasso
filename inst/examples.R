@@ -1,5 +1,4 @@
 library(lglasso)
-library(fake)
 # number of nodes
 p=20
 # number of edge in general network
@@ -12,13 +11,12 @@ set.seed(1)
 ## One-stage model
 ### Estimate the network based on homogeneous one-stage model
 ####simulate data
-dd=lglasso:::Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
+dd=Simulate(type="homo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
 ddata=dd$data
 dim(ddata)
 ddata[1:2,1:5]
 #### Estimation
 aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
-#### estimated network
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 #### estimated network
 estimates
@@ -33,7 +31,7 @@ aa$ll
 
 ### Estimate the network based on heterogeneous one-stage model
 ####simulate data
-dd=lglasso:::Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
+dd=Simulate(type="heter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
 ddata=dd$data$pre
 dim(ddata)
 ddata[1:2,1:5]
@@ -51,8 +49,8 @@ aa$ll
 
 ## Two-stage model
 ### Estimate the networks based on homogeneous two-stage model
-####simulte data
-dd=lglasso:::Simulate(type="longihomo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
+####simulate data
+dd=Simulate(type="homo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
 ddata=do.call(rbind,dd$data)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)
@@ -74,9 +72,9 @@ aa$tau
 aa$ll
 
 
-### Estimate the networks based on hetergeneous two-stage model
+### Estimate the networks based on heterogeneous two-stage model
 ####simulate data
-dd=lglasso:::Simulate(type="longiheter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
+dd=Simulate(type="heter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
 ddata=do.call(rbind,dd$data)
 group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)

@@ -243,7 +243,7 @@ if (m==1){
 #' @param wi.init inital value for precision matrix
 #' @param trace whether or not show the progress of the computation
 #' @param N a integer specifying the number of sampling for heterogeneous model
-
+#' @example inst/examples.R
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
@@ -1046,29 +1046,32 @@ crossDataLambda=vector("list",N)
 
 
 
-#' Title
-#'
-#' @param type which type of data you are generating
-#' @param n the number of subjects
+#' Simulate longitudinal data from one-stage/two-stage model
+#' @description This function generates simulated data. These data could
+#'  help to verify the effectiveness of algorithms.
+#' @param type which type of data you are generating. There are two options. One is *homo* which generates subjects with identical
+#' temporal correlation parameter. The other is *heter* which generates subjects with different temporal correlation parameter.
+#' @param n the number of subjects in the data set
 #' @param p the dimension of the normal distribution
-#' @param m1 the number of edges
-#' @param m2 the difference between two networks
-#' @param tt the average length of data for each subject
-#' @param tau the dampening rate in homogeneous models
-#' @param alpha the parameter in exponential distribution
-#' @param group the scalar indicating the number of group
-#' @noRd
-#' @returns a data list
+#' @param m1 the number of edges in true networks
+#' @param m2 the edge difference between two networks
+#' @param tt the average time points for each subject
+#' @param tau the true dampening rate in homogeneous models
+#' @param alpha the true parameter in exponential distribution of tau when *type* is *heter*
+#' @param group a scalar of 1 or 2,  indicating one-stage or two-stage model.
+#' @export
+#' @returns a data list. It include the data generated, true networks underlying the data,true tau.
+#' If *type* is *heter*, then true parameter *alpha* is included as well.
 
-Simulate=function(type=c("longihomo","longiheter"),n=20,p=20,m1=20,
-                  m2=1,tt=5,tau=c(2,1),alpha=2,group){
+Simulate=function(type=c("homo","heter"),n,p,m1,
+                  m2,tt,tau,alpha,group){
 
   type=match.arg(type)
-  if (type=="longihomo"){
+  if (type=="homo"){
     data=simulate_long(n=n,p=p,m1=m1,m2=m2,tau=tau,tt=tt)
   }
 
-  if (type=="longiheter"){
+  if (type=="heter"){
 
     data=simulate_randomTau(n=n, p=p,m1=m1,m2=m2,tt=tt,
                             alpha=alpha,group = group)
