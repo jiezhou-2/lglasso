@@ -17,7 +17,7 @@ ddata=dd$data
 dim(ddata)
 ddata[1:2,1:5]
 #### Estimation
-aa=lglasso(data=ddata,lambda = 0.01,trace=T)
+aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
 #### estimated network
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 #### estimated network
@@ -38,7 +38,7 @@ ddata=dd$data$pre
 dim(ddata)
 ddata[1:2,1:5]
 #### Estimation
-aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=T,N=100)
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=TRUE,N=100)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 #### estimated network
 estimates
@@ -58,7 +58,7 @@ group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)
 ddata[1:2,1:5]
 #### Estimation
-aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=T)
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=TRUE)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 #### estimated pre-treatment  network
 estimates[[1]]
@@ -82,7 +82,7 @@ group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
 dim(ddata)
 ddata[1:2,1:5]
 #### Estimation
-aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=T,group = group,trace=T,N=100)
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=TRUE,group = group,trace=TRUE,N=100)
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 #### estimated pre-treatment network
 estimates[[1]]

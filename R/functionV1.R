@@ -218,8 +218,6 @@ if (m==1){
 }
 
 
-
-
 #' @title Longitudinal graphical lasso
 #' @description
 #'  This is the main function of the package which estimates the underlying precision matrices(networks) from longitudinal
@@ -260,7 +258,7 @@ if (m==1){
 #'
 #' \code{alpha} the parameter in exponential distribution of *tau* for heterogeneous models
 #'
-#'\code{ll} the likelihood for current parameter estimates
+#'\code{ll} the value of likelihood.  *ll* can be used to compute Extended BIC for tuning parameter selection
 #'
 #' @details *lglasso* is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
 #'  It is based on the models in Zhou *et al* (2024).
@@ -746,9 +744,8 @@ a=c()
 #' @param x CVlglasso object
 #' @param xvar character which specify the x axis of the plot
 #' @param ... other plot arguments
-#'
+#' @noRd
 #' @returns If \code{group} is NULL in \code{CVlglasso}, then a line plot will produced; otherwise, a heatmap will be produced.
-#' @export
 #'
 plot.cvlglasso=function(x, xvar=c("lambda","step"),...){
   xvar=match.arg(xvar)
@@ -840,17 +837,16 @@ return(invisible(heat_plot))
 #' @param K cv folds
 #' @param expFix given parameter
 #' @param trace whether show the process
-#' @param NN the number of sampling
 #' @param random a logical variable indicating the type of the model
+#' @noRd
 #' @returns list of which the first component is the cross validation errors and the second component is the corresponding
 #' tuning parameters
-#' @export
-#'
-CVlglasso=function(data,group=NULL,random=FALSE,
-                    lambda=NULL,nlam=10,lam.min.ratio=0.01, K, expFix=1,trace=FALSE,NN=500){
+
+CVlglasso=function(data,K,group=NULL,random=FALSE,
+                    lambda=NULL,nlam=10,lam.min.ratio=0.01, expFix=1,trace=FALSE){
 
   results=cvlglassofull(data=data,group=group,lambda = lambda,nlam=nlam,random = random,
-                        lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace, NN=NN)
+                        lam.min.ratio=lam.min.ratio, K=K, expFix=expFix,trace=trace)
 
   return(results)
 }
@@ -868,14 +864,13 @@ CVlglasso=function(data,group=NULL,random=FALSE,
 #' @param expFix given parameter
 #' @param trace whether show the process
 #' @param random a logical variable specifying the type of the model
-#' @param NN a integer specifying the number of the sampling
 #' @returns list
 #' @noRd
 #' @import parallel foreach doParallel
 
 cvlglassofull=function(data,group=NULL,
                     lambda=NULL,random=FALSE,nlam=10,lam.min.ratio=0.01,
-                    K, expFix=1,trace=FALSE,NN){
+                    K, expFix=1,trace=FALSE){
 
 if (!is.null(lambda)){
   if (is.null(group) && !is.vector(lambda))
@@ -996,9 +991,9 @@ crossDataLambda=vector("list",N)
                  }
                  if (is.null(group)){
                    if (random==FALSE){
-                   aa= lglasso(data=crossDataLambda[[k]]$crossData$train,lambda=crossDataLambda[[k]]$lambda,N=NN)$wi[[1]]
+                   aa= lglasso(data=crossDataLambda[[k]]$crossData$train,lambda=crossDataLambda[[k]]$lambda)$wi[[1]]
                    }else{
-                    aa= lglasso(data=crossDataLambda[[k]]$crossData$train,lambda=crossDataLambda[[k]]$lambda,random = TRUE,N=NN)$wi[[1]]
+                    aa= lglasso(data=crossDataLambda[[k]]$crossData$train,lambda=crossDataLambda[[k]]$lambda,random = TRUE)$wi[[1]]
                    }
                    cc=ifelse(abs(aa)<=10^(-2), 0,1)
                    diag(cc)=2
@@ -1011,13 +1006,13 @@ crossDataLambda=vector("list",N)
                    aa=lglasso(data=crossDataLambda[[k]]$crossData$train,
                               lambda=crossDataLambda[[k]]$lambda,
                               expFix = expFix,
-                              group=crossDataLambda[[k]]$crossData$trainGroup,N=NN)$wi
+                              group=crossDataLambda[[k]]$crossData$trainGroup)$wi
                    }else{
                      aa=lglasso(data=crossDataLambda[[k]]$crossData$train,
                                 lambda=crossDataLambda[[k]]$lambda,
                                 expFix = expFix,
                                 group=crossDataLambda[[k]]$crossData$trainGroup,
-                                random = TRUE,N=NN)$wi
+                                random = TRUE)$wi
                    }
                    aa[[1]]=ifelse(abs(aa[[1]])<=10^(-1), 0,1)
                    diag(aa[[1]])=2

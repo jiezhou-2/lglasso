@@ -14,22 +14,21 @@ knitr::opts_chunk$set(
 )
 ```
 
-In this vignette, we show how to use **lglasso** package to estimate one-stage/ two-stage network model from longitudinal data. 
+In this vignette, we show how to use *lglasso* package to estimate one-stage/ two-stage network models from longitudinal data. 
 
-In  section 1 and 2, we use simulated data to demonstrate how to use the two main function *lglasso()* and *CVlglasso()* respectively. 
-
-In section 3 and 4, we apply the model to a real antibody titer data from a large vaccine study.
-
+In  section 1, we use simulated data to demonstrate how to use the main function *lglasso()*.
+In section 3, we use the model to study a real antibody data set from a clinical vaccine trial.  Function *CVlglasso()* is still under optimization. It becomes very slow if the dimension is larger than 50. It can be accessed through *lglasso:::CVlglasso*.
 
 
-### Simulation examples
+
+### Simulated data
 
 [1. lglasso examples](lglasso.html)
 
 
 [2. CVlglasso examples](CVlglasso.html)
 
-### A Real data example
+### Real data 
 
 [3.lglasso examples](realDatab.html)
 
