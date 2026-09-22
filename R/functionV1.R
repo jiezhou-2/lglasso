@@ -451,9 +451,9 @@ conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
 #' @returns a data frame for samples and their weights
 
 importanceSample=function(n,datai,wi,alpha,groupi,expFix=1){
-  dd1=matrix(rexp(n=n,rate=alpha),ncol=1)
+  dd1=matrix(stats::rexp(n=n,rate=alpha),ncol=1)
   likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
-  likelihood2=log(apply(dd1, 1, dexp,rate=alpha))
+  likelihood2=log(apply(dd1, 1, stats::dexp,rate=alpha))
   index1=which(!is.nan(likelihood1))
   index2=which(!is.infinite(likelihood1))
 index=intersect(index1,index2)
@@ -515,7 +515,7 @@ AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
   names(A)=subjects
   Tau=matrix(nrow=length(subjects),ncol=1)
   rownames(Tau)=subjects
-  simTau=matrix(rexp(n=l,rate=alpha),ncol=1)
+  simTau=matrix(stats::rexp(n=l,rate=alpha),ncol=1)
   dataList=split(data,f=factor(data[,1],levels=subjects))
   groupList=split(group,f=factor(data[,1],levels=subjects))
   for (i in 1:length(subjects)) {
@@ -1209,7 +1209,7 @@ simulate_randomTau=function(n,p,m1,tt,m2,alpha,group){
   timepoint2=vector("list",n)
   cc1=vector("list",n)
   cc2=vector("list",n)
-  trueTau=rexp(n=n,rate=alpha)
+  trueTau=stats::rexp(n=n,rate=alpha)
   for (i in 1:n) {
     m3=sample(x=1:tt,1,prob = rep(1,1,tt))
     if (group==1){

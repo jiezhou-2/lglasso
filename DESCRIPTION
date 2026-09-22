@@ -5,10 +5,10 @@ Version: 2.0.0
 Description: Based on high-dimensional longitudinal data, 
              *lglasso* implements the  $L_1$ penalized maximum likelihood 
             estimation of the precision matrices and the corresponding correlation parameters. 
-            *lglasso* can  estimate a single network (i.e., one-stage model) 
-            or two networks (i.e., two-stage model). For the details of the algorithms, please refer to the paper Jie Zhou et al. 
-            Identifying Microbial Interaction Networks Based on Irregularly Spaced 
-            Longitudinal 16S rRNA Sequence Data 
+            *lglasso* can  estimate  both one-stage models (without treatment) 
+            and  two-stage models (with one treatment). For the details of the algorithms, please refer to the paper Jie Zhou et al. 
+            *Identifying Microbial Interaction Networks Based on Irregularly Spaced 
+            Longitudinal 16S rRNA Sequence Data* 
             <doi:10.1101/2021.11.26.470159>.
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -42,7 +42,8 @@ Imports:
     pheatmap,
     RColorBrewer,
     MASS,
-    fake
+    fake,
+    stats
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggestions:
