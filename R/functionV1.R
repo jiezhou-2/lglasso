@@ -841,6 +841,7 @@ return(invisible(heat_plot))
 #' @returns list of which the first component is the cross validation errors and the second component is the corresponding
 #' tuning parameters
 
+
 CVlglasso=function(data,K,group=NULL,random=FALSE,
                     lambda=NULL,nlam=10,lam.min.ratio=0.01, expFix=1,trace=FALSE){
 

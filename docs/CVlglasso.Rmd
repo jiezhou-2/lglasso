@@ -26,7 +26,6 @@ library(forcats)
 library(fake)
 library(CVglasso)
 library(lglasso)
-source("../scripts/simulations.R")
 set.seed(1)
 ```
 
@@ -52,7 +51,7 @@ rho=0.8
 ## Model 1:  homogeneous individuals
 
 ```{r}
-dd=Simulate(type="longihomo",n=n,p=p,m1=m1,tt=10,tau=c(2,1))
+dd=Simulate(type="homo",n=n,p=p,m1=m1,tt=10,tau=c(2,1))
 data1=cbind(1,dd$data$pre)
 colnames(data1)[1]="group"
 data2=cbind(2,dd$data$post)
@@ -87,7 +86,7 @@ plot(bb)
 ## Model 2:  heterogeneous individuals
 
 ```{r}
-dd=Simulate(type="longiheter",n=n,p=p,m1=m1,alpha=2,group=2)
+dd=Simulate(type="heter",n=n,p=p,m1=m1,alpha=2,group=2)
 data1=cbind(1,dd$data$pre)
 colnames(data1)[1]="group"
 data2=cbind(2,dd$data$post)
