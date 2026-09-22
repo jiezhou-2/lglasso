@@ -16,15 +16,15 @@ ddata=dd$data
 dim(ddata)
 ddata[1:2,1:5]
 #### Estimation
-aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
-estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
-#### estimated network
-estimates
-#### true network
-dd$network
-#### correlation parameter
-aa$tau
-#### likelihood
-aa$ll
+# aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
+# estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+# #### estimated network
+# estimates
+# #### true network
+# dd$network
+# #### correlation parameter
+# aa$tau
+# #### likelihood
+# aa$ll
 
 
