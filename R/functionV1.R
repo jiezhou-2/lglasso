@@ -243,10 +243,10 @@ if (m==1){
 #' @param wi.init inital value for precision matrix
 #' @param trace whether or not show the progress of the computation
 #' @param N a integer specifying the number of sampling for heterogeneous model
-#' @example inst/examples.R
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
+#' @example inst/examples.R
 #' @return list which include following components:
 #'
 #' \code{w} the list of the estimates for covariance matrices
