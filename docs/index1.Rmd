@@ -18,12 +18,18 @@ In this vignette, we show how to use *lglasso* package to estimate one-stage/ tw
 
 
 
+### Simulated data
+
 [1. lglasso examples](lglasso.html)
 
 
 [2. CVlglasso examples](CVlglasso.html)
 
+### Applications
 
+[3.lglasso examples](realDatab.html)
+
+[4.CVlglasso examples](cvRealData.html)
 
 
 

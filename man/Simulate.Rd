@@ -4,7 +4,17 @@
 \alias{Simulate}
 \title{Simulate longitudinal data from one-stage/two-stage model}
 \usage{
-Simulate(type = c("homo", "heter"), n, p, m1, m2, tt, tau, alpha, group)
+Simulate(
+  type = c("homo", "heter"),
+  n,
+  p,
+  m1,
+  m2,
+  tt,
+  tau,
+  alpha = 1,
+  group = 1
+)
 }
 \arguments{
 \item{type}{which type of data you are generating. There are two options. One is \code{homo} which generates subjects with identical

@@ -90,7 +90,7 @@ group=ifelse(fulldata$visit_name==2,1,2)
 lambda1=exp(seq(-10,-1,length=5))
 lambda2=exp(seq(-3,-1,length=5))
 lambda=expand.grid(lambda1,lambda2)
-aa1=CVlglasso(data=fulldata,lambda = lambda,K=2,trace = TRUE,random = FALSE,group = group,NN=100)
+aa1=CVlglasso(data=fulldata,lambda = lambda,K=2,trace = TRUE,random = FALSE,group = group)
 plot(aa1)
 ```
 
@@ -101,7 +101,7 @@ plot(aa1)
 
 ```{r,eval=FALSE,echo=FALSE}
 lambda=exp(seq(-10,-1,length=4))
-aa1=CVlglasso(data=postdata[,-c(3:5)],lambda = lambda,K=2,trace = FALSE,random = TRUE,NN=1000)
+aa1=CVlglasso(data=postdata[,-c(3:5)],lambda = lambda,K=2,trace = FALSE,random = TRUE)
 plot(aa1)
 ```
 

@@ -17,21 +17,23 @@ CVlglasso(
 )
 }
 \arguments{
-\item{data}{raw data}
+\item{data}{same as in \code{lglasso}}
 
-\item{K}{cv folds}
+\item{K}{fold of the cross validation}
 
-\item{group}{group variable}
+\item{group}{same as in \code{lglasso}}
 
-\item{random}{a logical variable indicating the type of the model}
+\item{random}{same as in \code{lglasso}}
 
-\item{lambda}{tuning parameter}
+\item{lambda}{tuning parameter. For one-stage model, lambda is a vector. For two-stage model,
+lambda is a matrix. The first entry is to control the sparsity, the second entry is to control the
+similarity of two networks.}
 
-\item{nlam}{number of tuning parameter}
+\item{nlam}{If \code{lambda} is NULL, then \code{nlam} set the number of tuning parameter}
 
 \item{lam.min.ratio}{ratio of largest lambda vs smallest lambda}
 
-\item{expFix}{given parameter}
+\item{expFix}{same as on \code{lglasso}}
 
 \item{trace}{whether show the process}
 }
