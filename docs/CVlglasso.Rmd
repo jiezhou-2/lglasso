@@ -1,5 +1,5 @@
 ---
-title: "Identify networks from correlated data (2)"
+title: "Identify networks from longitudinal data (2)"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction_of_lglasso_package}
@@ -21,10 +21,10 @@ knitr::opts_chunk$set(
 
 
 ```{r setup, message=FALSE,warning=FALSE, echo=FALSE}
-library(devtools)
-library(forcats)
-library(fake)
-library(CVglasso)
+# library(devtools)
+# library(forcats)
+# library(fake)
+# library(CVglasso)
 library(lglasso)
 set.seed(1)
 ```
@@ -35,23 +35,20 @@ set.seed(1)
 # number of nodes
 p=20
 # number of edge in general network
-m1=100
+m1=50
 # the difference between the number of edges in individual networks and general network
-m2=20
-#  number of clusters
-m3=0
+m2=10
 # number of subjects
 n=50
-# correlation between cluster
-rho=0.8
-
+## number of time points
+tt=10
 ```
 
 
 ## Model 1:  homogeneous individuals
 
 ```{r}
-dd=Simulate(type="homo",n=n,p=p,m1=m1,tt=10,tau=c(2,1))
+dd=Simulate(type="homo",n=n,p=p,m1=m1,m2=m2,tt=10,tau=c(2,1))
 data1=cbind(1,dd$data$pre)
 colnames(data1)[1]="group"
 data2=cbind(2,dd$data$post)
@@ -69,7 +66,7 @@ ddata[1:5,1:5]
 ### one-stage model
 
 ```{r}
- bb=CVlglasso(data=data1[,-1],nlam =  10,K=3)
+ bb=CVlglasso(data=data1[,-1],nlam =  100,K=10)
 plot(bb)
 ```
 
@@ -78,7 +75,7 @@ plot(bb)
 
 ```{r}
 table(ddata[,1])
-bb=CVlglasso(data=ddata[,-1],nlam = 5,group=ddata[,1],K=3)
+bb=CVlglasso(data=ddata[,-1],nlam = 10,group=ddata[,1],K=10)
 plot(bb)
 ```
 
@@ -86,7 +83,7 @@ plot(bb)
 ## Model 2:  heterogeneous individuals
 
 ```{r}
-dd=Simulate(type="heter",n=n,p=p,m1=m1,alpha=2,group=2)
+dd=Simulate(type="heter",n=n,p=p,m1=m1,m2=m2,tt=tt,alpha=2,group=2)
 data1=cbind(1,dd$data$pre)
 colnames(data1)[1]="group"
 data2=cbind(2,dd$data$post)
@@ -105,7 +102,7 @@ ddata[1:5,1:5]
 
 ```{r}
 
-bb=CVlglasso(data=data1[,-1],nlam = 10,K=3,random=TRUE)
+bb=CVlglasso(data=data1[,-1],nlam = 100,K=10,random=TRUE)
 plot(bb)
 ```
 
@@ -114,6 +111,6 @@ plot(bb)
 
 ```{r}
 table(ddata[,1])
-bb=CVlglasso(data=ddata[,-1],group=ddata[,1],nlam = 5,K=3,random = TRUE)
+bb=CVlglasso(data=ddata[,-1],group=ddata[,1],nlam = 10,K=10,random = TRUE)
 plot(bb)
 ```
