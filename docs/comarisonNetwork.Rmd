@@ -1,0 +1,74 @@
+---
+title: "Case study: antibody interaction networks"
+author: "Jie Zhou"
+date: "2025-07-10"
+output: html_document
+---
+
+```{r setup, include=FALSE,echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(igraph)
+library(lglasso)
+set.seed(1)
+```
+
+
+
+
+```{r}
+adjMatrixPre=as.matrix(read.csv(file="../docs/adjMatrixPre.CSV",row.names = 1))
+pre=graph_from_adjacency_matrix(adjMatrixPre, mode = "undirected")
+adjMatrixPost=as.matrix(read.csv(file="../docs/adjMatrixPost.CSV",row.names = 1))
+post=graph_from_adjacency_matrix(adjMatrixPost, mode = "undirected")
+```
+
+
+```{r}
+edges_pre <- as_edgelist(pre, names = TRUE)
+edges_post <- as_edgelist(post, names = TRUE)
+
+diff_pre_not_post <- as_edgelist(difference(pre, post))
+print("Edges in pre but not post:")
+print(diff_pre_not_post)
+
+# Edges in Graph 2 that are NOT in Graph 1
+diff_post_not_pre <- as_edgelist(difference(post, pre))
+print("Edges in post but not pre:")
+print(diff_post_not_pre)
+```
+```{r}
+# Install and load the package
+install.packages("forestplot")
+library(forestplot)
+library(dplyr)
+
+# 1. Create a dummy dataset
+base_data <- tibble(
+  variable  = c("Age (>65 vs ≤65)", "Sex (Female vs Male)", "Treatment (B vs A)", "Smoker (Yes vs No)"),
+  mean      = c(1.25, 0.92, 2.10, 1.45),
+  lower     = c(0.95, 0.61, 1.55, 0.88),
+  upper     = c(1.65, 1.38, 2.85, 2.30),
+  p_value   = c("0.110", "0.680", "<0.001", "0.150")
+)
+
+# 2. Structure the data with a header row for the final table layout
+plot_data <- base_data %>%
+  # Insert an empty row at the top to serve as the header
+  add_row(variable = "Variable", p_value = "p-value", .before = 1)
+
+# 3. Generate the forest plot
+plot_data %>%
+  forestplot(
+    labeltext = c(variable, p_value), # Columns to display as text on the left
+    mean = mean,                      # Point estimates
+    lower = lower,                    # Lower CI bounds
+    upper = upper,                    # Upper CI bounds
+    is.summary = c(TRUE, rep(FALSE, nrow(base_data))), # Bold the first (header) row
+    clip = c(0.1, 3.0),               # Truncate CIs if they go past these limits
+    xlog = FALSE,                     # Set to TRUE if plotting Odds Ratios / Risk Ratios
+    xlab = "Hazard Ratio (95% CI)",
+    col = fpColors(box = "royalblue", line = "darkblue", summary = "black")
+  )
+
+```
+

@@ -7,8 +7,8 @@
 Simulate(type = c("homo", "heter"), n, p, m1, m2, tt, tau, alpha, group)
 }
 \arguments{
-\item{type}{which type of data you are generating. There are two options. One is \emph{homo} which generates subjects with identical
-temporal correlation parameter. The other is \emph{heter} which generates subjects with different temporal correlation parameter.}
+\item{type}{which type of data you are generating. There are two options. One is \code{homo} which generates subjects with identical
+temporal correlation parameter. The other is \code{heter} which generates subjects with different temporal correlation parameter.}
 
 \item{n}{the number of subjects in the data set}
 
@@ -22,15 +22,16 @@ temporal correlation parameter. The other is \emph{heter} which generates subjec
 
 \item{tau}{the true dampening rate in homogeneous models}
 
-\item{alpha}{the true parameter in exponential distribution of tau when \emph{type} is \emph{heter}}
+\item{alpha}{the true parameter in exponential distribution of tau when \code{type}
+is \code{heter}}
 
 \item{group}{a scalar of 1 or 2,  indicating one-stage or two-stage model.}
 }
 \value{
 a data list. It include the data generated, true networks underlying the data,true tau.
-If \emph{type} is \emph{heter}, then true parameter \emph{alpha} is included as well.
+If \code{type} is \code{heter}, then true parameter \code{alpha} is included as well.
 }
 \description{
-This function generates simulated data. These data could
-help to verify the effectiveness of algorithms.
+This function can generate simulated data that follows known network structures.
+It can used to evaluate the effectiveness of algorithms.
 }

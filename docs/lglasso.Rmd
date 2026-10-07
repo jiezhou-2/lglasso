@@ -52,9 +52,7 @@ set.seed(1)
 
 #### data 
 
-
 ```{r,warning=FALSE}
-
 dd=Simulate(type="homo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
 ddata=dd$data
 dim(ddata)
@@ -68,6 +66,7 @@ ddata[1:2,1:5]
 
 ```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
+system.time(lglasso(data=ddata,lambda = 0.01,trace=TRUE))
 ## estimated network 
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 ## estimated network
@@ -98,6 +97,7 @@ ddata[1:2,1:5]
 
 ```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=TRUE,N=100)
+system.time(lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=TRUE,N=100))
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 ## estimated network
 estimates
@@ -133,6 +133,7 @@ ddata[1:2,1:5]
 
 ```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=TRUE)
+system.time(lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=TRUE))
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 
 ## estimated pre-treatment  network  
@@ -173,6 +174,7 @@ ddata[1:2,1:5]
 
 ```{r,warning=FALSE}
 aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=TRUE,group = group,trace=TRUE,N=100)
+system.time(lglasso(data=ddata,lambda = c(0.01,0.01),random=TRUE,group = group,trace=TRUE,N=100))
 estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
 
 ## estimated pre-treatment network  

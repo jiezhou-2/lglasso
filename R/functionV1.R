@@ -174,8 +174,7 @@ BB=function(A,data,lambda,random=FALSE,tau){
       if (!random){
       likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)+likeli
     }else{
-      likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)
-      -2*nn*log(mean(tau))/nrow(dd)+likeli
+      likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)-2*nn*log(mean(tau))/nrow(dd)+likeli
     }
       aa=aa+ sum(abs(B[[i]])*mask1)
 
@@ -226,11 +225,11 @@ if (m==1){
 #' @param data \code{n} by \code{(p+2)} data frame in which the first column is for subject IDs, the second column is
 #' for the time points of longitudinal data.
 #' @param lambda   numerical vector of tuning parameters,controlling the
-#' sparsity of the networks. For one-stage model, *lambda* is a scalar. For two-stage model,
-#' *lambda* is a vector of length 2.  For details, see the explanations in the below.
+#' sparsity of the networks. For one-stage model, \code{lambda} is a scalar. For two-stage model,
+#' \code{lambda} is a vector of length 2.  For details, see the explanations in the below.
 #' @param group  factor  of length \code{n} if supplied. It indicates each data
 #'  point either before or after the treatment (exposure). Default is a single-level factor,
-#'  which corresponds to the one-stage model. For two-stage model, *group* is a two-level factor.
+#'  which corresponds to the one-stage model. For two-stage model, \code{group} is a two-level factor.
 #'  where the two levels correspond to the two stage.
 #' @param random a logical variable. If TRUE, then a heterogeneous model is estimated.
 #' Otherwise, a homogeneous model is estimated.
@@ -246,33 +245,33 @@ if (m==1){
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
-#' @example inst/examples.R
 #' @return list which include following components:
 #'
 #' \code{w} the list of the estimates for covariance matrices
 #'
 #' \code{wi} the list of the estimates for precision matrices
 #'
-#' \code{tau} the estimate of dampening rate *tau*
+#' \code{tau} the estimate of dampening rate \code{tau}
 #'
-#' \code{alpha} the parameter in exponential distribution of *tau* for heterogeneous models
+#' \code{alpha} the parameter in exponential distribution of \code{tau} for heterogeneous models
 #'
-#'\code{ll} the value of likelihood.  *ll* can be used to compute Extended BIC for tuning parameter selection
+#'\code{ll} the value of likelihood.  \code{ll} can be used to compute Extended BIC for tuning parameter selection
 #'
-#' @details *lglasso* is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
+#' @details \code{lglasso} is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
 #'  It is based on the models in Zhou *et al* (2024).
 #'  Currently, it contains two network identification models,
 #'   *i.e.,* one-stage  and two-stage model.
 #'  One-stage model assume a common network underlying
 #'   the longitudinal data for all the subjects. Consequently,
-#'   *lglasso* only outputs a single network as the estimate.
-#'   Two-stage model allows that a treatment occurred at time point *t_i*  for subject *i(1<= i <= m)*.
+#'   \code{lglasso} only outputs a single network as the estimate.
+#'   Two-stage model allows that a treatment occurred at time point \eqn{t_i}
+#'     for subject \eqn{i}.
 #'  Therefore, there are two networks, i.e., pre- and post-treatment networks,  that need to be estimated.
 
-#'  The core idea behind the models in *lglasso* is that the models decompose the covariance matrix
+#'  The core idea behind the models in \code{lglasso} is that the models decompose the covariance matrix
 #'  of longitudinal data into
 #'  temporal and cross-section part, where the model for the temporal part has the form of
-#'    *exp(-|t_1-t_2|^(-tau))*. For details, please check the  paper in the reference.
+#'    \deqn{\exp(-|t_{i}-t_{j}|^{(-\tau)}}. For details, please check the  paper in the reference.
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=50,
                  tol=10^(-2),lower=c(0.01,0.01),upper=c(10,10),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
@@ -837,7 +836,7 @@ return(invisible(heat_plot))
 #' @param expFix given parameter
 #' @param trace whether show the process
 #' @param random a logical variable indicating the type of the model
-#' @noRd
+#' @export
 #' @returns list of which the first component is the cross validation errors and the second component is the corresponding
 #' tuning parameters
 
@@ -1048,21 +1047,22 @@ crossDataLambda=vector("list",N)
 
 
 #' Simulate longitudinal data from one-stage/two-stage model
-#' @description This function generates simulated data. These data could
-#'  help to verify the effectiveness of algorithms.
-#' @param type which type of data you are generating. There are two options. One is *homo* which generates subjects with identical
-#' temporal correlation parameter. The other is *heter* which generates subjects with different temporal correlation parameter.
+#' @description This function can generate simulated data that follows known network structures.
+#'  It can used to evaluate the effectiveness of algorithms.
+#' @param type which type of data you are generating. There are two options. One is \code{homo} which generates subjects with identical
+#' temporal correlation parameter. The other is \code{heter} which generates subjects with different temporal correlation parameter.
 #' @param n the number of subjects in the data set
 #' @param p the dimension of the normal distribution
 #' @param m1 the number of edges in true networks
 #' @param m2 the edge difference between two networks
 #' @param tt the average time points for each subject
 #' @param tau the true dampening rate in homogeneous models
-#' @param alpha the true parameter in exponential distribution of tau when *type* is *heter*
+#' @param alpha the true parameter in exponential distribution of tau when \code{type}
+#' is \code{heter}
 #' @param group a scalar of 1 or 2,  indicating one-stage or two-stage model.
 #' @export
 #' @returns a data list. It include the data generated, true networks underlying the data,true tau.
-#' If *type* is *heter*, then true parameter *alpha* is included as well.
+#' If \code{type} is \code{heter}, then true parameter \code{alpha} is included as well.
 
 Simulate=function(type=c("homo","heter"),n,p,m1,
                   m2,tt,tau,alpha,group){
