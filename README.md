@@ -24,7 +24,10 @@ The difference between homogeneous and heterogeneous models is that
 heterogeneous models contain individual level random effects while
 homogeneous models treat all individuals as i.i.d samples. For details
 of the definitions and its usage, please check the reference and link
-below. The package is under constant optimization. So if you have any
+below.
+
+ADMM algorithm has been adopted in *lglasso* to speed up the
+computation. Main functions are optimized by c++. So if you have any
 questions/suggestions, please email *<chowstat@gmail.com>* without
 hesitation. I will get back to you at my earliest convenience.
 

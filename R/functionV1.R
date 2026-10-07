@@ -421,7 +421,7 @@ return(invisible(heat_plot))
 
 #' @title Cross validation for \code{lglasso}
 #' @description
-#' The function computes the cross validation errors for one of the three network models in \code{lglasso} command.
+#' The function computes the cross validation errors  in \code{lglasso}.
 #' @param data same as in \code{lglasso}
 #' @param K fold of the cross validation
 #' @param group same as in \code{lglasso}
