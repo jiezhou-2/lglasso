@@ -38,7 +38,7 @@ is \code{heter}}
 \item{group}{a scalar of 1 or 2,  indicating one-stage or two-stage model.}
 }
 \value{
-a data list. It include the data generated, true networks underlying the data,true tau.
+a data list. It includes the data generated, true networks underlying the data,true tau.
 If \code{type} is \code{heter}, then true parameter \code{alpha} is included as well.
 }
 \description{

@@ -43,10 +43,7 @@ Imports:
     parallel,
     pheatmap,
     RColorBrewer,
-    stats,
     Rcpp,
-    stats,
-    Rcpp, 
     doParallel, 
     foreach
 Roxygen: list(markdown = TRUE)

@@ -31,7 +31,6 @@
 #' @param trace whether or not show the progress of the computation
 #' @param N a integer specifying the number of sampling for heterogeneous model
 #' @param ... other inputs
-#' @import glasso glasso
 #' @export
 #' @example inst/examples.R
 #' @return A list which includes:
