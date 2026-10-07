@@ -22,71 +22,175 @@ lglasso(
 )
 }
 \arguments{
-\item{data}{\code{n} by \code{(p+2)} data frame in which the first column is for subject IDs, the second column is
-for the time points of longitudinal data.}
+\item{data}{\code{n} by \code{(p+2)} data frame in which the first column is subject IDs, the second column is
+the time points of longitudinal data.}
 
-\item{lambda}{numerical vector of tuning parameters,controlling the
-sparsity of the networks. For one-stage model, \code{lambda} is a scalar. For two-stage model,
-\code{lambda} is a vector of length 2.  For details, see the explanations in the below.}
+\item{lambda}{numerical vector of tuning parameters. For one-stage model, \code{lambda} is a scalar controlling the
+sparsity of the network. For two-stage model,
+\code{lambda} is a vector of length 2, in which the first entry controls the sparsity of both
+pre-treatment and post-treatment networks,
+while the second entry controls the overlap of the two networks.}
 
-\item{group}{factor  of length \code{n} if supplied. It indicates each data
-point either before or after the treatment (exposure). Default is a single-level factor,
-which corresponds to the one-stage model. For two-stage model, \code{group} is a two-level factor.
-where the two levels correspond to the two stage.}
+\item{group}{factor  of length \code{n} if supplied. If \code{group} is a  one-level factor,
+then a one-stage model is fitted. If \code{group} is a two-level factor, then a two-stage model is fitted.
+Data points that are before (after) the treatment (exposure) share the same
+level in \code{group}. If NULL, then a one-stage model is fitted.}
 
-\item{random}{a logical variable. If TRUE, then a heterogeneous model is estimated.
-Otherwise, a homogeneous model is estimated.}
+\item{random}{a logical variable. If TRUE, then a heterogeneous model is fitted.
+Otherwise, a homogeneous model is fitted.}
 
-\item{expFix}{numerical number to specify the form of the covariance function of the longitudinal data.}
+\item{expFix}{numerical number specifying the exponent in the covariance function of
+the longitudinal data. Default is 1.}
 
 \item{N}{a integer specifying the number of sampling for heterogeneous model}
 
-\item{maxit}{integer of  the maximum iterations for the algorithms.}
+\item{maxit}{integer specifying  the maximum iterations for the algorithms.}
 
-\item{tol}{value for determining if the algorithms have converged.}
+\item{tol}{a small number determining whether the algorithms converged and should stop.}
 
-\item{lower}{vector of length 1 or 2 which specifies the lower bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix}
+\item{lower}{vector of length 1 or 2 which specifies the lower bounds for temporal correlation \code{tau}.
+It is of length 1 for one-stage model and 2 for two-stage model}
 
-\item{upper}{vector of length 1 or 2 which specifies the upper bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix}
+\item{upper}{vector of length 1 or 2 which specifies the upper bounds for temporal correlation \code{tau}
+It is of length 1 for one-stage model and 2 for two-stage model}
 
-\item{w.init}{initial value for covariance matrix}
+\item{w.init}{initial value for covariance matrix. Default is identity matrix.}
 
-\item{wi.init}{inital value for precision matrix}
+\item{wi.init}{initial value for precision matrix. Default is identity matrix.}
 
 \item{trace}{whether or not show the progress of the computation}
 
 \item{...}{other inputs}
 }
 \value{
-list which include following components:
+A list which includes:
 
-\code{w} the list of the estimates for covariance matrices
+\code{w:} the list of the estimates for covariance matrices
 
-\code{wi} the list of the estimates for precision matrices
+\code{wi:} the list of the estimates for precision matrices
 
-\code{tau} the estimate of dampening rate \code{tau}
+\code{tau:} the estimate of dampening rate \code{tau}. For heterogeneous models, the
+output is a vector called random effects. For homogeneous model, the output is a scalar.
 
-\code{alpha} the parameter in exponential distribution of \code{tau} for heterogeneous models
+\code{alpha:} a scalar representing the estimate of the parameter in exponential distribution of \code{tau} for heterogeneous models.
+The output is NULL for homogeneous model
 
-\code{ll} the value of likelihood.  \code{ll} can be used to compute Extended BIC for tuning parameter selection
+\code{ll:} the likelihood.  \code{ll} is used to compute extended QIC for tuning parameter selection
 }
 \description{
-This is the main function of the package which estimates the underlying precision matrices(networks) from longitudinal
+This function estimates  precision matrices(networks) and random effects from longitudinal
 high-dimensional data under normality assumption.
 }
 \details{
-\code{lglasso} is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
-It is based on the models in Zhou \emph{et al} (2024).
+\code{lglasso} is developed to estimate precision matrices, or networks, and random effects \eqn{\tau_i}
+from high-dimensional longitudinal data.
+The one-stage model in \code{lglasso} is proposed in Zhou \emph{et al} (2024).
 Currently, it contains two network identification models,
 \emph{i.e.,} one-stage  and two-stage model.
 One-stage model assume a common network underlying
 the longitudinal data for all the subjects. Consequently,
-\code{lglasso} only outputs a single network as the estimate.
-Two-stage model allows that a treatment occurred at time point \eqn{t_i}
+the function outputs a single network as the estimate in this case.
+In two-stage models, a treatment is applied at time \eqn{t_i} during the time interval
 for subject \eqn{i}.
-Therefore, there are two networks, i.e., pre- and post-treatment networks,  that need to be estimated.
-The core idea behind the models in \code{lglasso} is that the models decompose the covariance matrix
-of longitudinal data into
-temporal and cross-section part, where the model for the temporal part has the form of
-\deqn{\exp(-|t_{i}-t_{j}|^{(-\tau)}}. For details, please check the  paper in the reference.
+Therefore, there are two networks, \emph{i.e}., pre- and post-treatment networks,  that need to be estimated simultaneously.
+For details, please check the reference paper
+and the online resources.
+}
+\examples{
+\dontrun{
+library(lglasso)
+# number of nodes
+p=15
+# number of edge in general network
+m1=20
+# the difference between the number of edges in individual networks and general network
+m2=5
+# number of subjects
+n=30
+set.seed(1)
+## One-stage model
+### Estimate the network based on homogeneous one-stage model
+####simulate data
+dd=Simulate(type="homo",n=n,p=p,m1=m1,m2=m2,tau=2,tt=10)
+ddata=dd$data
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = 0.01,trace=TRUE)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated network
+estimates
+#### true network
+dd$network
+#### correlation parameter
+aa$tau
+#### likelihood
+aa$ll
+
+
+
+### Estimate the network based on heterogeneous one-stage model
+####simulate data
+dd=Simulate(type="heter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=5,group = 1)
+ddata=dd$data$pre
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = 0.01,random=TRUE,trace=TRUE)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated network
+estimates
+####  true network
+dd$network
+#### likelihood
+aa$ll
+
+
+
+## Two-stage model
+### Estimate the networks based on homogeneous two-stage model
+####simulate data
+dd=Simulate(type="homo",n=n,p=p,m1=m1,m2=m2,tau=c(2,1),tt=10)
+ddata=do.call(rbind,dd$data)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),group = group,trace=TRUE)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated pre-treatment  network
+estimates[[1]]
+####  true pre-treatment network
+dd$network$pre
+#### estimated post-treatment  network
+estimates[[2]]
+####  true post-treatment network
+dd$network$post
+#### correlation parameters
+aa$tau
+#### likelihood
+aa$ll
+
+
+### Estimate the networks based on heterogeneous two-stage model
+####simulate data
+dd=Simulate(type="heter",n=n,p=p,m1=m1,m2=m2,tt=10,alpha=0.5,group=2)
+ddata=do.call(rbind,dd$data)
+group=c(rep(0,nrow(ddata)/2),rep(1,nrow(ddata)/2))
+dim(ddata)
+ddata[1:2,1:5]
+#### Estimation
+aa=lglasso(data=ddata,lambda = c(0.01,0.01),random=TRUE,group = group,trace=TRUE)
+estimates=lapply(aa$wi,function(ll){ifelse(abs(ll)>10^(-5),1,0)})
+#### estimated pre-treatment network
+estimates[[1]]
+#### true pre-treatment network
+dd$network$pre
+#### estimated post-treatment network
+estimates[[2]]
+####  true post-treatment network
+dd$network$post
+#### likelihood
+aa$ll
+}
 }

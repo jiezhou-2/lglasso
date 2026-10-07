@@ -19,26 +19,27 @@ CVlglasso(
 \arguments{
 \item{data}{same as in \code{lglasso}}
 
-\item{K}{fold of the cross validation}
+\item{K}{fold number for the cross validation}
 
 \item{group}{same as in \code{lglasso}}
 
 \item{random}{same as in \code{lglasso}}
 
 \item{lambda}{tuning parameter. For one-stage model, lambda is a vector. For two-stage model,
-lambda is a matrix. The first entry is to control the sparsity, the second entry is to control the
+lambda is a 2-column matrix. The first column  is tuning parameter controlling the sparsity,
+the second column is tuning parameter controlling the
 similarity of two networks.}
 
 \item{nlam}{If \code{lambda} is NULL, then \code{nlam} set the number of tuning parameter}
 
 \item{lam.min.ratio}{ratio of largest lambda vs smallest lambda}
 
-\item{expFix}{same as on \code{lglasso}}
+\item{expFix}{same as in \code{lglasso}}
 
-\item{trace}{whether show the process}
+\item{trace}{logical variable. Whether show the computation process}
 }
 \value{
-list of which the first component is the cross validation errors and the second component is the corresponding
+list of length 2.  The first component is the cross validation errors, the second component is the corresponding
 tuning parameters
 }
 \description{

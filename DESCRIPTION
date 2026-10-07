@@ -1,17 +1,14 @@
-   
-    
 Package: lglasso
 Type: Package
-Title:  Graphical Lasso for Longitudinal data
+Title:  Graphical Lasso for Longitudinal Data
 Version: 2.0.0
-Description: This package estimates the precision matrices and the corresponding
-    temporal correlation parameters for longitudinal high-dimensional normal data.
-    It is motivated by the analysis of omics data in clinical trials where the 
-    longitudinal omics data are becoming increasingly common. It can handle 
-    both one-stage models (without treatment/exposure) and two-stage models (with one 
-    treatment/exposure). For details of the algorithms, please check the materials 
-    on its GitHub repo. If you have any questions, feel free to contact the maintainers 
-    through the email below.
+Description: Estimate treatment-specific precision matrices (networks) from longitudinal
+    high-dimensional normal data. The corresponding random effects are also estimated. 
+    It is motivated by the analysis of omics data in clinical trials where the longitudinal
+    omics data becomes increasingly common. It includes both one-stage models (without 
+    treatment) and two-stage models (with one treatment). For details of the algorithms, 
+    please check the materials on its GitHub repo. If you have any questions, feel free to 
+    contact the maintainers through the email below.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -21,17 +18,21 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Depends: R (>= 3.5)
-Authors@R: c(person("Jie", "Zhou", role = c("aut", "cre","cph"),
-                     email = "chowstat@gmail.com"),
-                     person("Jiang", "Gui",role=c("aut")),
-                     person("Weston", "Viles",role=c("aut")),
-                      person("Anne", "Hoen",role=c("aut")))
+Authors@R: c(
+    person(given = "Jie", family = "Zhou",
+           role = c("aut", "cre", "cph"),
+           email = "chowstat@gmail.com"),
+    person(given = "Jiang", family = "Gui",
+           role = "aut"),
+    person(given = "Weston", family = "Viles",
+           role = "aut"),
+    person(given = "Anne", family = "Hoen",
+           role = "aut")
+    )
 NeedsCompilation: no
-Packaged: 2022-01-13 16:54:06 UTC; jie
-Author: Jie Zhou [aut, cre, cph],
-  Jiang Gui [aut],
-  Weston Viles [aut],
-  Anne G.Hoen [aut]
+Packaged: 2022-01-13 16:54:06 UTC; 
+Author: Jie Zhou [aut, cre, cph], Jiang Gui [aut],
+            Weston Viles [aut], Anne Hoen [aut]
 Maintainer: Jie Zhou <chowstat@gmail.com>
 Repository: CRAN
 Date/Publication: 2026-09-09 11:46:00 UTC
@@ -39,16 +40,16 @@ LinkingTo:
     Rcpp,
     RcppArmadillo
 Imports: 
-    doParallel,
-    foreach,
-    glasso,
     parallel,
     pheatmap,
     RColorBrewer,
     stats,
-    Rcpp
+    Rcpp,
+    stats,
+    Rcpp, 
+    doParallel, 
+    foreach
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Suggestions:
 Config/testthat/edition: 3
 

@@ -42,6 +42,6 @@ a data list. It include the data generated, true networks underlying the data,tr
 If \code{type} is \code{heter}, then true parameter \code{alpha} is included as well.
 }
 \description{
-This function can generate simulated data that follows known network structures.
-It can used to evaluate the effectiveness of algorithms.
+This function randomly generates precision matrices (networks)
+and then  simulates normal data that follows these network structures.
 }

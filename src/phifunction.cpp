@@ -17,11 +17,8 @@
 //' @param t Numeric vector of time points.
 //' @param tau Positive scalar decay parameter.
 //' @param expFix Exponent applied to the distance (default 1).
+//' @noRd
 //' @return An n x n numeric matrix.
-//' @examples
-//' phifunction(1:5, tau = 0.3)
-//' phifunction(c(0, 2, 5), tau = 0.7, expFix = 2)
-//' @export
  // [[Rcpp::export]]
  arma::mat phifunction(const arma::vec& t, double tau, double expFix = 1.0) {
    if (tau <= 0) Rcpp::stop("tau should be positive!");

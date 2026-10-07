@@ -3,9 +3,9 @@
 \docType{package}
 \name{lglasso-package}
 \alias{lglasso-package}
-\title{lglasso: Graphical Lasso for Longitudinal data}
+\title{lglasso: Graphical Lasso for Longitudinal Data}
 \description{
-This package estimates the precision matrices and the corresponding temporal correlation parameters for longitudinal high-dimensional normal data. It is motivated by the analysis of omics data in clinical trials where the longitudinal omics data are becoming increasingly common. It can handle both one-stage models (without treatment/exposure) and two-stage models (with one treatment/exposure). For details of the algorithms, please check the materials on its GitHub repo. If you have any questions, feel free to contact the maintainers through the email below.
+Estimate treatment-specific precision matrices (networks) from longitudinal high-dimensional normal data. The corresponding random effects are also estimated. It is motivated by the analysis of omics data in clinical trials where the longitudinal omics data becomes increasingly common. It includes both one-stage models (without treatment) and two-stage models (with one treatment). For details of the algorithms, please check the materials on its GitHub repo. If you have any questions, feel free to contact the maintainers through the email below.
 }
 \seealso{
 Useful links:

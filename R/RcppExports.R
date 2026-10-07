@@ -8,11 +8,8 @@
 #' @param t Numeric vector of time points.
 #' @param tau Positive scalar decay parameter.
 #' @param expFix Exponent applied to the distance (default 1).
+#' @noRd
 #' @return An n x n numeric matrix.
-#' @examples
-#' phifunction(1:5, tau = 0.3)
-#' phifunction(c(0, 2, 5), tau = 0.7, expFix = 2)
-#' @export
 phifunction <- function(t, tau, expFix = 1.0) {
     .Call(`_lglasso_phifunction`, t, tau, expFix)
 }

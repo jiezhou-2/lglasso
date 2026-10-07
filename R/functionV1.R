@@ -3,59 +3,64 @@
 
 #' @title Longitudinal graphical lasso
 #' @description
-#'  This is the main function of the package which estimates the underlying precision matrices(networks) from longitudinal
+#'  This function estimates  precision matrices(networks) and random effects from longitudinal
 #'  high-dimensional data under normality assumption.
-#'
-#' @param data \code{n} by \code{(p+2)} data frame in which the first column is for subject IDs, the second column is
-#' for the time points of longitudinal data.
-#' @param lambda   numerical vector of tuning parameters,controlling the
-#' sparsity of the networks. For one-stage model, \code{lambda} is a scalar. For two-stage model,
-#' \code{lambda} is a vector of length 2.  For details, see the explanations in the below.
-#' @param group  factor  of length \code{n} if supplied. It indicates each data
-#'  point either before or after the treatment (exposure). Default is a single-level factor,
-#'  which corresponds to the one-stage model. For two-stage model, \code{group} is a two-level factor.
-#'  where the two levels correspond to the two stage.
-#' @param random a logical variable. If TRUE, then a heterogeneous model is estimated.
-#' Otherwise, a homogeneous model is estimated.
-#' @param expFix  numerical number to specify the form of the covariance function of the longitudinal data.
-#' @param maxit integer of  the maximum iterations for the algorithms.
-#' @param tol  value for determining if the algorithms have converged.
-#' @param lower  vector of length 1 or 2 which specifies the lower bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix
-#' @param upper  vector of length 1 or 2 which specifies the upper bounds for temporal correlation parameter alpha_1 (and alpha_2) in the correlation matrix
-#' @param w.init initial value for covariance matrix
-#' @param wi.init inital value for precision matrix
+#' @param data \code{n} by \code{(p+2)} data frame in which the first column is subject IDs, the second column is
+#' the time points of longitudinal data.
+#' @param lambda   numerical vector of tuning parameters. For one-stage model, \code{lambda} is a scalar controlling the
+#' sparsity of the network. For two-stage model,
+#' \code{lambda} is a vector of length 2, in which the first entry controls the sparsity of both
+#' pre-treatment and post-treatment networks,
+#' while the second entry controls the overlap of the two networks.
+#' @param group  factor  of length \code{n} if supplied. If \code{group} is a  one-level factor,
+#' then a one-stage model is fitted. If \code{group} is a two-level factor, then a two-stage model is fitted.
+#'  Data points that are before (after) the treatment (exposure) share the same
+#'   level in \code{group}. If NULL, then a one-stage model is fitted.
+#' @param random a logical variable. If TRUE, then a heterogeneous model is fitted.
+#' Otherwise, a homogeneous model is fitted.
+#' @param expFix  numerical number specifying the exponent in the covariance function of
+#' the longitudinal data. Default is 1.
+#' @param maxit integer specifying  the maximum iterations for the algorithms.
+#' @param tol   a small number determining whether the algorithms converged and should stop.
+#' @param lower  vector of length 1 or 2 which specifies the lower bounds for temporal correlation \code{tau}.
+#' It is of length 1 for one-stage model and 2 for two-stage model
+#' @param upper  vector of length 1 or 2 which specifies the upper bounds for temporal correlation \code{tau}
+#' It is of length 1 for one-stage model and 2 for two-stage model
+#' @param w.init initial value for covariance matrix. Default is identity matrix.
+#' @param wi.init initial value for precision matrix. Default is identity matrix.
 #' @param trace whether or not show the progress of the computation
 #' @param N a integer specifying the number of sampling for heterogeneous model
 #' @param ... other inputs
 #' @import glasso glasso
 #' @export
-#' @return list which include following components:
+#' @example inst/examples.R
+#' @return A list which includes:
 #'
-#' \code{w} the list of the estimates for covariance matrices
+#' \code{w:} the list of the estimates for covariance matrices
 #'
-#' \code{wi} the list of the estimates for precision matrices
+#' \code{wi:} the list of the estimates for precision matrices
 #'
-#' \code{tau} the estimate of dampening rate \code{tau}
+#' \code{tau:} the estimate of dampening rate \code{tau}. For heterogeneous models, the
+#' output is a vector called random effects. For homogeneous model, the output is a scalar.
 #'
-#' \code{alpha} the parameter in exponential distribution of \code{tau} for heterogeneous models
+#' \code{alpha:} a scalar representing the estimate of the parameter in exponential distribution of \code{tau} for heterogeneous models.
+#' The output is NULL for homogeneous model
 #'
-#'\code{ll} the value of likelihood.  \code{ll} can be used to compute Extended BIC for tuning parameter selection
+#'\code{ll:} the likelihood.  \code{ll} is used to compute extended QIC for tuning parameter selection
 #'
-#' @details \code{lglasso} is the main function of the package which aims to estimate precision matrices, or networks, from longitudinal data.
-#'  It is based on the models in Zhou *et al* (2024).
+#' @details \code{lglasso} is developed to estimate precision matrices, or networks, and random effects \eqn{\tau_i}
+#' from high-dimensional longitudinal data.
+#'  The one-stage model in \code{lglasso} is proposed in Zhou *et al* (2024).
 #'  Currently, it contains two network identification models,
 #'   *i.e.,* one-stage  and two-stage model.
 #'  One-stage model assume a common network underlying
 #'   the longitudinal data for all the subjects. Consequently,
-#'   \code{lglasso} only outputs a single network as the estimate.
-#'   Two-stage model allows that a treatment occurred at time point \eqn{t_i}
+#'   the function outputs a single network as the estimate in this case.
+#'   In two-stage models, a treatment is applied at time \eqn{t_i} during the time interval
 #'     for subject \eqn{i}.
-#'  Therefore, there are two networks, i.e., pre- and post-treatment networks,  that need to be estimated.
-
-#'  The core idea behind the models in \code{lglasso} is that the models decompose the covariance matrix
-#'  of longitudinal data into
-#'  temporal and cross-section part, where the model for the temporal part has the form of
-#'    \deqn{\exp(-|t_{i}-t_{j}|^{(-\tau)}}. For details, please check the  paper in the reference.
+#'  Therefore, there are two networks, *i.e*., pre- and post-treatment networks,  that need to be estimated simultaneously.
+#'  For details, please check the reference paper
+#'    and the online resources.
 lglasso=function(data,lambda,group=NULL,random=FALSE,expFix=1,N=100,maxit=50,
                  tol=10^(-2),lower=c(0.01,0.01),upper=c(10,10),
                  w.init=NULL, wi.init=NULL,trace=FALSE,...)
@@ -423,18 +428,19 @@ return(invisible(heat_plot))
 #' @description
 #' The function computes the cross validation errors  in \code{lglasso}.
 #' @param data same as in \code{lglasso}
-#' @param K fold of the cross validation
+#' @param K fold number for the cross validation
 #' @param group same as in \code{lglasso}
 #' @param lambda tuning parameter. For one-stage model, lambda is a vector. For two-stage model,
-#'  lambda is a matrix. The first entry is to control the sparsity, the second entry is to control the
+#'  lambda is a 2-column matrix. The first column  is tuning parameter controlling the sparsity,
+#'  the second column is tuning parameter controlling the
 #'  similarity of two networks.
 #' @param nlam If \code{lambda} is NULL, then \code{nlam} set the number of tuning parameter
 #' @param lam.min.ratio ratio of largest lambda vs smallest lambda
-#' @param expFix same as on \code{lglasso}
-#' @param trace whether show the process
+#' @param expFix same as in \code{lglasso}
+#' @param trace logical variable. Whether show the computation process
 #' @param random same as in \code{lglasso}
 #' @export
-#' @returns list of which the first component is the cross validation errors and the second component is the corresponding
+#' @returns list of length 2.  The first component is the cross validation errors, the second component is the corresponding
 #' tuning parameters
 
 
@@ -646,8 +652,8 @@ crossDataLambda=vector("list",N)
 
 
 #' Simulate longitudinal data from one-stage/two-stage model
-#' @description This function can generate simulated data that follows known network structures.
-#'  It can used to evaluate the effectiveness of algorithms.
+#' @description This function randomly generates precision matrices (networks)
+#'  and then  simulates normal data that follows these network structures.
 #' @param type which type of data you are generating. There are two options. One is \code{homo} which generates subjects with identical
 #' temporal correlation parameter. The other is \code{heter} which generates subjects with different temporal correlation parameter.
 #' @param n the number of subjects in the data set
@@ -660,7 +666,7 @@ crossDataLambda=vector("list",N)
 #' is \code{heter}
 #' @param group a scalar of 1 or 2,  indicating one-stage or two-stage model.
 #' @export
-#' @returns a data list. It include the data generated, true networks underlying the data,true tau.
+#' @returns a data list. It includes the data generated, true networks underlying the data,true tau.
 #' If \code{type} is \code{heter}, then true parameter \code{alpha} is included as well.
 
 Simulate=function(type=c("homo","heter"),n,p,m1,
