@@ -1,220 +1,4 @@
 
-#' Title
-#'
-#' @param t a vector specify the time points corresponding to the data
-#' @param tau the damping rate parameter with length 1 or 2
-#' @param expFix a scalar specifying the form of correlation function
-#' @noRd
-#' @returns a square matrix used to construct the likelihood
-#'
-
-phifunction=function(t,tau,expFix=1){
-  n=length(t)
-  if (length(tau)>1){stop("Tau should be a scalar!")}
-  if (tau<=0){
-    stop("tau should be positive!")
-    }
-  if (n==1) return(matrix(1,1,1))
-   d=(abs(outer(t,t,"-")))^{expFix}
-   M=exp(-tau*d)
-  diag(M)=1
-   M
-}
-
-
-
-
-#' Find the tau's for homogeneous model
-#'
-#' @param B a list of length 1 or 2.  If B is of length 1, then its entry is a
-#'   p by p given precision matrix representing the whole data points.
-#'   If B is of length 2, then they represent the pre- and post-treatment network.
-#' @param data a (p+2)-by-n data frame
-#' @param expFix the parameter in variance function when the data are longitudinal
-#' @param maxit the maximum of iteration number
-#' @param tol the minimum difference of algorithm convergence
-#' @param lower vector of length 1 or 2 which specifies the lower bounds for alpha_1 (and alpha_2) in the correlation matrix
-#' @param upper vector of length 1 or 2 which specifies the upper bounds for alpha_1 (and alpha_2) in the correlation matrix
-#' @noRd
-#' @returns a list of matrices
-
-AA=function(B,data,expFix=1,maxit=50,
-            tol=10^(-4),lower=c(0.01,0.1),upper=c(10,5)){
-  ### clustered data
-if (!is.list(B)){
-  B=list(B)
-}
-
-if (is.data.frame(data)){
-  data=list(data)
-}
-
-  if (length(B)!= length(data)){
-    stop(" B should have same length as  data!")
-  }
-
-  ### longitudinal data
-    corMatrix=vector("list",length(B))
-    Tau=c()
-    for (i in 1:length(B)){
-      dd=data[[i]]
-      bb=B[[i]]
-      p=ncol(dd)-2
-      nn=length(unique(dd[,1]))
-      if (ncol(bb)!=p | nrow(bb)!=p){
-        stop("Precision matrix has to be a square one!")
-      }
-    time_list=split(dd[,2],f=factor(dd[,1],levels=unique(dd[,1])))
-    subdata_list=split(dd[,-c(1,2)],factor(dd[,1],levels=unique(dd[,1])))
-
-    likefun=function(tau){
-      obj1=0
-      obj2=0
-      for (i in 1:nn) {
-        datai=as.matrix(subdata_list[[i]])
-        t=time_list[[i]]
-        if (nrow(datai)==0 | length(t)==0){next}
-        Aa=phifunction(t=t,tau = tau)
-        amatrix=datai%*%bb%*%t(datai)
-        obji1=-0.5*p*log(det(Aa))
-        obji2= -0.5*sum(diag(solve(Aa)%*%amatrix))
-        obj1=obj1+obji1
-        obj2=obj2+obji2
-      }
-      obj=-(obj1+obj2)
-    }
-    tau=stats::optim(c(1),likefun,method = "L-BFGS-B",lower = lower,upper = upper)$par
-    Tau=c(Tau,tau)
-    A=lapply(time_list,phifunction,tau=tau)
-    corMatrix[[i]]=A
-  }
-    return(list(corMatrix=corMatrix,tau=Tau))
-
-}
-
-#' Title
-#'
-#' @param A a list of length 1 or 2 corresponding to the number of stages. The each entry of A is a
-#'  list representing all phi matrices before or after the treatment.
-#' @param data a list of (p+2)-by-n_i data frame
-#' @param lambda given tuning parameter(s)
-#' @param random logical variable indicating the type of the model
-#' @param tau scalar if *random* is FALSE and a vector if *random* is TRUE
-#' @noRd
-#' @returns a list with the same length as A
-
-BB=function(A,data,lambda,random=FALSE,tau){
-  if (!is.list(data) | !is.list(A)){
-    stop("A and data must be lists!")
-  }
-  featureNames=colnames(data[[1]])[-c(1,2)]
-
-
-  if (length(A)!= length(data)){
-    stop(" List A should have same length as list  data!")
-  }
-
-  # if (length(A)!=length(tau)){
-  #   stop(" List A should have same length as tau!")
-  # }
-  glev=names(A)
-
-    m= length(A)
-    for (i in 1:m){
-      Ai=A[[i]]
-      datai=data[[i]]
-      # if (length(Ai)!=length(unique(datai[,1]))){
-      #   stop("The format of A does not match the format of data!")
-      # }
-      subjects=unique(datai[,1])
-      for (j in 1:length(subjects)) {
-        Aij=Ai[[subjects[j]]]
-        if (is.null(Aij)){next}
-        index=which(datai[,1]==subjects[j])
-        dataij=datai[index,]
-        #browser()
-        if (nrow(Aij)!= nrow(dataij))
-        {stop("The format of A does not match the format of data!!")}
-      }
-
-    }
-
-
-
-    B=vector("list",m)
-    names(B)=glev
-    likeli=0
-    aa=0
-    bb=0
-    amatrix=list()
-    sz=c()
-    for (i in 1:m){
-      Ai=A[[i]]
-      dd=data[[i]]
-      sz=c(sz,nrow(dd))
-      nn=length(unique(dd[,1]))
-      p=ncol(dd)-2
-      data_sub=split(dd[,-c(1,2)],factor(dd[,1],unique(dd[,1])))
-      B[[i]]=CVXR::Variable(p,p,PSD=TRUE)
-      if (length(Ai)!=length(data_sub)){stop("Data do not match!")}
-      amatrix[[i]]=0
-      # Create a mask matrix
-      mask1 <- matrix(lambda[1], p, p)
-      diag(mask1) <- 0
-      mask2 <- matrix(lambda[2], p, p)
-      diag(mask2) <- 0
-      extra=0
-      for (j in 1:nn) {
-        xx=as.matrix(data_sub[[j]])
-        yy=solve(as.matrix(Ai[[j]]))
-        if (is.null(yy)){next}
-        amatrix[[i]]=t(xx)%*%yy%*%xx+amatrix[[i]]
-        extra=extra+p*log(det(as.matrix(Ai[[j]])))
-      }
-      if (!random){
-      likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)+likeli
-    }else{
-      likeli=-extra/nrow(dd)+CVXR::log_det(B[[i]])-CVXR::matrix_trace(B[[i]]%*%amatrix[[i]])/nrow(dd)-2*nn*log(mean(tau))/nrow(dd)+likeli
-    }
-      aa=aa+ sum(abs(B[[i]])*mask1)
-
-      if (m>1){
-        if (i>=2){
-          for (j in 1:(i-1)) {
-            bb=bb+sum(abs((B[[i]]-B[[j]]))*mask2)
-          }
-        }
-      }
-    }
-
-    obj=-likeli+aa+bb
-if (m==1){
-  results=glasso::glasso(s=amatrix[[1]]/(nrow(dd)),rho=lambda[1])
-  S_est=list(results$wi)
-  colnames(S_est[[1]])=featureNames
-  rownames(S_est[[1]])=featureNames
-  likelihood=ifelse(!random,
-                    -extra/nrow(dd)+log(det(results$wi))-sum(diag(results$wi%*%amatrix[[1]]))/(nrow(dd)),
-    -extra/nrow(dd)+log(det(results$wi))-sum(diag(results$wi%*%amatrix[[1]]))/nrow(dd)-2*nn*log(mean(tau))/nrow(dd)
-    )
-}else{
-    prob=CVXR::Problem(CVXR::Minimize(obj))
-    result=CVXR::psolve(prob)
-    S_est= lapply(B, function(x) result$getValue(x))
-    likelihood=-(result$value-sum(abs(mask1*S_est[[1]])+abs(mask1*S_est[[2]]))-sum(mask2*abs(S_est[[1]]-S_est[[2]])))
-    for (i in 1:length(S_est)) {
-      colnames(S_est[[i]])=featureNames
-      rownames(S_est[[i]])=featureNames
-    }
-}
-    names(S_est)=glev
-    w=vector("list",length(S_est))
-    for (i in 1:length(w)) {
-      w[[i]]=solve(S_est[[i]])
-    }
-    return(list(wi=S_est,w=w,ll=likelihood/2))
-
-}
 
 
 #' @title Longitudinal graphical lasso
@@ -394,165 +178,6 @@ output=lglassoHeter(data=data,lambda=lambda,expFix=expFix,
   return(output)
 }
 
-#' density function in EM algorithm
-#'
-#' @param tau the dampening rate
-#' @param datai the data set for subject i
-#' @param wi the given precision matrices
-#' @param alpha the  rate in exponential distribution
-#' @param groupi the data point indices
-#' @param expFix a scalar specifying the form of the correlation function
-#' @noRd
-#' @returns a numeric standing for the likelihood for a given subject
-
-conDensityTau=function(tau,expFix=1, datai,wi,alpha,groupi){
-    if (length(groupi)!=nrow(datai)){
-      stop("group should be the same length of the columns of data!")
-    }
-  # if (!all(is.numeric(groupi))){
-  #   stop("groupi need to be numeric!" )
-  # }
-  #browser()
-  groupi=as.character(groupi)
-  glev=unique(groupi)
-  p=nrow(wi[[1]])
-  #browser()
-  if (length(glev)==1){
-    timepoints=datai[,2]
-    phiMi=phifunction(t=timepoints,tau=tau,expFix=expFix)
-    s=t(as.matrix(datai[,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(datai[,-c(1,2)])%*%wi[[glev]]
-    likelihood=log(det(phiMi))*(-p/2)-0.5*sum(diag(s))
-  }else{
-    likelihood=0
-  data=split(datai,f=factor(groupi,levels = glev))
-  for (i in glev) {
-    timepoints=data[[i]][,2]
-    phiMi=phifunction(t=timepoints,tau=tau,expFix=expFix)
-    s=t(as.matrix(data[[i]][,-c(1,2)]))%*%solve(phiMi)%*%as.matrix(data[[i]][,-c(1,2)])%*%wi[[i]]
-    a=log(det(phiMi))*(-p/2)-0.5*sum(diag(s))
-    likelihood=a+likelihood
-  }
-  }
-  likelihoodi=log(alpha)+likelihood-alpha*tau
-  return(likelihoodi=likelihoodi)
-}
-
-#' Function for generating the samples from posterior distribution in EM algorithm
-#'
-#' @param n the number of random samples
-#' @param datai the data for subject i
-#' @param wi the given precision matrix
-#' @param alpha the exponential distribution with rate alpha
-#' @param groupi specify how datai is grouped
-#' @param expFix a scalar specifying the form of the correlation function
-#' @noRd
-#' @returns a data frame for samples and their weights
-
-importanceSample=function(n,datai,wi,alpha,groupi,expFix=1){
-  dd1=matrix(stats::rexp(n=n,rate=alpha),ncol=1)
-  likelihood1=apply(dd1, 1, conDensityTau,datai=datai,wi=wi,alpha=alpha,groupi=groupi)
-  likelihood2=log(apply(dd1, 1, stats::dexp,rate=alpha))
-  index1=which(!is.nan(likelihood1))
-  index2=which(!is.infinite(likelihood1))
-index=intersect(index1,index2)
-if (length(index)==0){stop("No valid samples are generated!")}
-  weights=likelihood1[index]-likelihood2[index]
-  weightNew=weights-(log(sum(exp(weights-max(weights))))+max(weights))
-  norWeights=exp(weightNew)
-  aa=data.frame(sample=dd1[index],weight=norWeights)
-  return(aa)
-}
-
-#' Function for computing estimates in EM algorithm
-#'
-#' @param importancesSample the random samples
-#' @param datai the data for subject i
-#' @param groupi specify how datai is grouped
-#' @param expFix a scalar specifying the form of the correlation function
-#' @noRd
-#' @returns a list of estimated
-
-importanceEstimates=function(importancesSample,datai,groupi,expFix=1){
-  lev=as.character(unique(groupi))
-  # if (length(lev)==1){
-  #   estimatePhi=vector("list",1)
-  #   tt=datai[,2]
-  #   sample0=importancesSample[,1]
-  #   weightTau=importancesSample[,2]
-  #   estimateTau=sum(sample0*weightTau)
-  #   estimatePhi[[1]]=phifunction(t=tt,tau=estimateTau, expFix=expFix)
-  # }else{
-  tt=split(datai[,2],f=factor(groupi,levels = lev))
-  sample0=importancesSample[,1]
-  weightTau=importancesSample[,2]
-  estimateTau=sum(sample0*weightTau)
-  estimatePhi=lapply(tt, phifunction,tau=estimateTau, expFix=expFix)
-  names(estimatePhi)=names(tt)
-  estimates=list(estimateTau=estimateTau,estimatePhi=estimatePhi)
-  return(estimates)
-}
-
-
-#' Estimate the phimatrix in heterogeneous model
-#' @param data longitudinal data set
-#' @param wi given precision matrix
-#' @param alpha exponential distribution with rate alpha
-#' @param group specify how data is grouped
-#' @param l number of random samples in importance sampling
-#' @param expFix a scalar specifying the the form of the correlation function.
-#' @param ... other arguments used in the downstream analysis
-#' @noRd
-#' @returns a list for estimates of tau and AA
-AAheter=function(data,wi,alpha,group,l=5000,expFix=1,...){
-  data[,1]=as.character(data[,1])
-  subjects=unique(data[,1])
-  group=as.character(group)
-  glev=unique(group)
-  nn=length(glev)
-  A=vector("list",length(subjects))
-  names(A)=subjects
-  Tau=matrix(nrow=length(subjects),ncol=1)
-  rownames(Tau)=subjects
-  simTau=matrix(stats::rexp(n=l,rate=alpha),ncol=1)
-  dataList=split(data,f=factor(data[,1],levels=subjects))
-  groupList=split(group,f=factor(data[,1],levels=subjects))
-  for (i in 1:length(subjects)) {
-    datai=dataList[[i]]
-    groupi=groupList[[i]]
-      imSample=importanceSample(n=l,datai=datai,wi=wi,alpha=alpha,groupi =groupi,expFix=expFix )
-      index=which(!is.nan(imSample[,2]))
-      imSample=imSample[index,]
-      imporResults=importanceEstimates(importancesSample=imSample,datai=datai,
-                                       groupi = groupi,expFix=expFix,...)
-      Tau[i,1]=imporResults$estimateTau
-      A[[i]]=imporResults$estimatePhi
-  }
-
-  AA=vector("list",nn)
-  names(AA)=glev
-#if (nn==1){AA[[1]]=A}
-  for(i in 1:nn) {
-    index=which(group==glev[i])
-    subjects=unique(data[index,1])
-    AA[[glev[i]]]=vector("list",length(subjects))
-    names(AA[[glev[i]]])=subjects
-    for (j in 1:length(subjects)) {
-      if (is.null(A[[subjects[j]]][[glev[i]]])){next}
-        else{
-      AA[[glev[i]]][[subjects[j]]]=A[[subjects[j]]][[glev[i]]]
-      }
-    }
-  # for (i in 1:nn) {
-  #   for (j in 1:length(subjects)) {
-  #     AA[[i]][[j]]=A[[j]][[i]]
-  #   }
-  # }
-}
-  return(list(Tau=Tau,AA=AA))
-}
-
-
-
 #' Title
 #'
 #' @param data a n by (p+2) data frame representing the longitudinal data
@@ -662,20 +287,20 @@ cvErrorji=function(data.train,data.valid,bi){
       if (length(index)>= nrow(data.train)){
         print(paste("number of variable ", length(index)))
         stop("network is too dense for model training!")
-      }
-
+      }else{
       y=data.train[,i+2]
       x=as.matrix(data.train[,index+2])
       coef.train=stats::lm(y~x)$coef
       yy=data.valid[,i+2, drop=FALSE]
       xx=as.matrix(cbind(1,data.valid[,index+2,drop=FALSE]))
       err=(yy-xx%*%coef.train)^2
-      cv_error=c(cv_error,mean(err[,,drop=TRUE]))
+      cv_error=mean(err[,,drop=TRUE])
+      }
       if (any(is.na(cv_error))) {
         print("cv error is missing!")
     }
 
-  return(mean(cv_error))
+  return(cv_error)
 }
 
 }
@@ -740,32 +365,20 @@ a=c()
 #' Plot function for CVlglasso
 #'
 #' @param x CVlglasso object
-#' @param xvar character which specify the x axis of the plot
 #' @param ... other plot arguments
 #' @noRd
 #' @returns If \code{group} is NULL in \code{CVlglasso}, then a line plot will produced; otherwise, a heatmap will be produced.
-#'
-plot.cvlglasso=function(x, xvar=c("lambda","step"),...){
-  xvar=match.arg(xvar)
+#' @export
+plot.cvlglasso=function(x,...){
+
   if (!inherits(x, "cvlglasso")) {
     stop("x must be an object of class 'cvlglasso'")
   }
 
-  if (xvar == "lambda") {
-    xlab_label <- "Lambda"
-    x_data <- x$lambda # Assuming your cvlglasso object has a lambda component
-  } else if (xvar == "step") {
-    xlab_label <- "Steps"
-    x_data <- seq_along(x$lambda) # Assuming lambda can represent steps
-  }
-
-
-
   lambda=x$lambda
-  #err=apply(x$cv_error, 1, mean)
   err=x$cv_error
   if (is.vector(lambda)){
-    graphics::plot(x=x_data,y=err,xlab=xlab_label,ylab="CV Error", main = "cvlglasso Fit",
+    graphics::plot(x=lambda,y=err,xlab="tuning parameter",ylab="CV Error", main = "cvlglasso Fit",
                    type = "b", ...)
   }else{
 lambda=as.matrix(lambda)
@@ -778,24 +391,6 @@ for (i in 1:length(a1)){
     err_matrix[i,j]=err[index]
   }
 }
-  # heat_plot <- pheatmap::pheatmap(err_matrix,
-  #                       col = brewer.pal(8, 'OrRd'), # choose a colour scale for your data
-  #                       cluster_rows = F, cluster_cols = F, # set to FALSE if you want to remove the dendograms
-  #                       clustering_distance_cols = 'euclidean',
-  #                       clustering_distance_rows = 'euclidean',
-  #                       clustering_method = 'ward.D',
-  #                       #annotation_row = gene_functions_df, # row (gene) annotations
-  #                       #annotation_col = ann_df, # column (sample) annotations
-  #                       #annotation_colors = ann_colors, # colours for your annotations
-  #                       #annotation_names_row = F,
-  #                       #annotation_names_col = F,
-  #                       fontsize_row = 10,          # row label font size
-  #                       fontsize_col = 7,          # column label font size
-  #                       angle_col = 45, # sample names at an angle
-  #                       legend_breaks = c(-2, 0, 2), # legend customisation
-  #                       legend_labels = c("Low", "Medium", "High"), # legend customisation
-  #                       show_colnames = T, show_rownames = F, # displaying column and row names
-  #                       main = "CV error") # a title for our heatmap
 
 heat_plot <- pheatmap::pheatmap(
   err_matrix,
@@ -827,15 +422,17 @@ return(invisible(heat_plot))
 #' @title Cross validation for \code{lglasso}
 #' @description
 #' The function computes the cross validation errors for one of the three network models in \code{lglasso} command.
-#' @param data raw data
-#' @param group group variable
-#' @param lambda tuning parameter
-#' @param nlam number of tuning parameter
+#' @param data same as in \code{lglasso}
+#' @param K fold of the cross validation
+#' @param group same as in \code{lglasso}
+#' @param lambda tuning parameter. For one-stage model, lambda is a vector. For two-stage model,
+#'  lambda is a matrix. The first entry is to control the sparsity, the second entry is to control the
+#'  similarity of two networks.
+#' @param nlam If \code{lambda} is NULL, then \code{nlam} set the number of tuning parameter
 #' @param lam.min.ratio ratio of largest lambda vs smallest lambda
-#' @param K cv folds
-#' @param expFix given parameter
+#' @param expFix same as on \code{lglasso}
 #' @param trace whether show the process
-#' @param random a logical variable indicating the type of the model
+#' @param random same as in \code{lglasso}
 #' @export
 #' @returns list of which the first component is the cross validation errors and the second component is the corresponding
 #' tuning parameters
@@ -854,10 +451,12 @@ CVlglasso=function(data,K,group=NULL,random=FALSE,
 
 #' Cross validation for lglasso
 #'
-#' @param data raw data
-#' @param group group variable
-#' @param lambda tuning parameter
-#' @param nlam number of tuning parameter
+#' @param data data used in lglasso
+#' @param group group variable used in lglasso
+#' @param lambda tuning parameter. For one-stage model, lambda is a vector. For two-stage model,
+#'  lambda is a matrix. The first entry is to control the sparsity, the second entry is to control the
+#'  similarity of two networks.
+#' @param nlam If lambda is NULL, then nlam set the number of tuning parameter
 #' @param lam.min.ratio ratio of largest lambda vs smallest lambda
 #' @param K cv folds
 #' @param expFix given parameter
@@ -994,7 +593,7 @@ crossDataLambda=vector("list",N)
                    }else{
                     aa= lglasso(data=crossDataLambda[[k]]$crossData$train,lambda=crossDataLambda[[k]]$lambda,random = TRUE)$wi[[1]]
                    }
-                   cc=ifelse(abs(aa)<=10^(-2), 0,1)
+                   cc=ifelse(abs(aa)<=10^(-5), 0,1)
                    diag(cc)=2
                    bb= cvError(data.train=crossDataLambda[[k]]$crossData$train,
                                data.valid=crossDataLambda[[k]]$crossData$validation,
@@ -1013,9 +612,9 @@ crossDataLambda=vector("list",N)
                                 group=crossDataLambda[[k]]$crossData$trainGroup,
                                 random = TRUE)$wi
                    }
-                   aa[[1]]=ifelse(abs(aa[[1]])<=10^(-1), 0,1)
+                   aa[[1]]=ifelse(abs(aa[[1]])<=10^(-5), 0,1)
                    diag(aa[[1]])=2
-                   aa[[2]]=ifelse(abs(aa[[2]])<=10^(-1), 0,1)
+                   aa[[2]]=ifelse(abs(aa[[2]])<=10^(-5), 0,1)
                    diag(aa[[2]])=2
                    cc=aa
                    bb=cvError(data.train=crossDataLambda[[k]]$crossData$train,
@@ -1065,7 +664,7 @@ crossDataLambda=vector("list",N)
 #' If \code{type} is \code{heter}, then true parameter \code{alpha} is included as well.
 
 Simulate=function(type=c("homo","heter"),n,p,m1,
-                  m2,tt,tau,alpha,group){
+                  m2,tt,tau,alpha=1,group=1){
 
   type=match.arg(type)
   if (type=="homo"){
@@ -1082,228 +681,7 @@ Simulate=function(type=c("homo","heter"),n,p,m1,
 }
 
 
-#' Title
-#'
-#' @param n the number of subjects
-#' @param p the dimension of the normal distribution
-#' @param m1 the number of edges
-#' @param tt the average length of data for each subject
-#' @param m2 the average of difference between two networks
-#' @param tau the dampening rate
-#' @noRd
-#' @returns a data frame
-
-simulate_long=function(n,p,m1,tt=5,m2=0,tau){
-  ## true structure
-  timepoint1=vector("list",n)
-  timepoint2=vector("list",n)
-
-  for (i in 1:n) {
-    m3=sample(x=1:tt,1,prob = rep(1,1,tt))
-    if (length(tau)==1){
-      t1=stats::rexp(m3)
-      timepoint1[[i]]=cumsum(t1)[1:m3]
-    }else{
-      t1=stats::rexp(2*m3)
-      timepoint1[[i]]=cumsum(t1)[1:m3]
-      timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
-    }
-  }
-  cc1=lapply(timepoint1,phifunction, tau=tau[1])
-  if (length(tau)==2){
-    cc2=lapply(timepoint2,phifunction, tau=tau[2])
-  }
-  real_stru=matrix(0, nrow = p, ncol = p)
-  real_stru[lower.tri(real_stru,diag = TRUE)]=1
-  index=which(real_stru==0,arr.ind = TRUE)
-  a=sample(1:nrow(index),m1, replace = F)
-  real_stru[index[a,]]=1
-  real_stru[lower.tri(real_stru,diag = TRUE)]=0
-  real_stru1=real_stru+t(real_stru)+diag(p)
-
-
-  distrubance=matrix(0, nrow = p, ncol = p)
-  distrubance[lower.tri(distrubance,diag = TRUE)]=1
-  index=which(distrubance==0,arr.ind = TRUE)
-  a=sample(1:nrow(index),m2, replace = F)
-  distrubance[index[a,]]=1
-  distrubance[lower.tri(distrubance,diag = TRUE)]=0
-  distrubance=distrubance+t(distrubance)+diag(p)
-  real_stru2=(real_stru1+distrubance)%%2
-
-
-  Precision=list()
-  Sigma=list()
-  mmlist=list()
-  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
-  theta[lower.tri(theta, diag = TRUE)] = 0
-  theta = theta + t(theta) + diag(p)
-  theta1 = theta * real_stru1
-  theta2 = theta * real_stru2
-  theta1=fake::MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
-  theta2=fake::MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
-  #colnames(theta)=paste0("metabolite",1:p)
-  #rownames(theta)=paste0("metabolite",1:p)
-  sigma1=solve(theta1)
-  sigma2=solve(theta2)
-  fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
-  if (length(tau)==2){
-    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma2)
-  }
-  fulldata=c()
-  a1=c()
-  a2=c()
-  for (i in 1:n) {
-    ai=c()
-    m3=nrow(fullCovariance1[[i]])
-    mu=rep(0,m3)
-    data1=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance1[[i]])
-    for (j in 1:(m3/p)) {
-      ai=as.data.frame(rbind(ai,data1[c(((j-1)*p+1) :(j*p))]))
-    }
-    subject=paste0("subject",i)
-    ai=cbind(subject,timepoint1[[i]],ai)
-    a1=rbind(a1,ai)
-  }
-  colnames(a1)[2]="time"
-  featureName1=colnames(a1)[-c(1,2)]
-  colnames(real_stru1)=featureName1
-  rownames(real_stru1)=featureName1
-  colnames(real_stru2)=featureName1
-  rownames(real_stru2)=featureName1
-  if (length(tau)==2){
-    for (i in 1:n) {
-      ai=c()
-      m3=nrow(fullCovariance2[[i]])
-      mu=rep(0,m3)
-      data2=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance2[[i]])
-      for (j in 1:(m3/p)) {
-        ai=as.data.frame(rbind(ai,data2[c(((j-1)*p+1) :(j*p))]))
-      }
-
-      subject=paste0("subject",i)
-      ai=cbind(subject,timepoint2[[i]],ai)
-      a2=rbind(a2,ai)
-    }
-    colnames(a2)[2]="time"
-    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=tau))
-  }
-
-  return(list(data=a1,network=real_stru1,tau=tau))
-}
 
 
 
-#' Title
-#'
-#' @param n the number of subjects
-#' @param p the dimension of the normal distribution
-#' @param m1 the number of edges
-#' @param tt the average length of data for each subject
-#' @param m2 the number of differences between two networks
-#' @param alpha the parameter in the exponential distribution
-#' @param group indicator vector
-#' @noRd
-#' @returns a data frame
 
-simulate_randomTau=function(n,p,m1,tt,m2,alpha,group){
-  ## true structure
-  timepoint1=vector("list",n)
-  timepoint2=vector("list",n)
-  cc1=vector("list",n)
-  cc2=vector("list",n)
-  trueTau=stats::rexp(n=n,rate=alpha)
-  for (i in 1:n) {
-    m3=sample(x=1:tt,1,prob = rep(1,1,tt))
-    if (group==1){
-      t1=stats::rexp(m3)
-      timepoint1[[i]]=cumsum(t1)[1:m3]
-      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
-    }else{
-      t1=stats::rexp(2*m3)
-      timepoint1[[i]]=cumsum(t1)[1:m3]
-      timepoint2[[i]]=cumsum(t1)[(m3+1):(2*m3)]
-      cc1[[i]]=phifunction(t=timepoint1[[i]],tau=trueTau[i])
-      cc2[[i]]=phifunction(t=timepoint2[[i]],tau=trueTau[i])
-    }
-  }
-
-
-
-  real_stru=matrix(0, nrow = p, ncol = p)
-  real_stru[lower.tri(real_stru,diag = TRUE)]=1
-  index=which(real_stru==0,arr.ind = TRUE)
-  a=sample(1:nrow(index),m1, replace = F)
-  real_stru[index[a,]]=1
-  real_stru[lower.tri(real_stru,diag = TRUE)]=0
-  real_stru1=real_stru+t(real_stru)+diag(p)
-
-
-  distrubance=matrix(0, nrow = p, ncol = p)
-  distrubance[lower.tri(distrubance,diag = TRUE)]=1
-  index=which(distrubance==0,arr.ind = TRUE)
-  a=sample(1:nrow(index),m2, replace = F)
-  distrubance[index[a,]]=1
-  distrubance[lower.tri(distrubance,diag = TRUE)]=0
-  distrubance=distrubance+t(distrubance)+diag(p)
-  real_stru2=(real_stru1+distrubance)%%2
-
-
-  Precision=list()
-  Sigma=list()
-
-
-
-  mmlist=list()
-  theta = matrix(stats::rnorm(p^2,mean = 0,sd=2), ncol = p,nrow = p)
-  theta[lower.tri(theta, diag = TRUE)] = 0
-  theta = theta + t(theta) + diag(p)
-  theta1 = theta * real_stru1
-  theta2 = theta * real_stru2
-  theta1=fake::MakePositiveDefinite(theta1,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
-  theta2=fake::MakePositiveDefinite(theta2,pd_strategy = "diagonally_dominant",scale = TRUE)$omega
-  #colnames(theta)=paste0("metabolite",1:p)
-  #rownames(theta)=paste0("metabolite",1:p)
-  sigma1=solve(theta1)
-  sigma2=solve(theta2)
-  fullCovariance1= lapply(cc1,function(x,cc) {kronecker(cc,x)},x=sigma1)
-  if (group==2){
-    fullCovariance2= lapply(cc2,function(x,cc) {kronecker(cc,x)},x=sigma2)
-  }
-  fulldata=c()
-  a1=c()
-  a2=c()
-  for (i in 1:n) {
-    ai=c()
-    m3=nrow(fullCovariance1[[i]])
-    mu=rep(0,m3)
-    data1=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance1[[i]])
-    for (j in 1:(m3/p)) {
-      ai=as.data.frame(rbind(ai,data1[c(((j-1)*p+1) :(j*p))]))
-    }
-    subject=paste0("subject",i)
-    ai=cbind(subject,timepoint1[[i]],ai)
-    a1=rbind(a1,ai)
-  }
-  colnames(a1)[2]="time"
-
-  if (group==2){
-    for (i in 1:n) {
-      ai=c()
-      m3=nrow(fullCovariance2[[i]])
-      mu=rep(0,m3)
-      data2=MASS::mvrnorm(1,mu=mu,Sigma = fullCovariance2[[i]])
-      for (j in 1:(m3/p)) {
-        ai=as.data.frame(rbind(ai,data2[c(((j-1)*p+1) :(j*p))]))
-      }
-
-      subject=paste0("subject",i)
-      ai=cbind(subject,timepoint2[[i]],ai)
-      a2=rbind(a2,ai)
-    }
-    colnames(a2)[2]="time"
-    return(list(data=list(pre=a1,post=a2),network=list(pre=real_stru1,post=real_stru2),tau=trueTau,alpha=alpha))
-  }
-
-  return(list(data=list(pre=a1),network=list(pre=real_stru1),tau=trueTau,alpha=alpha))
-}
