@@ -33,13 +33,13 @@ library(lglasso)
 
 ```{r, message=FALSE}
 # number of nodes
-p=20
+p=200
 # number of edge in general network
-m1=50
+m1=200
 # the difference between the number of edges in individual networks and general network
 m2=10
 # number of subjects
-n=50
+n=100
 ## number of time points
 tt=10
 set.seed(1)

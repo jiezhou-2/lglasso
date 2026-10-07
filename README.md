@@ -13,23 +13,18 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 
 <div style="text-align: justify">
 
-R package *lglasso* is designed to estimate precision matrix (*i.e.*,
-network) from longitudinal high-dimensional data under normal
-distribution. It can be used to estimate either one-stage models where a
-single network is underlying all the longitudinal measurements, or
-two-stage models where the network before the treatment is different
-from the one after the treatment (exposure). The one(two)-stage model
-can further be classified to homogeneous model and heterogeneous models.
-The difference between homogeneous and heterogeneous models is that
-heterogeneous models contain individual level random effects while
-homogeneous models treat all individuals as i.i.d samples. For details
-of the definitions and its usage, please check the reference and link
-below.
-
-ADMM algorithm has been adopted in *lglasso* to speed up the
-computation. Main functions are optimized by c++. So if you have any
-questions/suggestions, please email *<chowstat@gmail.com>* without
-hesitation. I will get back to you at my earliest convenience.
+The R package lglasso is designed to estimate precision matrices (i.e.,
+networks) from high-dimensional longitudinal data under a normal
+distribution. It can be used to estimate either one-stage models, where
+a single network underlies all longitudinal measurements, or two-stage
+models, where the network before treatment differs from the one after
+treatment (exposure). Both model types can be further classified as
+homogeneous—treating all individuals as i.i.d. samples—or heterogeneous,
+which includes individual-level random effects. For details on these
+definitions and usage, please check the references and links below. The
+ADMM algorithm is adopted to speed up computation, and the main
+functions are written in C++. If you have any questions or suggestions,
+please email <chowstat@gmail.com>.
 
 </div>
 
