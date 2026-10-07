@@ -1,7 +1,7 @@
 Package: lglasso
 Type: Package
-Title:  Graphical Lasso for Longitudinal Data
-Version: 2.0.0
+Title: Graphical Lasso for Longitudinal Data
+Version: 2.1.0
 Description: Estimate treatment-specific precision matrices (networks) from longitudinal
     high-dimensional normal data. The corresponding random effects are also estimated. 
     It is motivated by the analysis of omics data in clinical trials where the longitudinal
@@ -49,4 +49,3 @@ Imports:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
-
